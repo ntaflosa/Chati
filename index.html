@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="./css/bootstrap-reboot.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        body {
+            background: #a64bf4;
+            background: -webkit-linear-gradient(45deg, #00dbde, #fc00ff);
+            background: -o-linear-gradient(45deg, #00dbde, #fc00ff);
+            background: -moz-linear-gradient(45deg, #00dbde, #fc00ff);
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <form>
+            <h1>ntaflos.de | Chati der  Prompt-Generator (v 0.9.3 Beta)</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="description"><i class="fas fa-file-alt"></i> Beschreibung des Themas</label>
+                    <textarea id="description" placeholder="Geben Sie hier eine Beschreibung des Themas ein..."></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="content-type"><i class="fas fa-cogs"></i> Für welchen Zweck soll der generierte Text verwendet werden?</label>
+                    <select id="content-type" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="Artikel">Artikel</option>
+                        <option value="Blog-Post">Blog-Post</option>
+                        <option value="Produktbeschreibung">Produktbeschreibung</option>
+                        <option value="Social-Media-Post">Social-Media-Post</option>
+                        <option value="E-Mail">E-Mail</option>
+                        <option value="Anzeige">Anzeige</option>
+                        <option value="Buchrezension">Buchrezension</option>
+                        <option value="Whitepaper">Whitepaper</option>
+                        <option value="Case-Study">Case-Study</option>
+                        <option value="Pressemitteilung">Pressemitteilung</option>
+                        <option value="blogartikel">Blogartikel</option>
+                        <option value="facebook-beitrag">Facebook-Beitrag</option>
+                        <option value="instagram-beitrag">Instagram-Beitrag</option>
+                        <option value="linkedin-beitrag">LinkedIn-Beitrag</option>
+                        <option value="seo-text">SEO-Text</option>
+                        <option value="twitter-beitrag">Twitter-Beitrag</option>
+                        <option value="youtube-video">YouTube-Video</option>
+                        <option value="podcast-episode">Podcast-Episode</option>
+                        <option value="infografik">Infografik</option>
+                        <option value="e-book">E-Book</option>
+                        <option value="webinar">Webinar</option>
+                        <option value="live-stream">Live-Stream</option>
+                        <option value="newsletter">Newsletter</option>
+                        <option value="landing-page">Landing Page</option>
+                        <option value="online-quiz">Online-Quiz</option>
+                        <option value="chatbot">Chatbot</option>
+                        <option value="online-kurs">Online-Kurs</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="content-length"><i class="fas fa-text-width"></i> Wählen Sie bitte die gewünschte Länge für Ihren generierten Text:</label>
+                    <select id="content-length" name="content-length" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="Kurze, prägnante Sätze oder Fragen">Kurz</option>
+                        <option value="Kurze Absätze oder längere Sätze">Mittel</option>
+                        <option value="Mittellange Absätze oder kurze Absätze mit mehreren Sätzen">Lang</option>
+                        <option value="Lange Absätze mit vielen Sätzen">Sehr lang</option>
+                        <option value="Sehr lange Absätze oder mehrere Absätze in Folge">Extrem lang</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="target-audience"><i class="fas fa-users"></i> Welche Zielgruppe soll der generierte Text ansprechen?</label>
+                    <select id="target-audience" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="Allgemeininteressierte Leser">Allgemeininteressierte Leser</option>
+                        <option value="Spezialisierte Leser">Spezialisierte Leser</option>
+                        <option value="Fachleute und Experten">Fachleute und Experten</option>
+                        <option value="Leser mit bestimmten Interessen">Leser mit bestimmten Interessen</option>
+                        <option value="Geschäftliche Zielgruppen">Geschäftliche Zielgruppen</option>
+                        <option value="Akademische Zielgruppen">Akademische Zielgruppen</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="language-style"><i class="fas fa-language"></i> Welchen Sprachstil möchten Sie für den generierten Text verwenden?</label>
+                    <select id="language-style" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="emotional">Emotional</option>
+                        <option value="formell">Formell</option>
+                        <option value="humorvoll">Humorvoll</option>
+                        <option value="informell">Informell</option>
+                        <option value="journalistisch">Journalistisch</option>
+                        <option value="persönlich">Persönlich</option>
+                        <option value="poetisch">Poetisch</option>
+                        <option value="seriös">Seriös</option>
+                        <option value="technisch">Technisch</option>
+                        <option value="umgangsprachlich">Umgangssprachlich</option>
+                        <option value="werblich">Werblich</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="perspective"><i class="fas fa-eye"></i> Welche Perspektive möchten Sie für den generierten Text verwenden?</label>
+                    <select id="perspective" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="Du-Perspektive">Du-Perspektive</option>
+                        <option value="Er-/Sie-Perspektive">Er-/Sie-Perspektive</option>
+                        <option value="Ich-Perspektive">Ich-Perspektive</option>
+                        <option value="Neutral/Objektiv">Neutral/Objektiv</option>
+                        <option value="Wir-Perspektive">Wir-Perspektive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label><i class="fas fa-smile"></i> Wie viele Emojis möchten Sie verwenden?</label>
+                    <select name="emoji-option" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="keine">Keine Emojis</option>
+                        <option value="wenige">Wenige Emojis</option>
+                        <option value="viele">Viele Emojis</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label><i class="fas fa-user"></i> Welche Anredeform möchten Sie für Ihren generierten Text verwenden?</label>
+                    <select name="address-form" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="formal">Formal (Sie-Form)</option>
+                        <option value="informell">Informell (Du-Form)</option>
+                        <option value="neutral">Neutral (Keine Anrede)</option>
+                        <option value="kombiniert">Kombiniert (Wechsel zwischen Du- und Sie-Form)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label><i class="fas fa-align-left"></i> Welche Formatierungsoptionen möchten Sie für Ihren generierten Text verwenden?</label>
+                    <select name="formatting" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="tabelarisch">Tabellarisch</option>
+                        <option value="listen">Listen</option>
+                        <option value="text">Text</option>
+                        <option value="bullet-points">Bullet Points</option>
+                        <option value="numerierte-liste">Nummerierte Liste</option>
+                        <option value="Zitat">Zitat</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label><i class="fas fa-key"></i> Möchten Sie SEO-Keywords für Ihren generierten Text generieren?</label>
+                    <select name="seo-keyword-option" id="seo-keyword-option" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="Ja">Ja</option>
+                        <option value="Nein">Nein</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="title-subtitle-option"><i class="fas fa-heading"></i> Möchten Sie einen Titel und Untertitel generieren?</label>
+                    <select id="title-subtitle-option" required>
+                        <option value="">Bitte wählen</option>
+                        <option value="ja">Ja</option>
+                        <option value="nein">Nein</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <div class="live-preview-container">
+                        <label for="live-prompt" class="label-icon label-top">
+                            <span class="icon"><i class="fas fa-eye"></i></span>
+                            Live-Vorschau
+                        </label>
+                        <div id="live-prompt"></div>
+                        <div class="live-prompt-buttons">
+							<div class="d-flex flex-wrap justify-content-between align-items-center">
+								<button id="show-popup" class="btn btn-primary mx-2" style="min-width: 100px; height: 50px;">Anzeigen</button>
+								<button type="submit" class="btn btn-primary mx-2" style="min-width: 100px; height: 50px;">Kopieren</button>
+								<button type="button" onclick="window.open('https://copilot.microsoft.com')" class="btn btn-primary mx-2" style="min-width: 100px; height: 50px;">Copilot</button>
+								<button type="button" onclick="window.open('https://chat.openai.com/chat')" class="btn btn-primary mx-2" style="min-width: 100px; height: 50px;">GPT</button>
+						</div>
+         				 </div>
+                        <!-- Hier fügen wir das Popup hinzu -->
+                        <div class="popup-overlay">
+                            <div class="popup">
+                                <p class="popup-text"></p>
+                                <button id="close-popup">Schließe Popup</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+
+        </form>
+    </div>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./script.js"></script>
+</body>
+
+</html>

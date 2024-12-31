@@ -1,0 +1,355 @@
+/* Variablen für häufig verwendete Werte */
+:root {
+  --main-color: #a64bf4;
+  --font-size-small: 0.875rem;
+  --font-size-medium: 1rem;
+  --border-radius: 4px;
+  --input-padding: 5px;
+  --spacing-small: 10px;
+  --spacing-medium: 20px;
+}
+
+/* Allgemeine Stile */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Allgemeine Stile für das body-Element */
+body {
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f0f0;
+  padding: var(--spacing-medium);
+}
+
+/* Stile für das Formular */
+form {
+  max-width: 100%;
+  background-color: #fff;
+  padding: var(--spacing-medium);
+  border-radius: var(--border-radius);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  /* Flexbox für die Anordnung der Elemente */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: auto;
+}
+
+/* Anpassungen für mobile Ansichten */
+@media (max-width: 600px) {
+  /* Kompakteres Layout */
+  body {
+    padding: var(--spacing-small);
+  }
+
+  /* Flexibles Layout für das Formular */
+  form {
+    padding: var(--spacing-small);
+  }
+
+  /* Größere Schriftgröße für bessere Lesbarkeit */
+  :root {
+    --font-size-small: 1rem;
+    --font-size-medium: 1.125rem;
+  }
+}
+
+/* Animation für den Textschatten-Effekt */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  animation: color-change 5s infinite, text-shadow 5s infinite;
+  text-shadow: none;
+  
+  /* Border um den Titel */
+  border-bottom: 2px solid var(--main-color);
+  padding-bottom: 10px;
+}
+
+
+/* Keyframes für die Animation color-change */
+@keyframes color-change {
+  0% {
+    color: #000;
+  }
+  50% {
+    color: var(--main-color);
+  }
+  100% {
+    color: #000;
+  }
+}
+
+/* Keyframes für die Animation text-shadow */
+@keyframes text-shadow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+
+/* Stile für label-Elemente */
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: var(--spacing-small);
+}
+
+/* Gemeinsame Stile für select- und textarea-Elemente */
+select,
+textarea {
+  width: 100%;
+  padding: var(--input-padding);
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-small);
+  margin-top: var(--spacing-small);
+}
+
+/* Stile für das textarea-Element */
+textarea {
+  height: 6.25rem;
+  resize: none;
+}
+
+/* Stile für den Absenden-Button */
+input[type="submit"] {
+  -webkit-appearance: none; 
+  display: block;
+  width: 100%;
+  padding: 0.625rem;
+  background-color: var(--main-color);
+  color: white;
+  font-weight: bold;
+  font-size: var(--font-size-small);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* Stile für den Popup-Overlay */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+/* Stile für den Popup-Container */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1001;
+  text-align: center;
+  max-width: 60%;
+  word-wrap: break-word;
+}
+
+/* Stile für den Popup-Text */
+.popup .popup-text {
+  margin-bottom: 20px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Stile für den Popup-Button */
+.popup button {
+  cursor: pointer;
+  background-color: var(--main-color);
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Stile für die label- und radio-Zeilen */
+.label-row,
+.radio-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3125rem;
+}
+
+/* Stile für den Roboter-Container */
+.roboter-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  justify-content: center;
+}
+
+/* Stile für das Roboter-Bild */
+.roboter-container img {
+  width: 200px;
+  height: 200px;
+  margin-right: 10px;
+  align-items: center;
+}
+
+/* Stile für den Live-Vorschau-Container */
+.live-preview-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  margin-left: 0px;
+}
+
+/* Stile für die Live-Vorschau */
+#live-prompt {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  width: auto;
+  min-height: 100px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  margin-top: 0px; /* Hier den gewünschten Abstand oben einstellen */
+}
+
+/* Stile für die Live-Vorschau-Buttons */
+.live-prompt-buttons {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.live-prompt-buttons button {
+  -webkit-appearance: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: var(--main-color);
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 0.2rem;
+}
+
+/* Stile für den Formular-Button */
+form button {
+  margin-right: 10px;
+}
+
+/* Stile für die Radio-Container-Gruppe */
+.radio-container-group {
+  display: flex;
+}
+
+/* Stile für die Radio-Container */
+.radio-container {
+  width: 50%;
+}
+
+/* Stile für die Radio-Container mit Abstand */
+.radio-container {
+  width: 50%;
+  padding: 0 10px;
+}
+
+/* Media Query für Mobilgeräte */
+@media screen and (max-width: 768px) {
+  form {
+    display: block !important;
+  }
+}
+
+/* Animation für den blinkenden Rand */
+@keyframes blink {
+  0%, 100% {
+    border-color: var(--main-color);
+  }
+  50% {
+    border-color: transparent;
+  }
+}
+
+/* Stile für die Live-Vorschau mit blinkendem Rand */
+#live-prompt {
+  border: 2px solid var(--main-color);
+  animation: blink 1s linear infinite;
+}
+
+/* Icons farblich anpassen */
+.fa {
+  color: #a64bf4;
+}
+/* Andere CSS-Regeln */
+
+/* Stile für label-Elemente mit Icon und Ausrichtung links */
+.label-icon.label-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.label-icon.label-top .icon {
+  margin-right: 10px;
+}
+
+.label-icon.label-top .icon i {
+  /* Fügen Sie hier den gewünschten Icon-Stil hinzu */
+}
+
+/* Weitere CSS-Regeln */
+
+/* Stile für alle Button-Elemente */
+.btn {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Leichter "Hover"-Effekt */
+.btn:hover {
+  background-color: darken(var(--main-color), 10%); /* Dunkler beim Hover */
+  transform: scale(1.02); /* Ein wenig größer beim Hover */
+}
+
+/* Klicken-Effekt */
+.btn:active {
+  transform: scale(0.98); /* Ein wenig kleiner beim Klicken */
+}
+
+/* Fügt einen "Ripple"-Effekt hinzu, wenn der Button angeklickt wird */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transition: width 0.5s ease, height 0.5s ease, background-color 0.5s ease;
+}
+
+.btn:active::after {
+  width: 200%;
+  height: 200%;
+  background-color: rgba(255, 255, 255, 0);
+}
