@@ -1,6 +1,13 @@
 # Claude Code local config (contains tool permissions – never publish)
 .claude/
 
+# Demo / Playwright
+demo-output/
+demo.js
+package.json
+package-lock.json
+node_modules/
+
 # VSCode user-specific settings (optional – launch.json is safe, but secrets could end up here)
 # .vscode/
 
