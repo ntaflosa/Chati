@@ -49,6 +49,10 @@
             <i class="fa-solid fa-clock-rotate-left"></i>
             <span class="d-none d-lg-inline ms-1" data-i18n="btn.history">Verlauf</span>
           </button>
+          <button id="btn-library" class="help-btn" aria-label="Prompt-Bibliothek öffnen">
+            <i class="fa-solid fa-bookmark"></i>
+            <span class="d-none d-lg-inline ms-1" data-i18n="btn.library">Bibliothek</span>
+          </button>
           <button id="btn-dark-mode" class="help-btn" aria-label="Dark Mode umschalten">
             <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
           </button>
@@ -60,7 +64,7 @@
             <i class="fa-solid fa-globe"></i>
             <span class="d-none d-sm-inline ms-1" id="ui-lang-label">EN</span>
           </button>
-          <span class="version-badge">v1.3</span>
+          <span class="version-badge">v1.4</span>
         </div>
       </div>
     </div>
@@ -111,7 +115,7 @@
           </div>
         </div>
         <div class="section-body" id="body-aufgabe">
-          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
+          <p class="section-hint"><i class="fa-solid fa-lightbulb me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
           <div class="row g-3">
             <div class="col-md-8 col-lg-6">
               <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter.">Texttyp / Verwendungszweck</label>
@@ -129,6 +133,9 @@
                   <option value="E-Book">E-Book</option>
                   <option value="Buchrezension">Buchrezension</option>
                   <option value="Zusammenfassung">Zusammenfassung</option>
+                  <option value="Erfahrungsbericht">Erfahrungsbericht / Testimonial</option>
+                  <option value="Checkliste">Checkliste</option>
+                  <option value="Glossar / Lexikon">Glossar / Lexikon</option>
                 </optgroup>
                 <optgroup label="Social Media" data-i18n-grp="grp.social_media">
                   <option value="Facebook-Beitrag">Facebook-Beitrag</option>
@@ -151,6 +158,8 @@
                   <option value="SEO-Text">SEO-Text</option>
                   <option value="Newsletter">Newsletter</option>
                   <option value="Landing Page">Landing Page</option>
+                  <option value="Produkttest / Review">Produkttest / Review</option>
+                  <option value="Meta-Description (SEO)">Meta-Description (SEO)</option>
                 </optgroup>
                 <optgroup label="E-Mail &amp; Kommunikation" data-i18n-grp="grp.email_komm">
                   <option value="E-Mail">E-Mail (allgemein)</option>
@@ -158,6 +167,8 @@
                   <option value="Follow-up-E-Mail">Follow-up-E-Mail</option>
                   <option value="Onboarding-E-Mail">Onboarding-E-Mail</option>
                   <option value="Kundenservice-Antwort">Kundenservice-Antwort</option>
+                  <option value="Einladungsschreiben">Einladungsschreiben</option>
+                  <option value="Dankes-E-Mail">Dankes-E-Mail</option>
                 </optgroup>
                 <optgroup label="Business &amp; Karriere" data-i18n-grp="grp.business_karriere">
                   <option value="Präsentation">Präsentation</option>
@@ -167,6 +178,8 @@
                   <option value="Meeting-Protokoll">Meeting-Protokoll</option>
                   <option value="Stellenanzeige">Stellenanzeige</option>
                   <option value="Bewerbungsschreiben">Bewerbungsschreiben</option>
+                  <option value="Unternehmensvorstellung">Unternehmensvorstellung / About Us</option>
+                  <option value="Vision & Mission Statement">Vision &amp; Mission Statement</option>
                 </optgroup>
                 <optgroup label="Multimedia" data-i18n-grp="grp.multimedia">
                   <option value="YouTube-Video">YouTube-Video</option>
@@ -178,6 +191,7 @@
                 </optgroup>
                 <optgroup label="Kreativ" data-i18n-grp="grp.kreativ">
                   <option value="Slogan / Claim">Slogan / Claim</option>
+                  <option value="Produktname / Naming">Produktname / Naming</option>
                   <option value="Kurzgeschichte">Kurzgeschichte</option>
                   <option value="Gedicht / Lyrik">Gedicht / Lyrik</option>
                   <option value="Drehbuch / Skript">Drehbuch / Skript</option>
@@ -189,6 +203,11 @@
                 </optgroup>
               </select>
             </div>
+          </div>
+          <div class="guided-next">
+            <button class="action-btn action-btn--primary guided-btn-next" data-next="body-kontext">
+              <span data-i18n="btn.next">Weiter</span> <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -220,6 +239,7 @@
               <select id="target-audience" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="B2C – Privat" data-i18n-grp="grp.b2c_privat">
+                  <option value="Schüler & Auszubildende (15–22 Jahre)">Schüler &amp; Auszubildende (15–22 Jahre)</option>
                   <option value="Jugendliche (16–25 Jahre)">Jugendliche (16–25 Jahre)</option>
                   <option value="Junge Erwachsene (25–35 Jahre)">Junge Erwachsene (25–35 Jahre)</option>
                   <option value="Berufstätige (30–50 Jahre)">Berufstätige (30–50 Jahre)</option>
@@ -232,6 +252,8 @@
                   <option value="Manager &amp; Führungskräfte">Manager &amp; Führungskräfte</option>
                   <option value="B2B-Entscheider">B2B-Entscheider</option>
                   <option value="IT-Professionals">IT-Professionals</option>
+                  <option value="Kreative & Designer">Kreative &amp; Designer</option>
+                  <option value="Lehrkräfte & Pädagogen">Lehrkräfte &amp; Pädagogen</option>
                 </optgroup>
                 <optgroup label="Interessen &amp; Community" data-i18n-grp="grp.interests">
                   <option value="Technik &amp; Digitales">Technik &amp; Digitales</option>
@@ -239,9 +261,16 @@
                   <option value="Mode &amp; Lifestyle">Mode &amp; Lifestyle</option>
                   <option value="Finanzen &amp; Investment">Finanzen &amp; Investment</option>
                   <option value="Bildung &amp; Weiterbildung">Bildung &amp; Weiterbildung</option>
+                  <option value="Sport & Outdoor">Sport &amp; Outdoor</option>
+                  <option value="Nachhaltigkeit & Umwelt">Nachhaltigkeit &amp; Umwelt</option>
                 </optgroup>
               </select>
             </div>
+          </div>
+          <div class="guided-next">
+            <button class="action-btn action-btn--primary guided-btn-next" data-next="body-format">
+              <span data-i18n="btn.next">Weiter</span> <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -284,6 +313,8 @@
                 <option value="Schritt-für-Schritt">Schritt-für-Schritt</option>
                 <option value="Tabellarisch">Tabellarisch</option>
                 <option value="Zitat">Zitat</option>
+                <option value="FAQ-Format (Frage & Antwort)">FAQ-Format (Frage &amp; Antwort)</option>
+                <option value="Checkliste / Aufgabenliste">Checkliste / Aufgabenliste</option>
               </select>
             </div>
             <div class="col-sm-6 col-lg-4">
@@ -311,6 +342,11 @@
                 <option value="nein">Nein</option>
               </select>
             </div>
+          </div>
+          <div class="guided-next">
+            <button class="action-btn action-btn--primary guided-btn-next" data-next="body-persona">
+              <span data-i18n="btn.next">Weiter</span> <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -353,6 +389,11 @@
               </select>
             </div>
           </div>
+          <div class="guided-next">
+            <button class="action-btn action-btn--primary guided-btn-next" data-next="body-tonfall">
+              <span data-i18n="btn.next">Weiter</span> <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -377,14 +418,17 @@
               <select id="language-style" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="Emotional">Emotional (bewegt, berührt)</option>
+                <option value="Empathisch">Empathisch (einfühlsam, verständnisvoll)</option>
                 <option value="Formell">Formell (professionell, distanziert)</option>
                 <option value="Humorvoll">Humorvoll (locker, mit Witz)</option>
                 <option value="Informell">Informell (entspannt, ungezwungen)</option>
                 <option value="Inspirierend">Inspirierend (motiviert zum Handeln)</option>
                 <option value="Journalistisch">Journalistisch (objektiv, nachrichtlich)</option>
+                <option value="Minimalistisch">Minimalistisch (knapp, auf den Punkt)</option>
                 <option value="Motivierend">Motivierend (antreibend, ermutigend)</option>
                 <option value="Persönlich">Persönlich (nahbar, authentisch)</option>
                 <option value="Poetisch">Poetisch (bildreich, kreativ)</option>
+                <option value="Provokativ">Provokativ (mutig, gegen den Strom)</option>
                 <option value="Sachlich">Sachlich (nüchtern, faktenbasiert)</option>
                 <option value="Seriös">Seriös (vertrauenswürdig, solid)</option>
                 <option value="Storytelling">Storytelling (erzählend, narrativ)</option>
@@ -394,6 +438,11 @@
                 <option value="Wissenschaftlich">Wissenschaftlich (analytisch, belegt)</option>
               </select>
             </div>
+          </div>
+          <div class="guided-next">
+            <button class="action-btn action-btn--primary guided-btn-next" data-next="body-beispiel">
+              <span data-i18n="btn.next">Weiter</span> <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -417,6 +466,11 @@
           <textarea id="beispiel" class="form-control field-input" rows="3"
             placeholder='z.B. „Schreibe wie Tim Ferriss" oder füge einen Beispieltext ein, dem der Stil entsprechen soll …'
             data-i18n-ph="ph.beispiel"></textarea>
+          <div class="guided-next">
+            <button class="action-btn action-btn--primary guided-btn-next" data-next="body-preview">
+              <i class="fa-solid fa-eye me-2"></i><span data-i18n="btn.toPreview">Zur Vorschau</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -478,6 +532,9 @@
             <button id="btn-variations" type="button" class="action-btn action-btn--outline">
               <i class="fa-solid fa-shuffle me-2"></i><span data-i18n="btn.variations">Variationen</span>
             </button>
+            <button id="btn-save" type="button" class="action-btn action-btn--outline action-btn--save">
+              <i class="fa-solid fa-bookmark me-2"></i><span data-i18n="btn.save">Speichern</span>
+            </button>
             <div class="action-divider d-none d-sm-flex"></div>
             <span class="action-label d-none d-sm-block" data-i18n="lbl.openin">Öffnen in:</span>
             <button type="button" onclick="window.open('https://copilot.microsoft.com')" class="action-btn action-btn--ghost">
@@ -537,6 +594,12 @@
     <div id="share-toast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body"><i class="fa-solid fa-link me-2"></i>Link in Zwischenspeicher kopiert!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
+      </div>
+    </div>
+    <div id="save-toast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" style="background:var(--color-primary);color:#fff;">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-solid fa-bookmark me-2"></i><span data-i18n="toast.saved">In Bibliothek gespeichert!</span></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
       </div>
     </div>
@@ -655,6 +718,50 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== Speichern-Modal ===== -->
+  <div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="saveModalLabel">
+            <i class="fa-solid fa-bookmark me-2" style="color:var(--color-primary)"></i><span data-i18n="save.title">In Bibliothek speichern</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body">
+          <label for="library-title-input" class="form-label fw-semibold" data-i18n="save.label">Name / Titel</label>
+          <input type="text" id="library-title-input" class="form-control" maxlength="80"
+            placeholder="z.B. LinkedIn-Post Tech-Startup" data-i18n-ph="save.placeholder">
+          <div class="form-text mt-1" data-i18n="save.hint">Gib dem Prompt einen aussagekräftigen Namen.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
+          <button id="btn-save-confirm" type="button" class="action-btn action-btn--primary">
+            <i class="fa-solid fa-bookmark me-2"></i><span data-i18n="btn.saveConfirm">Speichern</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Bibliothek Offcanvas ===== -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="libraryOffcanvas" aria-labelledby="libraryOffcanvasLabel" style="width:440px;max-width:100vw;">
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title" id="libraryOffcanvasLabel">
+        <i class="fa-solid fa-bookmark me-2" style="color:var(--color-primary)"></i><span data-i18n="library.title">Prompt-Bibliothek</span>
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+      <p class="text-center text-muted mt-4" id="library-empty" style="font-size:.875rem;">
+        <i class="fa-solid fa-bookmark d-block mb-2" style="font-size:2rem;opacity:.3"></i>
+        <span data-i18n="library.empty">Noch keine Prompts gespeichert.</span><br>
+        <small data-i18n="library.emptyhint">Generiere einen Prompt und klicke auf „Speichern".</small>
+      </p>
+      <div id="library-list"></div>
     </div>
   </div>
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE  = 'chati-v1.3';
+const CACHE  = 'chati-v1.4';
 const ASSETS = [
   './',
   './index.html',

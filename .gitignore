@@ -1,3 +1,9 @@
+# Claude Code local config (contains tool permissions – never publish)
+.claude/
+
+# VSCode user-specific settings (optional – launch.json is safe, but secrets could end up here)
+# .vscode/
+
 # Logs
 logs
 *.log

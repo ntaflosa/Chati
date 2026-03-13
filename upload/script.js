@@ -33,13 +33,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const langToggle      = document.getElementById('lang-toggle');
   const historyList     = document.getElementById('history-list');
   const historyEmpty    = document.getElementById('history-empty');
+  const btnSave         = document.getElementById('btn-save');
+  const btnLibrary      = document.getElementById('btn-library');
+  const libraryList     = document.getElementById('library-list');
+  const libraryEmpty    = document.getElementById('library-empty');
 
   const promptModal      = new bootstrap.Modal(document.getElementById('promptModal'));
   const helpModal        = new bootstrap.Modal(document.getElementById('helpModal'));
   const variationsModal  = new bootstrap.Modal(document.getElementById('variationsModal'));
   const historyCanvas    = new bootstrap.Offcanvas(document.getElementById('historyOffcanvas'));
+  const libraryCanvas    = new bootstrap.Offcanvas(document.getElementById('libraryOffcanvas'));
+  const saveModal        = new bootstrap.Modal(document.getElementById('saveModal'));
   const copyToast      = new bootstrap.Toast(document.getElementById('copy-toast'),  { delay: 2500 });
   const shareToast     = new bootstrap.Toast(document.getElementById('share-toast'), { delay: 2500 });
+  const saveToast      = new bootstrap.Toast(document.getElementById('save-toast'),  { delay: 2500 });
 
   // ── Constants ─────────────────────────────────────────────────────────────
   const FIELD_IDS = [
@@ -50,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const LS_FORM_KEY    = 'chati_form';
   const LS_HISTORY_KEY = 'chati_history';
+  const LS_LIBRARY_KEY = 'chati_library';
   const LS_THEME_KEY   = 'chati_theme';
   const HISTORY_MAX    = 8;
 
@@ -83,14 +91,18 @@ document.addEventListener('DOMContentLoaded', () => {
     'Schritt-für-Schritt':     'step-by-step',
     'Tabellarisch':            'tabular layout',
     'Zitat':                   'quote format',
+    'FAQ-Format (Frage & Antwort)': 'FAQ format (Q&A)',
+    'Checkliste / Aufgabenliste':   'checklist / task list',
   };
 
   const STYLE_MAP_EN = {
-    'Emotional': 'emotional', 'Formell': 'formal', 'Humorvoll': 'humorous',
-    'Informell': 'informal', 'Inspirierend': 'inspiring', 'Journalistisch': 'journalistic',
+    'Emotional': 'emotional', 'Empathisch': 'empathetic', 'Formell': 'formal',
+    'Humorvoll': 'humorous', 'Informell': 'informal', 'Inspirierend': 'inspiring',
+    'Journalistisch': 'journalistic', 'Minimalistisch': 'minimalist',
     'Motivierend': 'motivational', 'Persönlich': 'personal', 'Poetisch': 'poetic',
-    'Sachlich': 'factual', 'Seriös': 'serious', 'Storytelling': 'storytelling',
-    'Technisch': 'technical', 'Umgangssprachlich': 'colloquial', 'Werblich': 'promotional',
+    'Provokativ': 'provocative', 'Sachlich': 'factual', 'Seriös': 'serious',
+    'Storytelling': 'storytelling', 'Technisch': 'technical',
+    'Umgangssprachlich': 'colloquial', 'Werblich': 'promotional',
     'Wissenschaftlich': 'scientific',
   };
 
@@ -110,6 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
     'Mode & Lifestyle':                 'fashion and lifestyle audience',
     'Finanzen & Investment':            'finance and investment community',
     'Bildung & Weiterbildung':          'education and learning community',
+    'Schüler & Auszubildende (15–22 Jahre)': 'students and trainees (15–22)',
+    'Kreative & Designer':              'creatives and designers',
+    'Lehrkräfte & Pädagogen':           'teachers and educators',
+    'Sport & Outdoor':                  'sports and outdoor enthusiasts',
+    'Nachhaltigkeit & Umwelt':          'sustainability and environmental community',
   };
 
   const PERSPECTIVE_MAP_EN = {
@@ -143,6 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
     'Slogan / Claim': 'einen ', 'Kurzgeschichte': 'eine ',
     'Gedicht / Lyrik': 'ein ', 'Drehbuch / Skript': 'ein ',
     'Online-Quiz': 'ein ', 'Chatbot': 'einen ', 'Online-Kurs': 'einen ',
+    'Erfahrungsbericht': 'einen ', 'Checkliste': 'eine ', 'Glossar / Lexikon': 'ein ',
+    'Produkttest / Review': 'einen ', 'Meta-Description (SEO)': 'eine ',
+    'Einladungsschreiben': 'ein ', 'Dankes-E-Mail': 'eine ',
+    'Unternehmensvorstellung': 'eine ', 'Vision & Mission Statement': 'ein ',
+    'Produktname / Naming': 'ein ',
   };
 
   const ARTICLE_MAP_EN = {
@@ -173,6 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
     'Slogan / Claim': 'a slogan', 'Kurzgeschichte': 'a short story',
     'Gedicht / Lyrik': 'a poem', 'Drehbuch / Skript': 'a script',
     'Online-Quiz': 'an online quiz', 'Chatbot': 'a chatbot script', 'Online-Kurs': 'an online course outline',
+    'Erfahrungsbericht': 'a testimonial / experience report', 'Checkliste': 'a checklist',
+    'Glossar / Lexikon': 'a glossary', 'Produkttest / Review': 'a product review',
+    'Meta-Description (SEO)': 'a meta description', 'Einladungsschreiben': 'an invitation letter',
+    'Dankes-E-Mail': 'a thank-you email', 'Unternehmensvorstellung': 'a company introduction',
+    'Vision & Mission Statement': 'a vision & mission statement', 'Produktname / Naming': 'a product name concept',
   };
 
   // ── Preview groups ────────────────────────────────────────────────────────
@@ -476,6 +503,93 @@ document.addEventListener('DOMContentLoaded', () => {
     copyToast.show();
   });
 
+  // ── Prompt Library ────────────────────────────────────────────────────────
+  const loadLibrary = () => {
+    try { return JSON.parse(localStorage.getItem(LS_LIBRARY_KEY)) || []; } catch { return []; }
+  };
+
+  const saveToLibrary = (title, text) => {
+    const items = loadLibrary();
+    const fields = Object.fromEntries(FIELD_IDS.map(id => [id, val(id)]).filter(([, v]) => v));
+    const now = new Date();
+    items.unshift({
+      id: Date.now(),
+      title,
+      text,
+      lang: activeLang,
+      fields,
+      time: now.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+    });
+    try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(items)); } catch {}
+  };
+
+  const renderLibrary = () => {
+    if (!libraryList) return;
+    const items = loadLibrary();
+    if (libraryEmpty) libraryEmpty.style.display = items.length ? 'none' : '';
+    libraryList.innerHTML = '';
+    items.forEach(entry => {
+      const div = document.createElement('div');
+      div.className = 'library-item';
+      div.innerHTML = `
+        <div class="library-item__header">
+          <span class="library-item__title">${esc(entry.title)}</span>
+          <div class="library-item__meta">
+            <span class="history-item__lang ${entry.lang === 'en' ? 'history-item__lang--en' : ''}">${(entry.lang || 'de').toUpperCase()}</span>
+            <span class="history-item__time">${entry.time}</span>
+          </div>
+        </div>
+        <div class="library-item__text">${esc(entry.text)}</div>
+        <div class="library-item__btns">
+          <button class="action-btn action-btn--primary lib-btn-load" data-id="${entry.id}">
+            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i>Laden
+          </button>
+          <button class="action-btn action-btn--outline lib-btn-copy" data-id="${entry.id}">
+            <i class="fa-solid fa-copy me-1"></i>Kopieren
+          </button>
+          <button class="action-btn action-btn--ghost lib-btn-delete" data-id="${entry.id}">
+            <i class="fa-solid fa-trash me-1"></i>Löschen
+          </button>
+        </div>`;
+      libraryList.appendChild(div);
+    });
+  };
+
+  libraryList?.addEventListener('click', async e => {
+    const idNum = Number(e.target.closest('[data-id]')?.dataset.id);
+    if (!idNum) return;
+    const items  = loadLibrary();
+    const entry  = items.find(i => i.id === idNum);
+    if (!entry) return;
+
+    if (e.target.closest('.lib-btn-copy')) {
+      try { await navigator.clipboard.writeText(entry.text); }
+      catch {
+        const ta = Object.assign(document.createElement('textarea'),
+          { value: entry.text, style: 'position:fixed;opacity:0;' });
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      }
+      copyToast.show();
+    }
+
+    if (e.target.closest('.lib-btn-load')) {
+      FIELD_IDS.forEach(fid => {
+        const el = document.getElementById(fid);
+        if (el) el.value = entry.fields?.[fid] || '';
+      });
+      activeCardId = null;
+      renderCatalog(activeFilter);
+      refreshPreview();
+      libraryCanvas.hide();
+    }
+
+    if (e.target.closest('.lib-btn-delete')) {
+      const updated = items.filter(i => i.id !== idNum);
+      try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(updated)); } catch {}
+      renderLibrary();
+    }
+  });
+
   // ── Clipboard ─────────────────────────────────────────────────────────────
   const copyPrompt = async () => {
     const text = getCurrentPrompt().trim();
@@ -539,8 +653,9 @@ document.addEventListener('DOMContentLoaded', () => {
     activeCardId = id;
     renderCatalog(activeFilter);
     refreshPreview();
-    descEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    descEl?.focus();
+    autoExpandFilled();
+    openSection('body-aufgabe');
+    document.getElementById('description')?.focus();
   };
 
   catalogFilters.addEventListener('click', e => {
@@ -588,6 +703,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCatalog(); }
   });
 
+  // ── Guided "Weiter"-Button ────────────────────────────────────────────────
+  document.querySelector('.main-content')?.addEventListener('click', e => {
+    const btn = e.target.closest('.guided-btn-next');
+    if (!btn) return;
+    const nextId = btn.dataset.next;
+    if (nextId === 'body-preview') {
+      document.getElementById('body-preview')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      openSection(nextId);
+    }
+  });
+
   // ── Generic collapsible sections ──────────────────────────────────────────
   const expandBody = (body, chevron) => {
     body.style.maxHeight = body.scrollHeight + 'px';
@@ -610,6 +737,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!body) return;
     const chevron = header.querySelector('.section-chevron');
     body.classList.contains('collapsed') ? expandBody(body, chevron) : collapseBody(body, chevron);
+  };
+
+  // ── Guided mode helpers ────────────────────────────────────────────────────
+  const STEP_BODIES = ['body-aufgabe', 'body-kontext', 'body-format', 'body-persona', 'body-tonfall', 'body-beispiel'];
+
+  const openSection = (id) => {
+    const body = document.getElementById(id);
+    if (!body) return;
+    const header = document.querySelector(`[data-target="${id}"]`);
+    const chevron = header?.querySelector('.section-chevron');
+    if (body.classList.contains('collapsed')) expandBody(body, chevron);
+    setTimeout(() => {
+      (header || body).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      updateToggleAllBtn();
+    }, 150);
+  };
+
+  const autoExpandFilled = () => {
+    const stepFields = {
+      'body-aufgabe': ['content-type'],
+      'body-kontext': ['description', 'target-audience'],
+      'body-format':  ['content-length', 'formatting', 'emoji-option', 'seo-keyword-option', 'title-subtitle-option'],
+      'body-persona': ['perspective', 'address-form'],
+      'body-tonfall': ['language-style'],
+      'body-beispiel': ['beispiel'],
+    };
+    Object.entries(stepFields).forEach(([bodyId, fields]) => {
+      if (fields.some(f => val(f))) openSection(bodyId);
+    });
   };
 
   document.querySelectorAll('.section-collapsible[data-target]').forEach(header => {
@@ -673,12 +829,40 @@ document.addEventListener('DOMContentLoaded', () => {
   btnHelp?.addEventListener('click', () => helpModal.show());
   btnReset?.addEventListener('click', resetForm);
   btnShare?.addEventListener('click', shareUrl);
-  btnExport?.addEventListener('click', downloadPrompt);
-  btnVariations?.addEventListener('click', showVariations);
+  btnExport?.addEventListener('click', () => downloadPrompt());
+  btnVariations?.addEventListener('click', () => showVariations());
 
   document.getElementById('btn-history')?.addEventListener('click', () => {
     renderHistory();
     historyCanvas.show();
+  });
+
+  btnLibrary?.addEventListener('click', () => {
+    renderLibrary();
+    libraryCanvas.show();
+  });
+
+  btnSave?.addEventListener('click', () => {
+    const text = getCurrentPrompt().trim();
+    if (!text) return;
+    const titleInput = document.getElementById('library-title-input');
+    if (titleInput) titleInput.value = '';
+    saveModal.show();
+    setTimeout(() => titleInput?.focus(), 350);
+  });
+
+  document.getElementById('btn-save-confirm')?.addEventListener('click', () => {
+    const titleInput = document.getElementById('library-title-input');
+    const title = titleInput?.value.trim() || 'Ohne Titel';
+    const text  = getCurrentPrompt().trim();
+    if (!text) { saveModal.hide(); return; }
+    saveToLibrary(title, text);
+    saveModal.hide();
+    saveToast.show();
+  });
+
+  document.getElementById('library-title-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-save-confirm')?.click();
   });
 
   // ── TXT Export ────────────────────────────────────────────────────────────
@@ -820,6 +1004,15 @@ document.addEventListener('DOMContentLoaded', () => {
       'history.title': 'Prompt-Verlauf', 'history.empty': 'Noch keine Prompts generiert.',
       'variations.title': 'Prompt-Variationen',
       'variations.subtitle': '3 alternative Formulierungen deines Prompts – klicke auf eine, um sie zu kopieren.',
+      'btn.library': 'Bibliothek', 'btn.save': 'Speichern', 'btn.saveConfirm': 'Speichern',
+      'save.title': 'In Bibliothek speichern', 'save.label': 'Name / Titel',
+      'save.hint': 'Gib dem Prompt einen aussagekräftigen Namen.',
+      'save.placeholder': 'z.B. LinkedIn-Post Tech-Startup',
+      'library.title': 'Prompt-Bibliothek',
+      'library.empty': 'Noch keine Prompts gespeichert.',
+      'library.emptyhint': 'Generiere einen Prompt und klicke auf „Speichern".',
+      'toast.saved': 'In Bibliothek gespeichert!',
+      'btn.next': 'Weiter', 'btn.toPreview': 'Zur Vorschau',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -850,6 +1043,15 @@ document.addEventListener('DOMContentLoaded', () => {
       'history.title': 'Prompt History', 'history.empty': 'No prompts generated yet.',
       'variations.title': 'Prompt Variations',
       'variations.subtitle': '3 alternative formulations of your prompt – click one to copy.',
+      'btn.library': 'Library', 'btn.save': 'Save', 'btn.saveConfirm': 'Save',
+      'save.title': 'Save to Library', 'save.label': 'Name / Title',
+      'save.hint': 'Give the prompt a descriptive name.',
+      'save.placeholder': 'e.g. LinkedIn Post Tech Startup',
+      'library.title': 'Prompt Library',
+      'library.empty': 'No prompts saved yet.',
+      'library.emptyhint': 'Generate a prompt and click "Save".',
+      'toast.saved': 'Saved to library!',
+      'btn.next': 'Next', 'btn.toPreview': 'To Preview',
     },
   };
 
@@ -893,9 +1095,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderCatalog();
   catalogBody.style.maxHeight = 'none';
-  restoreFromUrl();   // URL params take priority
-  restoreForm();      // then localStorage
+
+  // Guided mode: collapse all step sections on load
+  STEP_BODIES.forEach(id => {
+    const body = document.getElementById(id);
+    if (!body) return;
+    body.style.maxHeight = '0';
+    body.classList.add('collapsed');
+    const header = document.querySelector(`[data-target="${id}"]`);
+    header?.querySelector('.section-chevron')?.classList.add('collapsed');
+  });
+
+  restoreFromUrl();      // URL params take priority
+  restoreForm();         // then localStorage
   refreshPreview();
+  autoExpandFilled();    // re-open steps that have saved data
   renderHistory();
 
   // PWA service worker
