@@ -1,36 +1,177 @@
-# Chati
+# Chati – KI Prompt-Generator
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Technologien](https://img.shields.io/badge/Technologien-HTML5%20%7C%20CSS3%20%7C%20JavaScript%20%7C%20Bootstrap-blue)
+![Version](https://img.shields.io/badge/version-1.2-brightgreen.svg)
+![Technologien](https://img.shields.io/badge/Technologien-HTML5%20%7C%20CSS3%20%7C%20JavaScript%20%7C%20Bootstrap%205-blue)
+![PWA](https://img.shields.io/badge/PWA-ready-purple.svg)
 
 ## Überblick
 
-**Chati** ist ein innovatives Chatbot-Tool zur Erstellung und Verwaltung von individuellen Prompts für KI-Anwendungen wie [Microsoft Copilot](https://www.microsoft.com/de-de/microsoft-365/copilot) und [ChatGPT](https://chat.openai.com/). Mit einer benutzerfreundlichen Oberfläche und leistungsstarken Funktionen ermöglicht Chati die nahtlose Integration und Anpassung von KI-gestützten Kommunikationslösungen, die genau auf die Bedürfnisse und Anforderungen der Nutzer zugeschnitten sind.
+**Chati** ist ein browserbasierter KI Prompt-Generator, der Nutzer dabei unterstützt, präzise und strukturierte Prompts für KI-Anwendungen wie [Microsoft Copilot](https://copilot.microsoft.com) und [ChatGPT](https://chat.openai.com) zu erstellen. Über ein übersichtliches Formular werden alle relevanten Parameter (Texttyp, Zielgruppe, Sprachstil, Formatierung u.v.m.) ausgewählt – Chati generiert daraus automatisch einen fertig formulierten Prompt, der direkt in das gewünschte KI-Tool eingefügt werden kann.
 
-Nach einem Jahr erfolgreicher Entwicklung und positiver Resonanz aus der Community haben wir beschlossen, Chati im Februar 2025 als Open-Source-Projekt auf GitHub zu veröffentlichen. Bereits jetzt haben sich zahlreiche Interessierte gemeldet und wertvolle Verbesserungsvorschläge eingereicht – ein starkes Zeichen für die Zukunft von "Collaboration without Limits" 🚀!
+Chati läuft vollständig im Browser – kein Backend, kein Build-Schritt. Ab Version 1.2 ist Chati auch als **Progressive Web App (PWA)** installierbar.
 
-## Funktionen
+Nach einem Jahr erfolgreicher Entwicklung und positiver Resonanz aus der Community wurde Chati im Februar 2025 als Open-Source-Projekt auf GitHub veröffentlicht.
 
-- **Anpassungsmöglichkeiten**:
-  - **Texttyp**: Wähle den gewünschten Texttyp (z.B. E-Mail, Blogbeitrag, technische Dokumentation).
-  - **Zielgruppe**: Definiere die Zielgruppe für den generierten Text.
-  - **Sprachstil**: Passe den Sprachstil an (z.B. formell, informell, kreativ).
-  - **Länge**: Bestimme die gewünschte Länge des Textes.
+---
 
-- **Live-Vorschau**: Siehe sofort die generierten Prompts in Echtzeit, während du Anpassungen vornimmst.
+## Features
 
-- **Direkte Integration**: Einfache Integration mit KI-Anwendungen für einen nahtlosen Workflow.
+### Prompt-Katalog
+Vorgefertigte Vorlagen für die häufigsten Anwendungsfälle – ein Klick befüllt alle Felder automatisch mit optimalen Standardwerten.
+
+| Kategorie | Vorlagen |
+|---|---|
+| Content | SEO-Blogartikel, Whitepaper, Pressemitteilung, YouTube-Beschreibung |
+| Social Media | LinkedIn-Post, Instagram-Caption, Twitter/X-Post, Facebook-Beitrag |
+| Marketing | Produktbeschreibung, Newsletter, Landing Page |
+| E-Mail | Kalt-Akquise, Follow-Up, Angebots-E-Mail |
+| Business | Executive Summary, Bericht, Stellenanzeige |
+
+### Formular-Einstellungen (6 Schritte)
+Alle Parameter sind frei kombinierbar:
+
+- **Aufgabe** – über 30 Texttypen in 8 Kategorien (Content, Social Media, Marketing, E-Mail, Business, Multimedia, Kreativ, Interaktiv)
+- **Kontext** – Thema, Inhalt & Zielgruppe (B2C, B2B, Interessen)
+- **Format** – Textlänge, Formatierung, Emojis, SEO-Keywords, Titel & Untertitel
+- **Persona** – Perspektive (Ich / Wir / Du / Er-Sie / Neutral) & Anredeform
+- **Tonfall** – 16 Sprachstile (Emotional, Formell, Journalistisch, Werblich u.a.)
+- **Beispiel** – Stilreferenz oder Beispieltext (optional)
+
+### Live-Vorschau
+Der fertige Prompt wird in Echtzeit aktualisiert. Zwei Ansichtsmodi:
+- **Visuell** – strukturierte Kachel-Ansicht aller Bausteine
+- **Prompt** – fertiger Fließtext zum Kopieren
+
+Fortschrittsanzeige (Score-Punkte 0/6) zeigt, welche Felder noch fehlen.
+
+### PWA – Installierbar
+Chati kann als App auf Desktop und Mobilgeräten installiert werden (Chrome, Edge, Safari). Funktioniert auch offline dank Service Worker.
+
+### Dark Mode
+Vollständig unterstützter Dark/Light Mode mit automatischer Systemerkennung und manuellem Toggle.
+
+### Prompt-Verlauf
+Die letzten 8 generierten Prompts werden lokal gespeichert und sind per Seitenleiste abrufbar.
+
+### Sprache (DE / EN)
+Prompt-Ausgabe wahlweise auf Deutsch oder Englisch – umschaltbar direkt in der Live-Vorschau.
+
+### Teilen & Exportieren
+- Prompt per Knopfdruck in die Zwischenablage kopieren
+- Share-Link generieren (URL-Parameter)
+- Vollansicht im Modal
+- Direktzugriff auf Microsoft Copilot und ChatGPT
+
+---
 
 ## Technologien
 
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Framework**: Bootstrap
-- **Versionierung**: Git
-- **Hosting**: GitHub Pages (optional)
+| Bereich | Technologie |
+|---|---|
+| Markup | HTML5 |
+| Styling | CSS3, Bootstrap 5.3 (CDN) |
+| Logik | Vanilla JavaScript (ES6+) |
+| Icons | Font Awesome 6.5 (CDN) |
+| Schrift | Inter (Google Fonts) |
+| PWA | Web App Manifest + Service Worker |
+| Versionierung | Git / GitHub |
 
-## Installation
+Keine serverseitige Logik – Chati läuft vollständig im Browser.
 
-1. **Repository klonen**
+---
 
-   ```bash
-   git clone https://github.com/ntaflosa/Chati.git
+## Projektstruktur
+
+```
+Chati/
+├── index.html      # Haupt-HTML mit Struktur, Modals, Offcanvas und Toasts
+├── styles.css      # Gesamtes Styling (Custom Properties, Komponenten, Responsive, Dark Mode)
+├── script.js       # Formular-Logik, Live-Vorschau, Verlauf, Dark Mode, i18n, Share
+├── catalog.js      # Prompt-Katalog: alle Vorlagen als JS-Array (leicht erweiterbar)
+├── manifest.json   # PWA Web App Manifest
+├── sw.js           # Service Worker (Offline-Support)
+├── icon.svg        # App-Icon (PWA)
+└── README.md
+```
+
+---
+
+## Installation & Nutzung
+
+### Lokal starten
+
+```bash
+git clone https://github.com/ntaflosa/Chati.git
+cd Chati
+```
+
+Anschließend `index.html` direkt im Browser öffnen – kein Build-Schritt, kein Server erforderlich.
+
+### Als PWA installieren
+
+In Chrome oder Edge die Installieren-Schaltfläche in der Adressleiste klicken – Chati wird als eigenständige App hinzugefügt.
+
+### Neue Vorlage zum Katalog hinzufügen
+
+In `catalog.js` einfach ein weiteres Objekt ans Array anhängen:
+
+```js
+{
+  id: 'meine-vorlage',           // eindeutige ID (kebab-case)
+  name: 'Meine Vorlage',         // Anzeigename in der UI
+  icon: 'fa-solid fa-star',      // Font Awesome 6 Icon-Klasse
+  category: 'Content',           // Content | Social Media | Marketing | E-Mail | Business
+  descriptionHint: 'Hinweis für das Beschreibungsfeld …',
+  fields: {
+    'content-type':          'Blog-Post',
+    'content-length':        'Mittel (300–600 Wörter)',
+    'target-audience':       'Berufstätige (30–50 Jahre)',
+    'language-style':        'Informell',
+    'perspective':           'Ich-Perspektive',
+    'emoji-option':          'wenige',
+    'address-form':          'informell',
+    'formatting':            'Überschriften + Fließtext',
+    'seo-keyword-option':    'Nein',
+    'title-subtitle-option': 'nein',
+  },
+},
+```
+
+Kein weiterer Code notwendig – die Karte erscheint automatisch im UI.
+
+---
+
+## Changelog
+
+### v1.2
+- PWA-Support (installierbar, Offline-Modus via Service Worker)
+- Dark Mode mit Systemerkennung
+- Prompt-Verlauf (letzte 8 Prompts, lokal gespeichert)
+- Sprachtoggle DE / EN für Prompt-Ausgabe
+- Share-Funktion (URL-Parameter)
+- Erweiterter Prompt-Katalog (Business-Kategorie)
+- Score-Anzeige (Fortschritt 0/6)
+- Einklappbare Abschnitte
+
+### v1.0
+- Erster öffentlicher Release
+- Prompt-Katalog mit Filterung
+- Live-Vorschau, Visuell- und Prompt-Tab
+- Direkte KI-Integration (Copilot, ChatGPT)
+
+---
+
+## Mitwirken
+
+Pull Requests und Issues sind willkommen! Bitte vor größeren Änderungen zuerst ein Issue öffnen.
+
+---
+
+## Lizenz
+
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
+
+---
+
+*ntaflos.de – Chati Prompt-Generator*
