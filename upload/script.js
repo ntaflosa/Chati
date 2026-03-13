@@ -708,10 +708,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = e.target.closest('.guided-btn-next');
     if (!btn) return;
     const nextId = btn.dataset.next;
+    // Close the current section first
+    const currentBody = btn.closest('.section-body');
+    if (currentBody) {
+      const currentHeader = document.querySelector(`[data-target="${currentBody.id}"]`);
+      collapseBody(currentBody, currentHeader?.querySelector('.section-chevron'));
+    }
     if (nextId === 'body-preview') {
-      document.getElementById('body-preview')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => {
+        document.getElementById('body-preview')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
     } else {
-      openSection(nextId);
+      setTimeout(() => openSection(nextId), 300);
     }
   });
 
@@ -1110,6 +1118,9 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreForm();         // then localStorage
   refreshPreview();
   autoExpandFilled();    // re-open steps that have saved data
+  // If nothing was restored, open the first section so the user knows where to start
+  const anyStepOpen = STEP_BODIES.some(id => !document.getElementById(id)?.classList.contains('collapsed'));
+  if (!anyStepOpen) openSection('body-aufgabe');
   renderHistory();
 
   // PWA service worker
