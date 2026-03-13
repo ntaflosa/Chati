@@ -56,7 +56,11 @@
             <i class="fa-solid fa-circle-question"></i>
             <span class="d-none d-sm-inline ms-1" data-i18n="btn.help">Hilfe</span>
           </button>
-          <span class="version-badge">v1.1</span>
+          <button id="btn-ui-lang" class="help-btn" aria-label="App-Sprache wechseln">
+            <i class="fa-solid fa-globe"></i>
+            <span class="d-none d-sm-inline ms-1" id="ui-lang-label">EN</span>
+          </button>
+          <span class="version-badge">v1.3</span>
         </div>
       </div>
     </div>
@@ -84,6 +88,10 @@
             <button class="filter-chip" data-filter="Marketing">Marketing</button>
             <button class="filter-chip" data-filter="E-Mail">E-Mail</button>
             <button class="filter-chip" data-filter="Business">Business</button>
+            <button class="filter-chip" data-filter="Medizin"><i class="fa-solid fa-heart-pulse me-1"></i>Medizin</button>
+            <button class="filter-chip" data-filter="Recht"><i class="fa-solid fa-scale-balanced me-1"></i>Recht</button>
+            <button class="filter-chip" data-filter="Bildung"><i class="fa-solid fa-graduation-cap me-1"></i>Bildung</button>
+            <button class="filter-chip" data-filter="E-Commerce"><i class="fa-solid fa-store me-1"></i>E-Commerce</button>
           </div>
           <div class="catalog-grid" id="catalog-grid"></div>
         </div>
@@ -106,7 +114,7 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
           <div class="row g-3">
             <div class="col-md-8 col-lg-6">
-              <label for="content-type" class="field-label" data-i18n="lbl.contenttype">Texttyp / Verwendungszweck</label>
+              <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter.">Texttyp / Verwendungszweck</label>
               <select id="content-type" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="Artikel &amp; Blog" data-i18n-grp="grp.article_blog">
@@ -202,13 +210,13 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.kontext">Um was geht's? Was ist der Hintergrund?</span></p>
           <div class="row g-3">
             <div class="col-lg-8">
-              <label for="description" class="field-label" data-i18n="lbl.topic">Thema &amp; Inhalt</label>
+              <label for="description" class="field-label" data-i18n="lbl.topic" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Beschreibe das Thema so konkret wie möglich, z.B. '5 KI-Tools für Einsteiger im Büroalltag'.">Thema &amp; Inhalt</label>
               <textarea id="description" class="form-control field-input" rows="4"
                 placeholder="Beschreibe das Thema, den Inhalt oder das Ziel deines Textes …"
                 data-i18n-ph="ph.description"></textarea>
             </div>
             <div class="col-sm-6 col-lg-4">
-              <label for="target-audience" class="field-label" data-i18n="lbl.audience">Zielgruppe</label>
+              <label for="target-audience" class="field-label" data-i18n="lbl.audience" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Für wen schreibst du? Je genauer die Zielgruppe, desto passender der generierte Text.">Zielgruppe</label>
               <select id="target-audience" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="B2C – Privat" data-i18n-grp="grp.b2c_privat">
@@ -365,7 +373,7 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.tonfall">Welche Stimmung soll der Text vermitteln?</span></p>
           <div class="row g-3">
             <div class="col-sm-6 col-lg-4">
-              <label for="language-style" class="field-label" data-i18n="lbl.style">Sprachstil</label>
+              <label for="language-style" class="field-label" data-i18n="lbl.style" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="z.B. 'Journalistisch' für Artikel, 'Werblich' für Sales-Texte, 'Persönlich' für Social Media.">Sprachstil</label>
               <select id="language-style" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="Emotional">Emotional (bewegt, berührt)</option>
@@ -463,6 +471,12 @@
             </button>
             <button id="btn-show" type="button" class="action-btn action-btn--outline">
               <i class="fa-solid fa-expand me-2"></i><span data-i18n="btn.fullscreen">Vollansicht</span>
+            </button>
+            <button id="btn-export" type="button" class="action-btn action-btn--outline">
+              <i class="fa-solid fa-download me-2"></i><span data-i18n="btn.export">Exportieren</span>
+            </button>
+            <button id="btn-variations" type="button" class="action-btn action-btn--outline">
+              <i class="fa-solid fa-shuffle me-2"></i><span data-i18n="btn.variations">Variationen</span>
             </button>
             <div class="action-divider d-none d-sm-flex"></div>
             <span class="action-label d-none d-sm-block" data-i18n="lbl.openin">Öffnen in:</span>
@@ -657,6 +671,27 @@
         <i class="fa-solid fa-inbox d-block mb-2" style="font-size:2rem;opacity:.3"></i>
         <span data-i18n="history.empty">Noch keine Prompts generiert.</span>
       </p>
+    </div>
+  </div>
+
+  <!-- ===== Variations-Modal ===== -->
+  <div class="modal fade" id="variationsModal" tabindex="-1" aria-labelledby="variationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="variationsModalLabel">
+            <i class="fa-solid fa-shuffle me-2"></i><span data-i18n="variations.title">Prompt-Variationen</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body" id="variations-body">
+          <p class="text-muted mb-3" style="font-size:.875rem;" data-i18n="variations.subtitle">3 alternative Formulierungen deines Prompts – klicke auf eine, um sie zu kopieren.</p>
+          <div id="variations-list"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
+        </div>
+      </div>
     </div>
   </div>
 

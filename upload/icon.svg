@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Antenna base -->
+  <rect x="236" y="68" width="40" height="56" rx="20" fill="white" opacity="0.9"/>
+  <!-- Antenna ball -->
+  <circle cx="256" cy="58" r="28" fill="white" opacity="0.95"/>
+  <!-- Head -->
+  <rect x="96" y="124" width="320" height="220" rx="36" fill="white" opacity="0.93"/>
+  <!-- Left eye -->
+  <rect x="142" y="178" width="88" height="72" rx="18" fill="#7c3aed"/>
+  <circle cx="174" cy="202" r="16" fill="white" opacity="0.45"/>
+  <!-- Right eye -->
+  <rect x="282" y="178" width="88" height="72" rx="18" fill="#7c3aed"/>
+  <circle cx="314" cy="202" r="16" fill="white" opacity="0.45"/>
+  <!-- Mouth -->
+  <rect x="152" y="276" width="208" height="28" rx="14" fill="#7c3aed"/>
+  <rect x="214" y="276" width="4" height="28" rx="2" fill="white" opacity="0.5"/>
+  <rect x="294" y="276" width="4" height="28" rx="2" fill="white" opacity="0.5"/>
+  <!-- Body -->
+  <rect x="72" y="364" width="368" height="116" rx="32" fill="white" opacity="0.82"/>
+  <!-- Body buttons -->
+  <circle cx="172" cy="422" r="26" fill="#7c3aed" opacity="0.75"/>
+  <circle cx="256" cy="422" r="26" fill="#9333ea" opacity="0.75"/>
+  <circle cx="340" cy="422" r="26" fill="#6d28d9" opacity="0.75"/>
+</svg>

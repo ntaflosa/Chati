@@ -11,9 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalPromptText = document.getElementById('modal-prompt-text');
   const btnCopy         = document.getElementById('btn-copy');
   const btnShow         = document.getElementById('btn-show');
+  const btnExport       = document.getElementById('btn-export');
+  const btnVariations   = document.getElementById('btn-variations');
   const btnHelp         = document.getElementById('btn-help');
   const btnReset        = document.getElementById('btn-reset');
   const btnShare        = document.getElementById('btn-share');
+  const btnUiLang       = document.getElementById('btn-ui-lang');
+  const uiLangLabel     = document.getElementById('ui-lang-label');
   const btnDarkMode     = document.getElementById('btn-dark-mode');
   const darkModeIcon    = document.getElementById('dark-mode-icon');
   const btnToggleAll    = document.getElementById('btn-toggle-all');
@@ -30,9 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const historyList     = document.getElementById('history-list');
   const historyEmpty    = document.getElementById('history-empty');
 
-  const promptModal    = new bootstrap.Modal(document.getElementById('promptModal'));
-  const helpModal      = new bootstrap.Modal(document.getElementById('helpModal'));
-  const historyCanvas  = new bootstrap.Offcanvas(document.getElementById('historyOffcanvas'));
+  const promptModal      = new bootstrap.Modal(document.getElementById('promptModal'));
+  const helpModal        = new bootstrap.Modal(document.getElementById('helpModal'));
+  const variationsModal  = new bootstrap.Modal(document.getElementById('variationsModal'));
+  const historyCanvas    = new bootstrap.Offcanvas(document.getElementById('historyOffcanvas'));
   const copyToast      = new bootstrap.Toast(document.getElementById('copy-toast'),  { delay: 2500 });
   const shareToast     = new bootstrap.Toast(document.getElementById('share-toast'), { delay: 2500 });
 
@@ -668,11 +673,204 @@ document.addEventListener('DOMContentLoaded', () => {
   btnHelp?.addEventListener('click', () => helpModal.show());
   btnReset?.addEventListener('click', resetForm);
   btnShare?.addEventListener('click', shareUrl);
+  btnExport?.addEventListener('click', downloadPrompt);
+  btnVariations?.addEventListener('click', showVariations);
 
   document.getElementById('btn-history')?.addEventListener('click', () => {
     renderHistory();
     historyCanvas.show();
   });
+
+  // ── TXT Export ────────────────────────────────────────────────────────────
+  const downloadPrompt = () => {
+    const text = getCurrentPrompt().trim();
+    if (!text) return;
+    const date = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `chati-prompt-${date}.txt`,
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+
+  // ── Prompt Variationen ────────────────────────────────────────────────────
+  const buildVariations = () => {
+    const type        = val('content-type'),
+          description = val('description'),
+          audience    = val('target-audience'),
+          length      = val('content-length'),
+          formatting  = val('formatting'),
+          seo         = val('seo-keyword-option'),
+          titleSub    = val('title-subtitle-option'),
+          perspective = val('perspective'),
+          addressForm = val('address-form'),
+          style       = val('language-style'),
+          emojis      = val('emoji-option'),
+          beispiel    = val('beispiel');
+
+    if (!type && !description) return [];
+
+    const art = ARTICLE_MAP[type] ?? 'einen ';
+    const fp = [];
+    if (length)   fp.push(LENGTH_MAP[length] || length);
+    if (formatting) fp.push(formatting);
+    if (seo === 'Ja') fp.push('SEO-Keywords');
+    if (titleSub === 'ja') fp.push('Titel');
+    if (emojis === 'keine') fp.push('keine Emojis');
+    else if (emojis) fp.push(emojis + ' Emojis');
+    const fmt = fp.join(', ');
+
+    // Variation 1 – Kompakt (Stichpunkte)
+    const v1 = [];
+    if (type) v1.push(`Verfasse ${art}${type}.`);
+    if (description) v1.push(`Thema: ${description}.`);
+    if (audience)    v1.push(`Zielgruppe: ${audience}.`);
+    if (fmt)         v1.push(`Format: ${fmt}.`);
+    if (style)       v1.push(`Stil: ${style}.`);
+    if (beispiel)    v1.push(`Referenz: ${beispiel}`);
+
+    // Variation 2 – Thema zuerst
+    const v2 = [];
+    if (description) v2.push(`Zum Thema „${description}": `);
+    if (type)        v2.push(`Schreibe ${art}${type}${audience ? ` für ${audience}` : ''}.`);
+    const details = [];
+    if (fmt)   details.push(fmt);
+    if (style) details.push(`${style.toLowerCase()} Stil`);
+    if (perspective) details.push(perspective);
+    if (details.length) v2.push(`Berücksichtige: ${details.join(', ')}.`);
+    if (beispiel) v2.push(`Orientiere dich an: ${beispiel}`);
+
+    // Variation 3 – Rollen-Ansatz
+    const v3 = [];
+    v3.push(style ? `Du bist ein ${style.toLowerCase()} schreibender Texter.` : 'Du bist ein erfahrener Texter.');
+    if (type && description) v3.push(`Erstelle ${art}${type} über: ${description}.`);
+    else if (type)            v3.push(`Erstelle ${art}${type}.`);
+    if (audience) v3.push(`Zielgruppe: ${audience}.`);
+    if (fmt)      v3.push(`Format: ${fmt}.`);
+    if (addressForm) v3.push(`Schreibe in der ${ADDRESS_MAP[addressForm] || addressForm}.`);
+    if (beispiel) v3.push(`Stilreferenz: ${beispiel}`);
+
+    return [v1.join(' '), v2.join(''), v3.join(' ')].filter(v => v.trim().length > 5);
+  };
+
+  const showVariations = () => {
+    const vars = buildVariations();
+    const list = document.getElementById('variations-list');
+    if (!list) return;
+    if (!vars.length) {
+      list.innerHTML = '<p class="text-muted text-center py-3">Bitte zuerst mindestens Texttyp oder Thema ausfüllen.</p>';
+    } else {
+      list.innerHTML = vars.map((v, i) => `
+        <div class="variation-item" data-text="${v.replace(/"/g, '&quot;')}">
+          <div class="variation-num">Variation ${i + 1}</div>
+          <div class="variation-text">${esc(v)}</div>
+          <button type="button" class="action-btn action-btn--outline variation-copy-btn mt-2">
+            <i class="fa-solid fa-copy me-1"></i>Kopieren
+          </button>
+        </div>`).join('');
+    }
+    variationsModal.show();
+  };
+
+  document.getElementById('variations-list')?.addEventListener('click', async e => {
+    const btn = e.target.closest('.variation-copy-btn');
+    if (!btn) return;
+    const text = btn.closest('.variation-item')?.dataset.text;
+    if (!text) return;
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text, style: 'position:fixed;opacity:0;' });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    copyToast.show();
+  });
+
+  // ── UI Sprache (Mehrsprachige UI) ─────────────────────────────────────────
+  const UI_STRINGS = {
+    de: {
+      'header.subtitle': 'KI Prompt-Generator',
+      'btn.toggleAll.close': 'Alle schließen', 'btn.toggleAll.open': 'Alle aufklappen',
+      'btn.history': 'Verlauf', 'btn.help': 'Hilfe',
+      'catalog.title': 'Prompt-Katalog',
+      'catalog.subtitle': '– Vorlage wählen und alle Felder automatisch befüllen',
+      'filter.all': 'Alle',
+      'step.aufgabe': 'Aufgabe', 'step.kontext': 'Kontext', 'step.format': 'Format',
+      'step.persona': 'Persona', 'step.tonfall': 'Tonfall', 'step.beispiel': 'Beispiel',
+      'badge.essential': 'Essenziell', 'badge.important': 'Wichtig', 'badge.optional': 'Optional',
+      'hint.aufgabe': 'Was genau willst du erreichen?',
+      'hint.kontext': 'Um was geht\'s? Was ist der Hintergrund?',
+      'hint.format': 'Wie soll die Ausgabe strukturiert sein?',
+      'hint.persona': 'Wer schreibt – und wie spricht er die Leser an?',
+      'hint.tonfall': 'Welche Stimmung soll der Text vermitteln?',
+      'hint.beispiel': 'Ctrl+C → Ctrl+V: Gib einen Referenztext oder Stilhinweis an',
+      'lbl.contenttype': 'Texttyp / Verwendungszweck', 'lbl.topic': 'Thema & Inhalt',
+      'lbl.audience': 'Zielgruppe', 'lbl.length': 'Textlänge', 'lbl.formatting': 'Formatierung',
+      'lbl.emojis': 'Emojis', 'lbl.seo': 'SEO-Keywords', 'lbl.titlesubtitle': 'Titel & Untertitel',
+      'lbl.perspective': 'Perspektive', 'lbl.addressform': 'Anredeform', 'lbl.style': 'Sprachstil',
+      'lbl.example': 'Stilreferenz oder Beispieltext',
+      'preview.title': 'Live-Vorschau', 'tab.visual': 'Visuell', 'tab.flow': 'Prompt',
+      'btn.copy': 'Kopieren', 'btn.share': 'Teilen', 'btn.fullscreen': 'Vollansicht',
+      'btn.export': 'Exportieren', 'btn.variations': 'Variationen',
+      'lbl.openin': 'Öffnen in:', 'btn.reset': 'Zurücksetzen',
+      'modal.title': 'Generierter Prompt', 'btn.close': 'Schließen',
+      'history.title': 'Prompt-Verlauf', 'history.empty': 'Noch keine Prompts generiert.',
+      'variations.title': 'Prompt-Variationen',
+      'variations.subtitle': '3 alternative Formulierungen deines Prompts – klicke auf eine, um sie zu kopieren.',
+    },
+    en: {
+      'header.subtitle': 'AI Prompt Generator',
+      'btn.toggleAll.close': 'Collapse all', 'btn.toggleAll.open': 'Expand all',
+      'btn.history': 'History', 'btn.help': 'Help',
+      'catalog.title': 'Prompt Catalog',
+      'catalog.subtitle': '– Choose a template and auto-fill all fields',
+      'filter.all': 'All',
+      'step.aufgabe': 'Task', 'step.kontext': 'Context', 'step.format': 'Format',
+      'step.persona': 'Persona', 'step.tonfall': 'Tone', 'step.beispiel': 'Example',
+      'badge.essential': 'Essential', 'badge.important': 'Important', 'badge.optional': 'Optional',
+      'hint.aufgabe': 'What exactly do you want to achieve?',
+      'hint.kontext': 'What\'s it about? What\'s the background?',
+      'hint.format': 'How should the output be structured?',
+      'hint.persona': 'Who is writing – and how do they address readers?',
+      'hint.tonfall': 'What mood should the text convey?',
+      'hint.beispiel': 'Ctrl+C → Ctrl+V: Provide a reference text or style hint',
+      'lbl.contenttype': 'Content Type / Purpose', 'lbl.topic': 'Topic & Content',
+      'lbl.audience': 'Target Audience', 'lbl.length': 'Text Length', 'lbl.formatting': 'Formatting',
+      'lbl.emojis': 'Emojis', 'lbl.seo': 'SEO Keywords', 'lbl.titlesubtitle': 'Title & Subtitle',
+      'lbl.perspective': 'Perspective', 'lbl.addressform': 'Form of Address', 'lbl.style': 'Writing Style',
+      'lbl.example': 'Style Reference or Example Text',
+      'preview.title': 'Live Preview', 'tab.visual': 'Visual', 'tab.flow': 'Prompt',
+      'btn.copy': 'Copy', 'btn.share': 'Share', 'btn.fullscreen': 'Full View',
+      'btn.export': 'Export', 'btn.variations': 'Variations',
+      'lbl.openin': 'Open in:', 'btn.reset': 'Reset',
+      'modal.title': 'Generated Prompt', 'btn.close': 'Close',
+      'history.title': 'Prompt History', 'history.empty': 'No prompts generated yet.',
+      'variations.title': 'Prompt Variations',
+      'variations.subtitle': '3 alternative formulations of your prompt – click one to copy.',
+    },
+  };
+
+  let uiLang = 'de';
+
+  const applyUILang = (lang) => {
+    uiLang = lang;
+    const t = UI_STRINGS[lang] || UI_STRINGS.de;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (t[key]) el.textContent = t[key];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const key = el.dataset.i18nPh;
+      if (t[key]) el.placeholder = t[key];
+    });
+    if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
+    try { localStorage.setItem('chati_ui_lang', lang); } catch {}
+  };
+
+  btnUiLang?.addEventListener('click', () => applyUILang(uiLang === 'de' ? 'en' : 'de'));
 
   // ── Init ──────────────────────────────────────────────────────────────────
 
@@ -680,6 +878,17 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     const t = localStorage.getItem(LS_THEME_KEY);
     if (t === 'dark') applyTheme(true);
+  } catch {}
+
+  // Bootstrap Tooltips initialisieren
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el =>
+    new bootstrap.Tooltip(el, { trigger: 'hover focus' })
+  );
+
+  // UI-Sprache aus localStorage laden
+  try {
+    const savedUiLang = localStorage.getItem('chati_ui_lang');
+    if (savedUiLang && savedUiLang !== 'de') applyUILang(savedUiLang);
   } catch {}
 
   renderCatalog();

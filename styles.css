@@ -621,16 +621,27 @@ textarea.field-input { resize: vertical; min-height: 110px; line-height: 1.6; }
 
 /* Safe-Area-Insets für iPhone mit Notch / Dynamic Island */
 .app-header {
-  padding-top: calc(1rem + env(safe-area-inset-top));
-  padding-left:  env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  padding-top: 1rem;
+  padding-top: calc(1rem + env(safe-area-inset-top, 0px));
 }
 .main-content {
-  padding-left:  max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .app-footer {
-  padding-bottom: calc(1.125rem + env(safe-area-inset-bottom));
+  padding-bottom: 1.125rem;
+  padding-bottom: calc(1.125rem + env(safe-area-inset-bottom, 0px));
+}
+/* Safe-area für Geräte die env() unterstützen */
+@supports (padding: env(safe-area-inset-left)) {
+  .app-header {
+    padding-left:  env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .main-content {
+    padding-left:  calc(1rem + env(safe-area-inset-left));
+    padding-right: calc(1rem + env(safe-area-inset-right));
+  }
 }
 
 /* Mindest-Touch-Target 44px für alle Buttons */
@@ -863,3 +874,41 @@ textarea.field-input { resize: vertical; min-height: 110px; line-height: 1.6; }
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .history-item__copy { font-size: 0.75rem !important; padding: 0.3rem 0.75rem !important; }
+
+/* ============================================================
+   Prompt-Variationen
+   ============================================================ */
+.variation-item {
+  background: var(--color-surface-alt);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.875rem;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.variation-item:hover { border-color: var(--color-primary); box-shadow: var(--shadow-sm); }
+
+.variation-num {
+  font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+.variation-text {
+  font-size: 0.9375rem; line-height: 1.65; color: var(--color-text);
+  word-break: break-word;
+}
+
+[data-theme="dark"] .variation-item { background: var(--color-surface-alt); border-color: var(--color-border); }
+[data-theme="dark"] .variation-item:hover { border-color: var(--color-primary); }
+
+/* ============================================================
+   Field-Labels mit Tooltip – Cursor-Hinweis
+   ============================================================ */
+label[data-bs-toggle="tooltip"] { cursor: help; }
+label[data-bs-toggle="tooltip"]::after {
+  content: ' ⓘ';
+  font-size: 0.75em;
+  opacity: 0.5;
+  font-style: normal;
+}
