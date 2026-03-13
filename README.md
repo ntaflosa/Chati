@@ -1,12 +1,15 @@
 # Chati – KI Prompt-Generator
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-1.2-brightgreen.svg)
 ![Technologien](https://img.shields.io/badge/Technologien-HTML5%20%7C%20CSS3%20%7C%20JavaScript%20%7C%20Bootstrap%205-blue)
+![PWA](https://img.shields.io/badge/PWA-ready-purple.svg)
 
 ## Überblick
 
-**Chati** ist ein browserbasierter Prompt-Generator, der Nutzer dabei unterstützt, präzise und strukturierte Prompts für KI-Anwendungen wie [Microsoft Copilot](https://copilot.microsoft.com) und [ChatGPT](https://chat.openai.com) zu erstellen. Über ein übersichtliches Formular werden alle relevanten Parameter (Texttyp, Zielgruppe, Sprachstil, Formatierung u.v.m.) ausgewählt – Chati generiert daraus automatisch einen fertig formulierten Prompt, der direkt in das gewünschte KI-Tool eingefügt werden kann.
+**Chati** ist ein browserbasierter KI Prompt-Generator, der Nutzer dabei unterstützt, präzise und strukturierte Prompts für KI-Anwendungen wie [Microsoft Copilot](https://copilot.microsoft.com) und [ChatGPT](https://chat.openai.com) zu erstellen. Über ein übersichtliches Formular werden alle relevanten Parameter (Texttyp, Zielgruppe, Sprachstil, Formatierung u.v.m.) ausgewählt – Chati generiert daraus automatisch einen fertig formulierten Prompt, der direkt in das gewünschte KI-Tool eingefügt werden kann.
+
+Chati läuft vollständig im Browser – kein Backend, kein Build-Schritt. Ab Version 1.2 ist Chati auch als **Progressive Web App (PWA)** installierbar.
 
 Nach einem Jahr erfolgreicher Entwicklung und positiver Resonanz aus der Community wurde Chati im Februar 2025 als Open-Source-Projekt auf GitHub veröffentlicht.
 
@@ -23,26 +26,42 @@ Vorgefertigte Vorlagen für die häufigsten Anwendungsfälle – ein Klick befü
 | Social Media | LinkedIn-Post, Instagram-Caption, Twitter/X-Post, Facebook-Beitrag |
 | Marketing | Produktbeschreibung, Newsletter, Landing Page |
 | E-Mail | Kalt-Akquise, Follow-Up, Angebots-E-Mail |
+| Business | Executive Summary, Bericht, Stellenanzeige |
 
-### Formular-Einstellungen
+### Formular-Einstellungen (6 Schritte)
 Alle Parameter sind frei kombinierbar:
 
-- **Verwendungszweck** – über 20 Texttypen in 5 Kategorien (Content, Social Media, Marketing, Multimedia, Interaktiv)
-- **Textlänge** – Kurz bis Extrem lang
-- **Zielgruppe** – von Allgemein bis Akademisch
-- **Sprachstil** – 11 Stile (Emotional, Formell, Journalistisch, Werblich u.a.)
-- **Perspektive** – Ich / Du / Wir / Er-Sie / Neutral
-- **Emojis** – Keine / Wenige / Viele
-- **Anredeform** – Formal (Sie) / Informell (Du) / Neutral / Kombiniert
-- **Formatierung** – Fließtext, Bullet Points, Nummerierte Liste, Tabellarisch, Zitat
-- **SEO-Keywords** – optional generieren lassen
-- **Titel & Untertitel** – optional generieren lassen
+- **Aufgabe** – über 30 Texttypen in 8 Kategorien (Content, Social Media, Marketing, E-Mail, Business, Multimedia, Kreativ, Interaktiv)
+- **Kontext** – Thema, Inhalt & Zielgruppe (B2C, B2B, Interessen)
+- **Format** – Textlänge, Formatierung, Emojis, SEO-Keywords, Titel & Untertitel
+- **Persona** – Perspektive (Ich / Wir / Du / Er-Sie / Neutral) & Anredeform
+- **Tonfall** – 16 Sprachstile (Emotional, Formell, Journalistisch, Werblich u.a.)
+- **Beispiel** – Stilreferenz oder Beispieltext (optional)
 
 ### Live-Vorschau
-Der fertige Prompt wird in Echtzeit aktualisiert, während Parameter geändert werden. Per Knopfdruck in die Zwischenablage kopieren oder in der Vollansicht (Modal) lesen.
+Der fertige Prompt wird in Echtzeit aktualisiert. Zwei Ansichtsmodi:
+- **Visuell** – strukturierte Kachel-Ansicht aller Bausteine
+- **Prompt** – fertiger Fließtext zum Kopieren
 
-### Direkte KI-Integration
-Schnellzugriff-Buttons öffnen Microsoft Copilot und ChatGPT direkt im Browser.
+Fortschrittsanzeige (Score-Punkte 0/6) zeigt, welche Felder noch fehlen.
+
+### PWA – Installierbar
+Chati kann als App auf Desktop und Mobilgeräten installiert werden (Chrome, Edge, Safari). Funktioniert auch offline dank Service Worker.
+
+### Dark Mode
+Vollständig unterstützter Dark/Light Mode mit automatischer Systemerkennung und manuellem Toggle.
+
+### Prompt-Verlauf
+Die letzten 8 generierten Prompts werden lokal gespeichert und sind per Seitenleiste abrufbar.
+
+### Sprache (DE / EN)
+Prompt-Ausgabe wahlweise auf Deutsch oder Englisch – umschaltbar direkt in der Live-Vorschau.
+
+### Teilen & Exportieren
+- Prompt per Knopfdruck in die Zwischenablage kopieren
+- Share-Link generieren (URL-Parameter)
+- Vollansicht im Modal
+- Direktzugriff auf Microsoft Copilot und ChatGPT
 
 ---
 
@@ -55,9 +74,10 @@ Schnellzugriff-Buttons öffnen Microsoft Copilot und ChatGPT direkt im Browser.
 | Logik | Vanilla JavaScript (ES6+) |
 | Icons | Font Awesome 6.5 (CDN) |
 | Schrift | Inter (Google Fonts) |
+| PWA | Web App Manifest + Service Worker |
 | Versionierung | Git / GitHub |
 
-Keine serverseitige Logik – Chati läuft vollständig im Browser und benötigt kein Backend.
+Keine serverseitige Logik – Chati läuft vollständig im Browser.
 
 ---
 
@@ -65,10 +85,13 @@ Keine serverseitige Logik – Chati läuft vollständig im Browser und benötigt
 
 ```
 Chati/
-├── index.html      # Haupt-HTML mit Struktur, Modal und Toast
-├── styles.css      # Gesamtes Styling (Custom Properties, Komponenten, Responsive)
-├── script.js       # Formular-Logik, Live-Vorschau, Katalog-Interaktion, Clipboard
+├── index.html      # Haupt-HTML mit Struktur, Modals, Offcanvas und Toasts
+├── styles.css      # Gesamtes Styling (Custom Properties, Komponenten, Responsive, Dark Mode)
+├── script.js       # Formular-Logik, Live-Vorschau, Verlauf, Dark Mode, i18n, Share
 ├── catalog.js      # Prompt-Katalog: alle Vorlagen als JS-Array (leicht erweiterbar)
+├── manifest.json   # PWA Web App Manifest
+├── sw.js           # Service Worker (Offline-Support)
+├── icon.svg        # App-Icon (PWA)
 └── README.md
 ```
 
@@ -85,6 +108,10 @@ cd Chati
 
 Anschließend `index.html` direkt im Browser öffnen – kein Build-Schritt, kein Server erforderlich.
 
+### Als PWA installieren
+
+In Chrome oder Edge die Installieren-Schaltfläche in der Adressleiste klicken – Chati wird als eigenständige App hinzugefügt.
+
 ### Neue Vorlage zum Katalog hinzufügen
 
 In `catalog.js` einfach ein weiteres Objekt ans Array anhängen:
@@ -94,17 +121,17 @@ In `catalog.js` einfach ein weiteres Objekt ans Array anhängen:
   id: 'meine-vorlage',           // eindeutige ID (kebab-case)
   name: 'Meine Vorlage',         // Anzeigename in der UI
   icon: 'fa-solid fa-star',      // Font Awesome 6 Icon-Klasse
-  category: 'Content',           // Content | Social Media | Marketing | E-Mail
+  category: 'Content',           // Content | Social Media | Marketing | E-Mail | Business
   descriptionHint: 'Hinweis für das Beschreibungsfeld …',
   fields: {
     'content-type':          'Blog-Post',
-    'content-length':        'Kurze Absätze oder längere Sätze',
-    'target-audience':       'Allgemeininteressierte Leser',
+    'content-length':        'Mittel (300–600 Wörter)',
+    'target-audience':       'Berufstätige (30–50 Jahre)',
     'language-style':        'Informell',
     'perspective':           'Ich-Perspektive',
     'emoji-option':          'wenige',
     'address-form':          'informell',
-    'formatting':            'Text',
+    'formatting':            'Überschriften + Fließtext',
     'seo-keyword-option':    'Nein',
     'title-subtitle-option': 'nein',
   },
@@ -112,6 +139,26 @@ In `catalog.js` einfach ein weiteres Objekt ans Array anhängen:
 ```
 
 Kein weiterer Code notwendig – die Karte erscheint automatisch im UI.
+
+---
+
+## Changelog
+
+### v1.2
+- PWA-Support (installierbar, Offline-Modus via Service Worker)
+- Dark Mode mit Systemerkennung
+- Prompt-Verlauf (letzte 8 Prompts, lokal gespeichert)
+- Sprachtoggle DE / EN für Prompt-Ausgabe
+- Share-Funktion (URL-Parameter)
+- Erweiterter Prompt-Katalog (Business-Kategorie)
+- Score-Anzeige (Fortschritt 0/6)
+- Einklappbare Abschnitte
+
+### v1.0
+- Erster öffentlicher Release
+- Prompt-Katalog mit Filterung
+- Live-Vorschau, Visuell- und Prompt-Tab
+- Direkte KI-Integration (Copilot, ChatGPT)
 
 ---
 
