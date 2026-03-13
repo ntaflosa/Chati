@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="light">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chati – Prompt-Generator</title>
+  <!-- PWA -->
+  <meta name="theme-color" content="#7c3aed">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Chati">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,10 +29,25 @@
         </div>
         <div>
           <h1 class="header-title mb-0">Chati</h1>
-          <p class="header-subtitle mb-0">KI Prompt-Generator</p>
+          <p class="header-subtitle mb-0" data-i18n="header.subtitle">KI Prompt-Generator</p>
         </div>
-        <div class="ms-auto">
-          <span class="version-badge">v1.0</span>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <button id="btn-toggle-all" class="help-btn" aria-label="Alle Abschnitte auf-/zuklappen">
+            <i class="fa-solid fa-angles-up" id="toggle-all-icon"></i>
+            <span class="d-none d-sm-inline ms-1" id="toggle-all-label" data-i18n="btn.toggleAll.close">Alle schließen</span>
+          </button>
+          <button id="btn-history" class="help-btn" aria-label="Prompt-Verlauf öffnen">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span class="d-none d-lg-inline ms-1" data-i18n="btn.history">Verlauf</span>
+          </button>
+          <button id="btn-dark-mode" class="help-btn" aria-label="Dark Mode umschalten">
+            <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+          </button>
+          <button id="btn-help" class="help-btn" aria-label="Hilfe: Wie baut man einen Prompt?">
+            <i class="fa-solid fa-circle-question"></i>
+            <span class="d-none d-sm-inline ms-1" data-i18n="btn.help">Hilfe</span>
+          </button>
+          <span class="version-badge">v1.1</span>
         </div>
       </div>
     </div>
@@ -36,76 +58,114 @@
     <div class="container-lg">
 
       <!-- ===== Prompt-Katalog ===== -->
-      <div class="section-card mb-4">
-        <div class="section-header catalog-header" id="catalog-toggle" role="button" tabindex="0" aria-expanded="true">
-          <i class="fa-solid fa-book-open me-2"></i>Prompt-Katalog
-          <span class="catalog-subtitle ms-2">– Vorlage wählen und alle Felder automatisch befüllen</span>
-          <i class="fa-solid fa-chevron-up ms-auto catalog-chevron" id="catalog-chevron"></i>
+      <div class="section-card mb-3">
+        <div class="section-header section-collapsible" id="catalog-toggle" role="button" tabindex="0" aria-expanded="true">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-book-open"></i>
+            <span data-i18n="catalog.title">Prompt-Katalog</span>
+            <span class="catalog-subtitle d-none d-md-inline" data-i18n="catalog.subtitle">– Vorlage wählen und alle Felder automatisch befüllen</span>
+          </div>
+          <i class="fa-solid fa-chevron-up section-chevron" id="catalog-chevron"></i>
         </div>
         <div class="section-body" id="catalog-body">
           <div class="catalog-filters mb-4" id="catalog-filters">
-            <button class="filter-chip active" data-filter="alle">Alle</button>
+            <button class="filter-chip active" data-filter="alle" data-i18n="filter.all">Alle</button>
             <button class="filter-chip" data-filter="Content">Content</button>
             <button class="filter-chip" data-filter="Social Media">Social Media</button>
             <button class="filter-chip" data-filter="Marketing">Marketing</button>
             <button class="filter-chip" data-filter="E-Mail">E-Mail</button>
+            <button class="filter-chip" data-filter="Business">Business</button>
           </div>
-          <div class="catalog-grid" id="catalog-grid">
-            <!-- Rendered by script.js from catalog.js -->
-          </div>
+          <div class="catalog-grid" id="catalog-grid"></div>
         </div>
       </div>
 
-      <!-- Inhalt & Zweck -->
-      <div class="section-card mb-4">
-        <div class="section-header">
-          <i class="fa-solid fa-file-lines me-2"></i>Inhalt &amp; Zweck
+      <!-- ===== SCHRITT 1: AUFGABE ===== -->
+      <div class="section-card mb-3">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-aufgabe" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <span class="step-num">1</span>
+            <i class="fa-solid fa-bullseye"></i>
+            <span data-i18n="step.aufgabe">Aufgabe</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="priority-badge priority-badge--essential" data-i18n="badge.essential">Essenziell</span>
+            <i class="fa-solid fa-chevron-up section-chevron"></i>
+          </div>
         </div>
-        <div class="section-body">
-          <div class="row g-4">
-            <div class="col-md-6">
-              <label for="description" class="field-label">Beschreibung des Themas</label>
-              <textarea
-                id="description"
-                class="form-control field-input"
-                rows="5"
-                placeholder="Beschreiben Sie hier das Thema Ihres Inhalts …"></textarea>
-            </div>
-            <div class="col-md-6">
-              <label for="content-type" class="field-label">Verwendungszweck</label>
+        <div class="section-body" id="body-aufgabe">
+          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
+          <div class="row g-3">
+            <div class="col-md-8 col-lg-6">
+              <label for="content-type" class="field-label" data-i18n="lbl.contenttype">Texttyp / Verwendungszweck</label>
               <select id="content-type" class="form-select field-input">
                 <option value="">Bitte wählen</option>
-                <optgroup label="Artikel &amp; Blog">
+                <optgroup label="Artikel &amp; Blog" data-i18n-grp="grp.article_blog">
                   <option value="Artikel">Artikel</option>
                   <option value="Blog-Post">Blog-Post</option>
+                  <option value="How-to-Anleitung">How-to-Anleitung</option>
+                  <option value="Listicle (Top-X-Artikel)">Listicle (Top-X-Artikel)</option>
+                  <option value="Interview">Interview</option>
                   <option value="Whitepaper">Whitepaper</option>
                   <option value="Case-Study">Case-Study</option>
                   <option value="Pressemitteilung">Pressemitteilung</option>
                   <option value="E-Book">E-Book</option>
                   <option value="Buchrezension">Buchrezension</option>
+                  <option value="Zusammenfassung">Zusammenfassung</option>
                 </optgroup>
-                <optgroup label="Social Media">
+                <optgroup label="Social Media" data-i18n-grp="grp.social_media">
                   <option value="Facebook-Beitrag">Facebook-Beitrag</option>
                   <option value="Instagram-Beitrag">Instagram-Beitrag</option>
+                  <option value="Story-Skript (Instagram / Facebook)">Story-Skript (Instagram / Facebook)</option>
+                  <option value="Carousel-Post">Carousel-Post</option>
                   <option value="LinkedIn-Beitrag">LinkedIn-Beitrag</option>
                   <option value="Twitter-Beitrag">Twitter / X-Beitrag</option>
+                  <option value="TikTok-Skript">TikTok-Skript</option>
+                  <option value="Reels-Skript">Reels-Skript</option>
+                  <option value="Threads-Beitrag">Threads-Beitrag</option>
+                  <option value="Xing-Beitrag">Xing-Beitrag</option>
                 </optgroup>
-                <optgroup label="Marketing &amp; SEO">
+                <optgroup label="Marketing &amp; SEO" data-i18n-grp="grp.marketing_seo">
                   <option value="Produktbeschreibung">Produktbeschreibung</option>
+                  <option value="Verkaufstext / Sales Page">Verkaufstext / Sales Page</option>
+                  <option value="Produktvergleich">Produktvergleich</option>
+                  <option value="FAQ-Seite">FAQ-Seite</option>
                   <option value="Anzeige">Anzeige</option>
                   <option value="SEO-Text">SEO-Text</option>
                   <option value="Newsletter">Newsletter</option>
                   <option value="Landing Page">Landing Page</option>
-                  <option value="E-Mail">E-Mail</option>
                 </optgroup>
-                <optgroup label="Multimedia">
+                <optgroup label="E-Mail &amp; Kommunikation" data-i18n-grp="grp.email_komm">
+                  <option value="E-Mail">E-Mail (allgemein)</option>
+                  <option value="Kaltakquise-E-Mail">Kaltakquise-E-Mail</option>
+                  <option value="Follow-up-E-Mail">Follow-up-E-Mail</option>
+                  <option value="Onboarding-E-Mail">Onboarding-E-Mail</option>
+                  <option value="Kundenservice-Antwort">Kundenservice-Antwort</option>
+                </optgroup>
+                <optgroup label="Business &amp; Karriere" data-i18n-grp="grp.business_karriere">
+                  <option value="Präsentation">Präsentation</option>
+                  <option value="Executive Summary">Executive Summary</option>
+                  <option value="Bericht / Report">Bericht / Report</option>
+                  <option value="Angebot / Proposal">Angebot / Proposal</option>
+                  <option value="Meeting-Protokoll">Meeting-Protokoll</option>
+                  <option value="Stellenanzeige">Stellenanzeige</option>
+                  <option value="Bewerbungsschreiben">Bewerbungsschreiben</option>
+                </optgroup>
+                <optgroup label="Multimedia" data-i18n-grp="grp.multimedia">
                   <option value="YouTube-Video">YouTube-Video</option>
+                  <option value="YouTube-Short-Skript">YouTube-Short-Skript</option>
                   <option value="Podcast-Episode">Podcast-Episode</option>
                   <option value="Infografik">Infografik</option>
                   <option value="Webinar">Webinar</option>
                   <option value="Live-Stream">Live-Stream</option>
                 </optgroup>
-                <optgroup label="Interaktiv">
+                <optgroup label="Kreativ" data-i18n-grp="grp.kreativ">
+                  <option value="Slogan / Claim">Slogan / Claim</option>
+                  <option value="Kurzgeschichte">Kurzgeschichte</option>
+                  <option value="Gedicht / Lyrik">Gedicht / Lyrik</option>
+                  <option value="Drehbuch / Skript">Drehbuch / Skript</option>
+                </optgroup>
+                <optgroup label="Interaktiv" data-i18n-grp="grp.interaktiv">
                   <option value="Online-Quiz">Online-Quiz</option>
                   <option value="Chatbot">Chatbot</option>
                   <option value="Online-Kurs">Online-Kurs</option>
@@ -116,77 +176,101 @@
         </div>
       </div>
 
-      <!-- Zielgruppe & Stil -->
-      <div class="section-card mb-4">
-        <div class="section-header">
-          <i class="fa-solid fa-users me-2"></i>Zielgruppe &amp; Stil
+      <!-- ===== SCHRITT 2: KONTEXT ===== -->
+      <div class="section-card mb-3">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-kontext" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <span class="step-num">2</span>
+            <i class="fa-solid fa-circle-info"></i>
+            <span data-i18n="step.kontext">Kontext</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="priority-badge priority-badge--essential" data-i18n="badge.essential">Essenziell</span>
+            <i class="fa-solid fa-chevron-up section-chevron"></i>
+          </div>
         </div>
-        <div class="section-body">
-          <div class="row g-4">
-            <div class="col-sm-6 col-lg-3">
-              <label for="content-length" class="field-label">Textlänge</label>
-              <select id="content-length" class="form-select field-input">
-                <option value="">Bitte wählen</option>
-                <option value="Kurze, prägnante Sätze oder Fragen">Kurz</option>
-                <option value="Kurze Absätze oder längere Sätze">Mittel</option>
-                <option value="Mittellange Absätze oder kurze Absätze mit mehreren Sätzen">Lang</option>
-                <option value="Lange Absätze mit vielen Sätzen">Sehr lang</option>
-                <option value="Sehr lange Absätze oder mehrere Absätze in Folge">Extrem lang</option>
-              </select>
+        <div class="section-body" id="body-kontext">
+          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.kontext">Um was geht's? Was ist der Hintergrund?</span></p>
+          <div class="row g-3">
+            <div class="col-lg-8">
+              <label for="description" class="field-label" data-i18n="lbl.topic">Thema &amp; Inhalt</label>
+              <textarea id="description" class="form-control field-input" rows="4"
+                placeholder="Beschreibe das Thema, den Inhalt oder das Ziel deines Textes …"
+                data-i18n-ph="ph.description"></textarea>
             </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="target-audience" class="field-label">Zielgruppe</label>
+            <div class="col-sm-6 col-lg-4">
+              <label for="target-audience" class="field-label" data-i18n="lbl.audience">Zielgruppe</label>
               <select id="target-audience" class="form-select field-input">
                 <option value="">Bitte wählen</option>
-                <option value="Allgemeininteressierte Leser">Allgemein</option>
-                <option value="Spezialisierte Leser">Spezialisiert</option>
-                <option value="Fachleute und Experten">Fachleute &amp; Experten</option>
-                <option value="Leser mit bestimmten Interessen">Bestimmte Interessen</option>
-                <option value="Geschäftliche Zielgruppen">Geschäftlich</option>
-                <option value="Akademische Zielgruppen">Akademisch</option>
-              </select>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="language-style" class="field-label">Sprachstil</label>
-              <select id="language-style" class="form-select field-input">
-                <option value="">Bitte wählen</option>
-                <option value="Emotional">Emotional</option>
-                <option value="Formell">Formell</option>
-                <option value="Humorvoll">Humorvoll</option>
-                <option value="Informell">Informell</option>
-                <option value="Journalistisch">Journalistisch</option>
-                <option value="Persönlich">Persönlich</option>
-                <option value="Poetisch">Poetisch</option>
-                <option value="Seriös">Seriös</option>
-                <option value="Technisch">Technisch</option>
-                <option value="Umgangssprachlich">Umgangssprachlich</option>
-                <option value="Werblich">Werblich</option>
-              </select>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="perspective" class="field-label">Perspektive</label>
-              <select id="perspective" class="form-select field-input">
-                <option value="">Bitte wählen</option>
-                <option value="Du-Perspektive">Du-Perspektive</option>
-                <option value="Er-/Sie-Perspektive">Er-/Sie-Perspektive</option>
-                <option value="Ich-Perspektive">Ich-Perspektive</option>
-                <option value="Neutral/Objektiv">Neutral / Objektiv</option>
-                <option value="Wir-Perspektive">Wir-Perspektive</option>
+                <optgroup label="B2C – Privat" data-i18n-grp="grp.b2c_privat">
+                  <option value="Jugendliche (16–25 Jahre)">Jugendliche (16–25 Jahre)</option>
+                  <option value="Junge Erwachsene (25–35 Jahre)">Junge Erwachsene (25–35 Jahre)</option>
+                  <option value="Berufstätige (30–50 Jahre)">Berufstätige (30–50 Jahre)</option>
+                  <option value="Eltern &amp; Familien">Eltern &amp; Familien</option>
+                  <option value="Senioren (50+ Jahre)">Senioren (50+ Jahre)</option>
+                </optgroup>
+                <optgroup label="B2B – Business" data-i18n-grp="grp.b2b_business">
+                  <option value="Gründer &amp; Startups">Gründer &amp; Startups</option>
+                  <option value="KMU-Inhaber &amp; Selbstständige">KMU-Inhaber &amp; Selbstständige</option>
+                  <option value="Manager &amp; Führungskräfte">Manager &amp; Führungskräfte</option>
+                  <option value="B2B-Entscheider">B2B-Entscheider</option>
+                  <option value="IT-Professionals">IT-Professionals</option>
+                </optgroup>
+                <optgroup label="Interessen &amp; Community" data-i18n-grp="grp.interests">
+                  <option value="Technik &amp; Digitales">Technik &amp; Digitales</option>
+                  <option value="Fitness &amp; Gesundheit">Fitness &amp; Gesundheit</option>
+                  <option value="Mode &amp; Lifestyle">Mode &amp; Lifestyle</option>
+                  <option value="Finanzen &amp; Investment">Finanzen &amp; Investment</option>
+                  <option value="Bildung &amp; Weiterbildung">Bildung &amp; Weiterbildung</option>
+                </optgroup>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Format & Optionen -->
-      <div class="section-card mb-4">
-        <div class="section-header">
-          <i class="fa-solid fa-sliders me-2"></i>Format &amp; Optionen
+      <!-- ===== SCHRITT 3: FORMAT ===== -->
+      <div class="section-card mb-3">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-format" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <span class="step-num step-num--important">3</span>
+            <i class="fa-solid fa-sliders"></i>
+            <span data-i18n="step.format">Format</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="priority-badge priority-badge--important" data-i18n="badge.important">Wichtig</span>
+            <i class="fa-solid fa-chevron-up section-chevron"></i>
+          </div>
         </div>
-        <div class="section-body">
-          <div class="row g-4">
-            <div class="col-sm-6 col-lg-3">
-              <label for="emoji-option" class="field-label">Emojis</label>
+        <div class="section-body" id="body-format">
+          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.format">Wie soll die Ausgabe strukturiert sein?</span></p>
+          <div class="row g-3">
+            <div class="col-sm-6 col-lg-4">
+              <label for="content-length" class="field-label" data-i18n="lbl.length">Textlänge</label>
+              <select id="content-length" class="form-select field-input">
+                <option value="">Bitte wählen</option>
+                <option value="Sehr kurz (50–100 Wörter)">Sehr kurz (50–100 Wörter)</option>
+                <option value="Kurz (100–300 Wörter)">Kurz (100–300 Wörter)</option>
+                <option value="Mittel (300–600 Wörter)">Mittel (300–600 Wörter)</option>
+                <option value="Lang (600–1.200 Wörter)">Lang (600–1.200 Wörter)</option>
+                <option value="Sehr lang (1.200+ Wörter)">Sehr lang (1.200+ Wörter)</option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <label for="formatting" class="field-label" data-i18n="lbl.formatting">Formatierung</label>
+              <select id="formatting" class="form-select field-input">
+                <option value="">Bitte wählen</option>
+                <option value="Fließtext">Fließtext</option>
+                <option value="Überschriften + Fließtext">Überschriften + Fließtext</option>
+                <option value="Bullet Points">Bullet Points</option>
+                <option value="Nummerierte Liste">Nummerierte Liste</option>
+                <option value="Schritt-für-Schritt">Schritt-für-Schritt</option>
+                <option value="Tabellarisch">Tabellarisch</option>
+                <option value="Zitat">Zitat</option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <label for="emoji-option" class="field-label" data-i18n="lbl.emojis">Emojis</label>
               <select id="emoji-option" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="keine">Keine Emojis</option>
@@ -194,38 +278,16 @@
                 <option value="viele">Viele Emojis</option>
               </select>
             </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="address-form" class="field-label">Anredeform</label>
-              <select id="address-form" class="form-select field-input">
-                <option value="">Bitte wählen</option>
-                <option value="formal">Formal (Sie-Form)</option>
-                <option value="informell">Informell (Du-Form)</option>
-                <option value="neutral">Neutral</option>
-                <option value="kombiniert">Kombiniert</option>
-              </select>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="formatting" class="field-label">Formatierung</label>
-              <select id="formatting" class="form-select field-input">
-                <option value="">Bitte wählen</option>
-                <option value="Tabellarisch">Tabellarisch</option>
-                <option value="Listen">Listen</option>
-                <option value="Text">Fließtext</option>
-                <option value="Bullet Points">Bullet Points</option>
-                <option value="Nummerierte Liste">Nummerierte Liste</option>
-                <option value="Zitat">Zitat</option>
-              </select>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="seo-keyword-option" class="field-label">SEO-Keywords</label>
+            <div class="col-sm-6 col-lg-4">
+              <label for="seo-keyword-option" class="field-label" data-i18n="lbl.seo">SEO-Keywords</label>
               <select id="seo-keyword-option" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="Ja">Ja, generieren</option>
                 <option value="Nein">Nein</option>
               </select>
             </div>
-            <div class="col-sm-6 col-lg-3">
-              <label for="title-subtitle-option" class="field-label">Titel &amp; Untertitel</label>
+            <div class="col-sm-6 col-lg-4">
+              <label for="title-subtitle-option" class="field-label" data-i18n="lbl.titlesubtitle">Titel &amp; Untertitel</label>
               <select id="title-subtitle-option" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="ja">Ja, generieren</option>
@@ -236,36 +298,173 @@
         </div>
       </div>
 
-      <!-- Live-Vorschau -->
-      <div class="section-card mb-4">
-        <div class="section-header d-flex align-items-center justify-content-between">
-          <span><i class="fa-solid fa-eye me-2"></i>Live-Vorschau</span>
-          <span class="prompt-status" id="prompt-status">
-            <i class="fa-solid fa-circle-notch fa-spin me-1"></i>Warte auf Eingaben …
-          </span>
+      <!-- ===== SCHRITT 4: PERSONA ===== -->
+      <div class="section-card mb-3">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-persona" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <span class="step-num step-num--important">4</span>
+            <i class="fa-solid fa-user-pen"></i>
+            <span data-i18n="step.persona">Persona</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="priority-badge priority-badge--important" data-i18n="badge.important">Wichtig</span>
+            <i class="fa-solid fa-chevron-up section-chevron"></i>
+          </div>
         </div>
-        <div class="section-body">
+        <div class="section-body" id="body-persona">
+          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.persona">Wer schreibt – und wie spricht er die Leser an?</span></p>
+          <div class="row g-3">
+            <div class="col-sm-6 col-lg-4">
+              <label for="perspective" class="field-label" data-i18n="lbl.perspective">Perspektive</label>
+              <select id="perspective" class="form-select field-input">
+                <option value="">Bitte wählen</option>
+                <option value="Ich-Perspektive">Ich – persönlich, aus eigener Sicht</option>
+                <option value="Wir-Perspektive">Wir – Marke, Team oder Unternehmen</option>
+                <option value="Du-Perspektive">Du/Sie – Leser direkt ansprechen</option>
+                <option value="Er-/Sie-Perspektive">Er/Sie – beschreibend, über Dritte</option>
+                <option value="Neutral/Objektiv">Neutral – sachlich, ohne Perspektive</option>
+              </select>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <label for="address-form" class="field-label" data-i18n="lbl.addressform">Anredeform</label>
+              <select id="address-form" class="form-select field-input">
+                <option value="">Bitte wählen</option>
+                <option value="formal">Formal (Sie-Form)</option>
+                <option value="informell">Informell (Du-Form)</option>
+                <option value="neutral">Neutral</option>
+                <option value="kombiniert">Kombiniert</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCHRITT 5: TONFALL ===== -->
+      <div class="section-card mb-3">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-tonfall" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <span class="step-num step-num--important">5</span>
+            <i class="fa-solid fa-masks-theater"></i>
+            <span data-i18n="step.tonfall">Tonfall</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="priority-badge priority-badge--important" data-i18n="badge.important">Wichtig</span>
+            <i class="fa-solid fa-chevron-up section-chevron"></i>
+          </div>
+        </div>
+        <div class="section-body" id="body-tonfall">
+          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.tonfall">Welche Stimmung soll der Text vermitteln?</span></p>
+          <div class="row g-3">
+            <div class="col-sm-6 col-lg-4">
+              <label for="language-style" class="field-label" data-i18n="lbl.style">Sprachstil</label>
+              <select id="language-style" class="form-select field-input">
+                <option value="">Bitte wählen</option>
+                <option value="Emotional">Emotional (bewegt, berührt)</option>
+                <option value="Formell">Formell (professionell, distanziert)</option>
+                <option value="Humorvoll">Humorvoll (locker, mit Witz)</option>
+                <option value="Informell">Informell (entspannt, ungezwungen)</option>
+                <option value="Inspirierend">Inspirierend (motiviert zum Handeln)</option>
+                <option value="Journalistisch">Journalistisch (objektiv, nachrichtlich)</option>
+                <option value="Motivierend">Motivierend (antreibend, ermutigend)</option>
+                <option value="Persönlich">Persönlich (nahbar, authentisch)</option>
+                <option value="Poetisch">Poetisch (bildreich, kreativ)</option>
+                <option value="Sachlich">Sachlich (nüchtern, faktenbasiert)</option>
+                <option value="Seriös">Seriös (vertrauenswürdig, solid)</option>
+                <option value="Storytelling">Storytelling (erzählend, narrativ)</option>
+                <option value="Technisch">Technisch (präzise, fachspezifisch)</option>
+                <option value="Umgangssprachlich">Umgangssprachlich (alltagsnah, locker)</option>
+                <option value="Werblich">Werblich (überzeugend, verkaufsfördernd)</option>
+                <option value="Wissenschaftlich">Wissenschaftlich (analytisch, belegt)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCHRITT 6: BEISPIEL ===== -->
+      <div class="section-card mb-4">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-beispiel" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <span class="step-num step-num--optional">6</span>
+            <i class="fa-solid fa-lightbulb"></i>
+            <span data-i18n="step.beispiel">Beispiel</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="priority-badge priority-badge--optional" data-i18n="badge.optional">Optional</span>
+            <i class="fa-solid fa-chevron-up section-chevron"></i>
+          </div>
+        </div>
+        <div class="section-body" id="body-beispiel">
+          <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.beispiel">Ctrl+C → Ctrl+V: Gib einen Referenztext oder Stilhinweis an</span></p>
+          <label for="beispiel" class="field-label" data-i18n="lbl.example">Stilreferenz oder Beispieltext</label>
+          <textarea id="beispiel" class="form-control field-input" rows="3"
+            placeholder='z.B. „Schreibe wie Tim Ferriss" oder füge einen Beispieltext ein, dem der Stil entsprechen soll …'
+            data-i18n-ph="ph.beispiel"></textarea>
+        </div>
+      </div>
+
+      <!-- ===== Live-Vorschau ===== -->
+      <div class="section-card mb-4">
+        <div class="section-header section-header--spaced section-collapsible" data-target="body-preview" role="button" tabindex="0">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-eye"></i>
+            <span data-i18n="preview.title">Live-Vorschau</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="preview-tabs" id="preview-tabs">
+              <button class="preview-tab active" data-tab="visual">
+                <i class="fa-solid fa-table-cells-large me-1"></i><span data-i18n="tab.visual">Visuell</span>
+              </button>
+              <button class="preview-tab" data-tab="flow">
+                <i class="fa-solid fa-align-left me-1"></i><span data-i18n="tab.flow">Prompt</span>
+              </button>
+            </div>
+            <div class="lang-toggle lang-toggle--inline" id="lang-toggle" role="group" aria-label="Prompt-Sprache">
+              <button class="lang-btn active" data-lang="de">DE</button>
+              <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+            <span class="prompt-status d-none d-md-inline" id="prompt-status">
+              <i class="fa-solid fa-circle-notch fa-spin me-1"></i>Warte auf Eingaben …
+            </span>
+            <i class="fa-solid fa-chevron-up section-chevron d-none d-md-block"></i>
+          </div>
+        </div>
+        <div class="section-body" id="body-preview">
           <div id="live-prompt" class="live-prompt-box"></div>
+          <div class="preview-footer mt-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="score-dots" id="score-dots">
+                <span class="score-dot" data-step="aufgabe"  title="Aufgabe"></span>
+                <span class="score-dot" data-step="kontext"  title="Kontext"></span>
+                <span class="score-dot" data-step="format"   title="Format"></span>
+                <span class="score-dot" data-step="persona"  title="Persona"></span>
+                <span class="score-dot" data-step="tonfall"  title="Tonfall"></span>
+                <span class="score-dot" data-step="beispiel" title="Beispiel"></span>
+              </div>
+              <span id="score-counter" class="score-counter">0/6</span>
+            </div>
+            <span id="word-count" class="preview-counter"></span>
+          </div>
           <div class="action-row mt-3">
             <button id="btn-copy" type="button" class="action-btn action-btn--primary">
-              <i class="fa-solid fa-copy me-2"></i>Kopieren
+              <i class="fa-solid fa-copy me-2"></i><span data-i18n="btn.copy">Kopieren</span>
+            </button>
+            <button id="btn-share" type="button" class="action-btn action-btn--outline">
+              <i class="fa-solid fa-share-nodes me-2"></i><span data-i18n="btn.share">Teilen</span>
             </button>
             <button id="btn-show" type="button" class="action-btn action-btn--outline">
-              <i class="fa-solid fa-expand me-2"></i>Vollansicht
+              <i class="fa-solid fa-expand me-2"></i><span data-i18n="btn.fullscreen">Vollansicht</span>
             </button>
             <div class="action-divider d-none d-sm-flex"></div>
-            <span class="action-label d-none d-sm-block">Öffnen in:</span>
-            <button
-              type="button"
-              onclick="window.open('https://copilot.microsoft.com')"
-              class="action-btn action-btn--ghost">
+            <span class="action-label d-none d-sm-block" data-i18n="lbl.openin">Öffnen in:</span>
+            <button type="button" onclick="window.open('https://copilot.microsoft.com')" class="action-btn action-btn--ghost">
               <i class="fa-solid fa-robot me-2"></i>Copilot
             </button>
-            <button
-              type="button"
-              onclick="window.open('https://chat.openai.com/chat')"
-              class="action-btn action-btn--ghost">
+            <button type="button" onclick="window.open('https://chat.openai.com/chat')" class="action-btn action-btn--ghost">
               <i class="fa-solid fa-comment-dots me-2"></i>ChatGPT
+            </button>
+            <button id="btn-reset" type="button" class="action-btn action-btn--ghost ms-auto">
+              <i class="fa-solid fa-rotate-left me-2"></i><span class="d-none d-sm-inline" data-i18n="btn.reset">Zurücksetzen</span>
             </button>
           </div>
         </div>
@@ -282,17 +481,12 @@
   </footer>
 
   <!-- ===== Modal: Vollansicht ===== -->
-  <div
-    class="modal fade"
-    id="promptModal"
-    tabindex="-1"
-    aria-labelledby="promptModalLabel"
-    aria-hidden="true">
+  <div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="promptModalLabel">
-            <i class="fa-solid fa-eye me-2"></i>Generierter Prompt
+            <i class="fa-solid fa-eye me-2"></i><span data-i18n="modal.title">Generierter Prompt</span>
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
         </div>
@@ -301,32 +495,159 @@
         </div>
         <div class="modal-footer">
           <button id="modal-btn-copy" type="button" class="action-btn action-btn--primary">
-            <i class="fa-solid fa-copy me-2"></i>Kopieren
+            <i class="fa-solid fa-copy me-2"></i><span data-i18n="btn.copy">Kopieren</span>
           </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===== Toast: Kopiert-Benachrichtigung ===== -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
-    <div
-      id="copy-toast"
-      class="toast align-items-center text-bg-success border-0"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true">
+  <!-- ===== Toasts ===== -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1100;">
+    <div id="copy-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
-        <div class="toast-body">
-          <i class="fa-solid fa-circle-check me-2"></i>Prompt in Zwischenspeicher kopiert!
-        </div>
-        <button
-          type="button"
-          class="btn-close btn-close-white me-2 m-auto"
-          data-bs-dismiss="toast"
-          aria-label="Schließen"></button>
+        <div class="toast-body"><i class="fa-solid fa-circle-check me-2"></i>Prompt in Zwischenspeicher kopiert!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
       </div>
+    </div>
+    <div id="share-toast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-solid fa-link me-2"></i>Link in Zwischenspeicher kopiert!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Hilfe-Modal ===== -->
+  <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <button type="button" class="modal-close-outside" data-bs-dismiss="modal" aria-label="Schließen">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="modal-header border-0 pb-1">
+          <div>
+            <h4 class="modal-title fw-bold mb-1" id="helpModalLabel">
+              <i class="fa-solid fa-wand-magic-sparkles me-2" style="color:var(--color-primary)"></i><span data-i18n="help.header.title">Wie baut man einen guten Prompt?</span>
+            </h4>
+            <p class="text-muted mb-0" style="font-size:0.875rem;" data-i18n="help.header.subtitle">
+              Ein perfekter Prompt besteht aus bis zu 6 Bausteinen. Die ersten beiden sind essenziell – der Rest macht den Unterschied.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body pt-3">
+          <div class="help-tiles">
+            <div class="help-tile">
+              <div class="help-tile__accent help-tile__accent--aufgabe"></div>
+              <span class="help-tile__badge help-tile__badge--essential" data-i18n="badge.essential">Essenziell</span>
+              <div class="help-tile__icon help-tile__icon--aufgabe"><i class="fa-solid fa-bullseye"></i></div>
+              <h5 class="help-tile__title" data-i18n="help.tile.aufgabe.title">Aufgabe</h5>
+              <p class="help-tile__question" data-i18n="help.tile.aufgabe.q">Was genau willst du erreichen?</p>
+              <div class="help-tile__divider help-tile__divider--aufgabe"></div>
+              <p class="help-tile__example" data-i18n="help.tile.aufgabe.ex">„Schreibe einen Blog-Post über KI-Tools für Einsteiger."</p>
+            </div>
+            <div class="help-tile">
+              <div class="help-tile__accent help-tile__accent--kontext"></div>
+              <span class="help-tile__badge help-tile__badge--essential" data-i18n="badge.essential">Essenziell</span>
+              <div class="help-tile__icon help-tile__icon--kontext"><i class="fa-solid fa-circle-info"></i></div>
+              <h5 class="help-tile__title" data-i18n="help.tile.kontext.title">Kontext</h5>
+              <p class="help-tile__question" data-i18n="help.tile.kontext.q">Um was geht's? Was ist der Hintergrund?</p>
+              <div class="help-tile__divider help-tile__divider--kontext"></div>
+              <p class="help-tile__example" data-i18n="help.tile.kontext.ex">„… für Berufstätige ohne technischen Hintergrund, die KI im Alltag nutzen möchten."</p>
+            </div>
+            <div class="help-tile">
+              <div class="help-tile__accent help-tile__accent--format"></div>
+              <span class="help-tile__badge help-tile__badge--important" data-i18n="badge.important">Wichtig</span>
+              <div class="help-tile__icon help-tile__icon--format"><i class="fa-solid fa-sliders"></i></div>
+              <h5 class="help-tile__title" data-i18n="help.tile.format.title">Format</h5>
+              <p class="help-tile__question" data-i18n="help.tile.format.q">Wie soll die Ausgabe strukturiert sein?</p>
+              <div class="help-tile__divider help-tile__divider--format"></div>
+              <p class="help-tile__example" data-i18n="help.tile.format.ex">„Ca. 800 Wörter, Bullet Points, mit Überschriften und SEO-Keywords."</p>
+            </div>
+            <div class="help-tile">
+              <div class="help-tile__accent help-tile__accent--persona"></div>
+              <span class="help-tile__badge help-tile__badge--important" data-i18n="badge.important">Wichtig</span>
+              <div class="help-tile__icon help-tile__icon--persona"><i class="fa-solid fa-user-pen"></i></div>
+              <h5 class="help-tile__title" data-i18n="help.tile.persona.title">Persona</h5>
+              <p class="help-tile__question" data-i18n="help.tile.persona.q">Wer schreibt – und wie spricht er die Leser an?</p>
+              <div class="help-tile__divider help-tile__divider--persona"></div>
+              <p class="help-tile__example" data-i18n="help.tile.persona.ex">„Ich-Perspektive, Du-Form – als erfahrener Praktiker."</p>
+            </div>
+            <div class="help-tile">
+              <div class="help-tile__accent help-tile__accent--tonfall"></div>
+              <span class="help-tile__badge help-tile__badge--important" data-i18n="badge.important">Wichtig</span>
+              <div class="help-tile__icon help-tile__icon--tonfall"><i class="fa-solid fa-masks-theater"></i></div>
+              <h5 class="help-tile__title" data-i18n="help.tile.tonfall.title">Tonfall</h5>
+              <p class="help-tile__question" data-i18n="help.tile.tonfall.q">Welche Stimmung soll der Text vermitteln?</p>
+              <div class="help-tile__divider help-tile__divider--tonfall"></div>
+              <p class="help-tile__example" data-i18n="help.tile.tonfall.ex">„Journalistisch, leicht verständlich und motivierend."</p>
+            </div>
+            <div class="help-tile">
+              <div class="help-tile__accent help-tile__accent--beispiel"></div>
+              <span class="help-tile__badge help-tile__badge--optional" data-i18n="badge.optional">Optional</span>
+              <div class="help-tile__icon help-tile__icon--beispiel"><i class="fa-solid fa-lightbulb"></i></div>
+              <h5 class="help-tile__title" data-i18n="help.tile.beispiel.title">Beispiel</h5>
+              <p class="help-tile__question" data-i18n="help.tile.beispiel.q">Ctrl+C → Ctrl+V: Gib einen Referenztext ein</p>
+              <div class="help-tile__divider help-tile__divider--beispiel"></div>
+              <p class="help-tile__example" data-i18n="help.tile.beispiel.ex">„Ähnlich wie Tim Ferriss – praktisch, mit konkreten Tipps."</p>
+            </div>
+          </div>
+          <div class="help-full-example mt-4">
+            <div class="help-full-example__header">
+              <i class="fa-solid fa-star me-2"></i><span data-i18n="help.fullexample.header">Vollständiges Beispiel – alle 6 Bausteine kombiniert</span>
+            </div>
+            <div class="help-full-example__body">
+              <div class="hfe-row">
+                <span class="hfe-label hfe-label--aufgabe"><i class="fa-solid fa-bullseye"></i> <span data-i18n="help.hfe.aufgabe.label">Aufgabe</span></span>
+                <span class="hfe-value" data-i18n="help.hfe.aufgabe.value">Schreibe einen Blog-Post über KI-Tools für Einsteiger.</span>
+              </div>
+              <div class="hfe-row">
+                <span class="hfe-label hfe-label--kontext"><i class="fa-solid fa-circle-info"></i> <span data-i18n="help.hfe.kontext.label">Kontext</span></span>
+                <span class="hfe-value" data-i18n="help.hfe.kontext.value">Zielgruppe: Berufstätige ohne technischen Hintergrund, die KI im Alltag nutzen möchten.</span>
+              </div>
+              <div class="hfe-row">
+                <span class="hfe-label hfe-label--format"><i class="fa-solid fa-sliders"></i> <span data-i18n="help.hfe.format.label">Format</span></span>
+                <span class="hfe-value" data-i18n="help.hfe.format.value">Ca. 800 Wörter · Bullet Points · mit Überschriften · SEO-Keywords inklusive.</span>
+              </div>
+              <div class="hfe-row">
+                <span class="hfe-label hfe-label--persona"><i class="fa-solid fa-user-pen"></i> <span data-i18n="help.hfe.persona.label">Persona</span></span>
+                <span class="hfe-value" data-i18n="help.hfe.persona.value">Ich-Perspektive · Du-Form · als erfahrener Praktiker schreiben.</span>
+              </div>
+              <div class="hfe-row">
+                <span class="hfe-label hfe-label--tonfall"><i class="fa-solid fa-masks-theater"></i> <span data-i18n="help.hfe.tonfall.label">Tonfall</span></span>
+                <span class="hfe-value" data-i18n="help.hfe.tonfall.value">Journalistisch · leicht verständlich · motivierend.</span>
+              </div>
+              <div class="hfe-row">
+                <span class="hfe-label hfe-label--beispiel"><i class="fa-solid fa-lightbulb"></i> <span data-i18n="help.hfe.beispiel.label">Beispiel</span></span>
+                <span class="hfe-value" data-i18n="help.hfe.beispiel.value">Ähnlich wie Tim Ferriss – praktisch, mit konkreten Tipps und persönlichen Erfahrungen.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-1">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
+          <button type="button" class="action-btn action-btn--primary" data-bs-dismiss="modal">
+            <i class="fa-solid fa-arrow-right me-2"></i>Jetzt Prompt erstellen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Verlauf Offcanvas ===== -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="historyOffcanvas" aria-labelledby="historyOffcanvasLabel" style="width:420px;max-width:100vw;">
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title" id="historyOffcanvasLabel">
+        <i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--color-primary)"></i><span data-i18n="history.title">Prompt-Verlauf</span>
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+    </div>
+    <div class="offcanvas-body p-3" id="history-list">
+      <p class="text-center text-muted mt-4" id="history-empty" style="font-size:.875rem;">
+        <i class="fa-solid fa-inbox d-block mb-2" style="font-size:2rem;opacity:.3"></i>
+        <span data-i18n="history.empty">Noch keine Prompts generiert.</span>
+      </p>
     </div>
   </div>
 
