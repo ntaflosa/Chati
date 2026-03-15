@@ -118,7 +118,7 @@
           <p class="section-hint"><i class="fa-solid fa-lightbulb me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
           <div class="row g-3">
             <div class="col-md-8 col-lg-6">
-              <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter.">Texttyp / Verwendungszweck</label>
+              <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter." data-i18n-tooltip="tooltip.contenttype">Texttyp / Verwendungszweck</label>
               <select id="content-type" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="Artikel &amp; Blog" data-i18n-grp="grp.article_blog">
@@ -229,13 +229,13 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.kontext">Um was geht's? Was ist der Hintergrund?</span></p>
           <div class="row g-3">
             <div class="col-lg-8">
-              <label for="description" class="field-label" data-i18n="lbl.topic" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Beschreibe das Thema so konkret wie möglich, z.B. '5 KI-Tools für Einsteiger im Büroalltag'.">Thema &amp; Inhalt</label>
+              <label for="description" class="field-label" data-i18n="lbl.topic" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Beschreibe das Thema so konkret wie möglich, z.B. '5 KI-Tools für Einsteiger im Büroalltag'." data-i18n-tooltip="tooltip.topic">Thema &amp; Inhalt</label>
               <textarea id="description" class="form-control field-input" rows="4"
                 placeholder="Beschreibe das Thema, den Inhalt oder das Ziel deines Textes …"
                 data-i18n-ph="ph.description"></textarea>
             </div>
             <div class="col-sm-6 col-lg-4">
-              <label for="target-audience" class="field-label" data-i18n="lbl.audience" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Für wen schreibst du? Je genauer die Zielgruppe, desto passender der generierte Text.">Zielgruppe</label>
+              <label for="target-audience" class="field-label" data-i18n="lbl.audience" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Für wen schreibst du? Je genauer die Zielgruppe, desto passender der generierte Text." data-i18n-tooltip="tooltip.audience">Zielgruppe</label>
               <select id="target-audience" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="B2C – Privat" data-i18n-grp="grp.b2c_privat">
@@ -414,7 +414,7 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.tonfall">Welche Stimmung soll der Text vermitteln?</span></p>
           <div class="row g-3">
             <div class="col-sm-6 col-lg-4">
-              <label for="language-style" class="field-label" data-i18n="lbl.style" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="z.B. 'Journalistisch' für Artikel, 'Werblich' für Sales-Texte, 'Persönlich' für Social Media.">Sprachstil</label>
+              <label for="language-style" class="field-label" data-i18n="lbl.style" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="z.B. 'Journalistisch' für Artikel, 'Werblich' für Sales-Texte, 'Persönlich' für Social Media." data-i18n-tooltip="tooltip.style">Sprachstil</label>
               <select id="language-style" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="Emotional">Emotional (bewegt, berührt)</option>
@@ -587,13 +587,13 @@
   <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1100;">
     <div id="copy-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
-        <div class="toast-body"><i class="fa-solid fa-circle-check me-2"></i>Prompt in Zwischenspeicher kopiert!</div>
+        <div class="toast-body"><i class="fa-solid fa-circle-check me-2"></i><span data-i18n="toast.copy">Prompt in Zwischenspeicher kopiert!</span></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
       </div>
     </div>
     <div id="share-toast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
-        <div class="toast-body"><i class="fa-solid fa-link me-2"></i>Link in Zwischenspeicher kopiert!</div>
+        <div class="toast-body"><i class="fa-solid fa-link me-2"></i><span data-i18n="toast.share">Link in Zwischenspeicher kopiert!</span></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
       </div>
     </div>

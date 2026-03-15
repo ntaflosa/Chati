@@ -167,6 +167,231 @@ document.addEventListener('DOMContentLoaded', () => {
     'Produktname / Naming': 'ein ',
   };
 
+  // ── Option label translations (value stays German key, display text translates) ──
+  const OPTION_LABELS = {
+    de: {
+      'content-type': {
+        '': 'Bitte wählen',
+        'Artikel': 'Artikel', 'Blog-Post': 'Blog-Post', 'How-to-Anleitung': 'How-to-Anleitung',
+        'Listicle (Top-X-Artikel)': 'Listicle (Top-X-Artikel)', 'Interview': 'Interview',
+        'Whitepaper': 'Whitepaper', 'Case-Study': 'Case-Study', 'Pressemitteilung': 'Pressemitteilung',
+        'E-Book': 'E-Book', 'Buchrezension': 'Buchrezension', 'Zusammenfassung': 'Zusammenfassung',
+        'Erfahrungsbericht': 'Erfahrungsbericht / Testimonial', 'Checkliste': 'Checkliste',
+        'Glossar / Lexikon': 'Glossar / Lexikon', 'Facebook-Beitrag': 'Facebook-Beitrag',
+        'Instagram-Beitrag': 'Instagram-Beitrag',
+        'Story-Skript (Instagram / Facebook)': 'Story-Skript (Instagram / Facebook)',
+        'Carousel-Post': 'Carousel-Post', 'LinkedIn-Beitrag': 'LinkedIn-Beitrag',
+        'Twitter-Beitrag': 'Twitter / X-Beitrag', 'TikTok-Skript': 'TikTok-Skript',
+        'Reels-Skript': 'Reels-Skript', 'Threads-Beitrag': 'Threads-Beitrag',
+        'Xing-Beitrag': 'Xing-Beitrag', 'Produktbeschreibung': 'Produktbeschreibung',
+        'Verkaufstext / Sales Page': 'Verkaufstext / Sales Page',
+        'Produktvergleich': 'Produktvergleich', 'FAQ-Seite': 'FAQ-Seite',
+        'Anzeige': 'Anzeige', 'SEO-Text': 'SEO-Text', 'Newsletter': 'Newsletter',
+        'Landing Page': 'Landing Page', 'Produkttest / Review': 'Produkttest / Review',
+        'Meta-Description (SEO)': 'Meta-Description (SEO)', 'E-Mail': 'E-Mail (allgemein)',
+        'Kaltakquise-E-Mail': 'Kaltakquise-E-Mail', 'Follow-up-E-Mail': 'Follow-up-E-Mail',
+        'Onboarding-E-Mail': 'Onboarding-E-Mail', 'Kundenservice-Antwort': 'Kundenservice-Antwort',
+        'Einladungsschreiben': 'Einladungsschreiben', 'Dankes-E-Mail': 'Dankes-E-Mail',
+        'Präsentation': 'Präsentation', 'Executive Summary': 'Executive Summary',
+        'Bericht / Report': 'Bericht / Report', 'Angebot / Proposal': 'Angebot / Proposal',
+        'Meeting-Protokoll': 'Meeting-Protokoll', 'Stellenanzeige': 'Stellenanzeige',
+        'Bewerbungsschreiben': 'Bewerbungsschreiben',
+        'Unternehmensvorstellung': 'Unternehmensvorstellung / About Us',
+        'Vision & Mission Statement': 'Vision & Mission Statement',
+        'YouTube-Video': 'YouTube-Video', 'YouTube-Short-Skript': 'YouTube-Short-Skript',
+        'Podcast-Episode': 'Podcast-Episode', 'Infografik': 'Infografik',
+        'Webinar': 'Webinar', 'Live-Stream': 'Live-Stream',
+        'Slogan / Claim': 'Slogan / Claim', 'Produktname / Naming': 'Produktname / Naming',
+        'Kurzgeschichte': 'Kurzgeschichte', 'Gedicht / Lyrik': 'Gedicht / Lyrik',
+        'Drehbuch / Skript': 'Drehbuch / Skript', 'Online-Quiz': 'Online-Quiz',
+        'Chatbot': 'Chatbot', 'Online-Kurs': 'Online-Kurs',
+      },
+      'target-audience': {
+        '': 'Bitte wählen',
+        'Schüler & Auszubildende (15–22 Jahre)': 'Schüler & Auszubildende (15–22 Jahre)',
+        'Jugendliche (16–25 Jahre)': 'Jugendliche (16–25 Jahre)',
+        'Junge Erwachsene (25–35 Jahre)': 'Junge Erwachsene (25–35 Jahre)',
+        'Berufstätige (30–50 Jahre)': 'Berufstätige (30–50 Jahre)',
+        'Eltern & Familien': 'Eltern & Familien', 'Senioren (50+ Jahre)': 'Senioren (50+ Jahre)',
+        'Gründer & Startups': 'Gründer & Startups',
+        'KMU-Inhaber & Selbstständige': 'KMU-Inhaber & Selbstständige',
+        'Manager & Führungskräfte': 'Manager & Führungskräfte',
+        'B2B-Entscheider': 'B2B-Entscheider', 'IT-Professionals': 'IT-Professionals',
+        'Kreative & Designer': 'Kreative & Designer',
+        'Lehrkräfte & Pädagogen': 'Lehrkräfte & Pädagogen',
+        'Technik & Digitales': 'Technik & Digitales',
+        'Fitness & Gesundheit': 'Fitness & Gesundheit', 'Mode & Lifestyle': 'Mode & Lifestyle',
+        'Finanzen & Investment': 'Finanzen & Investment',
+        'Bildung & Weiterbildung': 'Bildung & Weiterbildung',
+        'Sport & Outdoor': 'Sport & Outdoor', 'Nachhaltigkeit & Umwelt': 'Nachhaltigkeit & Umwelt',
+      },
+      'content-length': {
+        '': 'Bitte wählen',
+        'Sehr kurz (50–100 Wörter)': 'Sehr kurz (50–100 Wörter)',
+        'Kurz (100–300 Wörter)': 'Kurz (100–300 Wörter)',
+        'Mittel (300–600 Wörter)': 'Mittel (300–600 Wörter)',
+        'Lang (600–1.200 Wörter)': 'Lang (600–1.200 Wörter)',
+        'Sehr lang (1.200+ Wörter)': 'Sehr lang (1.200+ Wörter)',
+      },
+      'formatting': {
+        '': 'Bitte wählen', 'Fließtext': 'Fließtext',
+        'Überschriften + Fließtext': 'Überschriften + Fließtext',
+        'Bullet Points': 'Bullet Points', 'Nummerierte Liste': 'Nummerierte Liste',
+        'Schritt-für-Schritt': 'Schritt-für-Schritt', 'Tabellarisch': 'Tabellarisch',
+        'Zitat': 'Zitat', 'FAQ-Format (Frage & Antwort)': 'FAQ-Format (Frage & Antwort)',
+        'Checkliste / Aufgabenliste': 'Checkliste / Aufgabenliste',
+      },
+      'emoji-option': { '': 'Bitte wählen', 'keine': 'Keine Emojis', 'wenige': 'Wenige Emojis', 'viele': 'Viele Emojis' },
+      'seo-keyword-option': { '': 'Bitte wählen', 'Ja': 'Ja, generieren', 'Nein': 'Nein' },
+      'title-subtitle-option': { '': 'Bitte wählen', 'ja': 'Ja, generieren', 'nein': 'Nein' },
+      'perspective': {
+        '': 'Bitte wählen',
+        'Ich-Perspektive': 'Ich – persönlich, aus eigener Sicht',
+        'Wir-Perspektive': 'Wir – Marke, Team oder Unternehmen',
+        'Du-Perspektive': 'Du/Sie – Leser direkt ansprechen',
+        'Er-/Sie-Perspektive': 'Er/Sie – beschreibend, über Dritte',
+        'Neutral/Objektiv': 'Neutral – sachlich, ohne Perspektive',
+      },
+      'address-form': {
+        '': 'Bitte wählen', 'formal': 'Formal (Sie-Form)',
+        'informell': 'Informell (Du-Form)', 'neutral': 'Neutral', 'kombiniert': 'Kombiniert',
+      },
+      'language-style': {
+        '': 'Bitte wählen',
+        'Emotional': 'Emotional (bewegt, berührt)',
+        'Empathisch': 'Empathisch (einfühlsam, verständnisvoll)',
+        'Formell': 'Formell (professionell, distanziert)',
+        'Humorvoll': 'Humorvoll (locker, mit Witz)',
+        'Informell': 'Informell (entspannt, ungezwungen)',
+        'Inspirierend': 'Inspirierend (motiviert zum Handeln)',
+        'Journalistisch': 'Journalistisch (objektiv, nachrichtlich)',
+        'Minimalistisch': 'Minimalistisch (knapp, auf den Punkt)',
+        'Motivierend': 'Motivierend (antreibend, ermutigend)',
+        'Persönlich': 'Persönlich (nahbar, authentisch)',
+        'Poetisch': 'Poetisch (bildreich, kreativ)',
+        'Provokativ': 'Provokativ (mutig, gegen den Strom)',
+        'Sachlich': 'Sachlich (nüchtern, faktenbasiert)',
+        'Seriös': 'Seriös (vertrauenswürdig, solid)',
+        'Storytelling': 'Storytelling (erzählend, narrativ)',
+        'Technisch': 'Technisch (präzise, fachspezifisch)',
+        'Umgangssprachlich': 'Umgangssprachlich (alltagsnah, locker)',
+        'Werblich': 'Werblich (überzeugend, verkaufsfördernd)',
+        'Wissenschaftlich': 'Wissenschaftlich (analytisch, belegt)',
+      },
+    },
+    en: {
+      'content-type': {
+        '': 'Please select',
+        'Artikel': 'Article', 'Blog-Post': 'Blog Post', 'How-to-Anleitung': 'How-to Guide',
+        'Listicle (Top-X-Artikel)': 'Listicle (Top-X Article)', 'Interview': 'Interview',
+        'Whitepaper': 'Whitepaper', 'Case-Study': 'Case Study', 'Pressemitteilung': 'Press Release',
+        'E-Book': 'E-Book', 'Buchrezension': 'Book Review', 'Zusammenfassung': 'Summary',
+        'Erfahrungsbericht': 'Experience Report / Testimonial', 'Checkliste': 'Checklist',
+        'Glossar / Lexikon': 'Glossary', 'Facebook-Beitrag': 'Facebook Post',
+        'Instagram-Beitrag': 'Instagram Caption',
+        'Story-Skript (Instagram / Facebook)': 'Story Script (Instagram / Facebook)',
+        'Carousel-Post': 'Carousel Post', 'LinkedIn-Beitrag': 'LinkedIn Post',
+        'Twitter-Beitrag': 'Twitter / X Post', 'TikTok-Skript': 'TikTok Script',
+        'Reels-Skript': 'Reels Script', 'Threads-Beitrag': 'Threads Post',
+        'Xing-Beitrag': 'Xing Post', 'Produktbeschreibung': 'Product Description',
+        'Verkaufstext / Sales Page': 'Sales Copy / Sales Page',
+        'Produktvergleich': 'Product Comparison', 'FAQ-Seite': 'FAQ Page',
+        'Anzeige': 'Advertisement', 'SEO-Text': 'SEO Article', 'Newsletter': 'Newsletter',
+        'Landing Page': 'Landing Page', 'Produkttest / Review': 'Product Test / Review',
+        'Meta-Description (SEO)': 'Meta Description (SEO)', 'E-Mail': 'Email (general)',
+        'Kaltakquise-E-Mail': 'Cold Outreach Email', 'Follow-up-E-Mail': 'Follow-up Email',
+        'Onboarding-E-Mail': 'Onboarding Email',
+        'Kundenservice-Antwort': 'Customer Service Response',
+        'Einladungsschreiben': 'Invitation Letter', 'Dankes-E-Mail': 'Thank-You Email',
+        'Präsentation': 'Presentation', 'Executive Summary': 'Executive Summary',
+        'Bericht / Report': 'Report', 'Angebot / Proposal': 'Proposal',
+        'Meeting-Protokoll': 'Meeting Minutes', 'Stellenanzeige': 'Job Posting',
+        'Bewerbungsschreiben': 'Cover Letter',
+        'Unternehmensvorstellung': 'Company Introduction / About Us',
+        'Vision & Mission Statement': 'Vision & Mission Statement',
+        'YouTube-Video': 'YouTube Video Description',
+        'YouTube-Short-Skript': 'YouTube Shorts Script',
+        'Podcast-Episode': 'Podcast Episode Outline', 'Infografik': 'Infographic',
+        'Webinar': 'Webinar', 'Live-Stream': 'Live Stream',
+        'Slogan / Claim': 'Slogan / Tagline', 'Produktname / Naming': 'Product Name / Naming',
+        'Kurzgeschichte': 'Short Story', 'Gedicht / Lyrik': 'Poem / Lyrics',
+        'Drehbuch / Skript': 'Screenplay / Script', 'Online-Quiz': 'Online Quiz',
+        'Chatbot': 'Chatbot Script', 'Online-Kurs': 'Online Course Outline',
+      },
+      'target-audience': {
+        '': 'Please select',
+        'Schüler & Auszubildende (15–22 Jahre)': 'Students & Apprentices (15–22)',
+        'Jugendliche (16–25 Jahre)': 'Teenagers (16–25)',
+        'Junge Erwachsene (25–35 Jahre)': 'Young Adults (25–35)',
+        'Berufstätige (30–50 Jahre)': 'Working Professionals (30–50)',
+        'Eltern & Familien': 'Parents & Families', 'Senioren (50+ Jahre)': 'Seniors (50+)',
+        'Gründer & Startups': 'Founders & Startups',
+        'KMU-Inhaber & Selbstständige': 'SME Owners & Freelancers',
+        'Manager & Führungskräfte': 'Managers & Executives',
+        'B2B-Entscheider': 'B2B Decision-Makers', 'IT-Professionals': 'IT Professionals',
+        'Kreative & Designer': 'Creatives & Designers',
+        'Lehrkräfte & Pädagogen': 'Teachers & Educators',
+        'Technik & Digitales': 'Tech & Digital', 'Fitness & Gesundheit': 'Fitness & Health',
+        'Mode & Lifestyle': 'Fashion & Lifestyle', 'Finanzen & Investment': 'Finance & Investment',
+        'Bildung & Weiterbildung': 'Education & Learning',
+        'Sport & Outdoor': 'Sports & Outdoor', 'Nachhaltigkeit & Umwelt': 'Sustainability & Environment',
+      },
+      'content-length': {
+        '': 'Please select',
+        'Sehr kurz (50–100 Wörter)': 'Very Short (50–100 Words)',
+        'Kurz (100–300 Wörter)': 'Short (100–300 Words)',
+        'Mittel (300–600 Wörter)': 'Medium (300–600 Words)',
+        'Lang (600–1.200 Wörter)': 'Long (600–1,200 Words)',
+        'Sehr lang (1.200+ Wörter)': 'Very Long (1,200+ Words)',
+      },
+      'formatting': {
+        '': 'Please select', 'Fließtext': 'Flowing Prose',
+        'Überschriften + Fließtext': 'Headings + Prose',
+        'Bullet Points': 'Bullet Points', 'Nummerierte Liste': 'Numbered List',
+        'Schritt-für-Schritt': 'Step-by-Step', 'Tabellarisch': 'Tabular',
+        'Zitat': 'Quote Format', 'FAQ-Format (Frage & Antwort)': 'FAQ Format (Q&A)',
+        'Checkliste / Aufgabenliste': 'Checklist / Task List',
+      },
+      'emoji-option': { '': 'Please select', 'keine': 'No Emojis', 'wenige': 'Few Emojis', 'viele': 'Many Emojis' },
+      'seo-keyword-option': { '': 'Please select', 'Ja': 'Yes, include', 'Nein': 'No' },
+      'title-subtitle-option': { '': 'Please select', 'ja': 'Yes, include', 'nein': 'No' },
+      'perspective': {
+        '': 'Please select',
+        'Ich-Perspektive': 'I – personal, first person',
+        'Wir-Perspektive': 'We – brand, team or company',
+        'Du-Perspektive': 'You – addressing the reader directly',
+        'Er-/Sie-Perspektive': 'He/She – descriptive, about third parties',
+        'Neutral/Objektiv': 'Neutral – objective, no perspective',
+      },
+      'address-form': {
+        '': 'Please select', 'formal': 'Formal',
+        'informell': 'Informal', 'neutral': 'Neutral', 'kombiniert': 'Combined',
+      },
+      'language-style': {
+        '': 'Please select',
+        'Emotional': 'Emotional (moving, touching)',
+        'Empathisch': 'Empathetic (understanding, caring)',
+        'Formell': 'Formal (professional, distant)',
+        'Humorvoll': 'Humorous (relaxed, witty)',
+        'Informell': 'Informal (relaxed, casual)',
+        'Inspirierend': 'Inspiring (drives to action)',
+        'Journalistisch': 'Journalistic (objective, news-style)',
+        'Minimalistisch': 'Minimalist (concise, to the point)',
+        'Motivierend': 'Motivational (driving, encouraging)',
+        'Persönlich': 'Personal (approachable, authentic)',
+        'Poetisch': 'Poetic (vivid, creative)',
+        'Provokativ': 'Provocative (bold, against the grain)',
+        'Sachlich': 'Factual (sober, evidence-based)',
+        'Seriös': 'Serious (trustworthy, solid)',
+        'Storytelling': 'Storytelling (narrative style)',
+        'Technisch': 'Technical (precise, domain-specific)',
+        'Umgangssprachlich': 'Colloquial (everyday, casual)',
+        'Werblich': 'Promotional (persuasive, sales-focused)',
+        'Wissenschaftlich': 'Academic (analytical, evidence-based)',
+      },
+    },
+  };
+
   const ARTICLE_MAP_EN = {
     'Artikel': 'an article', 'Blog-Post': 'a blog post',
     'How-to-Anleitung': 'a how-to guide', 'Listicle (Top-X-Artikel)': 'a listicle',
@@ -204,10 +429,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Preview groups ────────────────────────────────────────────────────────
   const PREVIEW_GROUPS = [
-    { key: 'aufgabe', label: 'Aufgabe', icon: 'fa-bullseye',     getValue: () => val('content-type') },
-    { key: 'kontext', label: 'Kontext', icon: 'fa-circle-info',
+    { key: 'aufgabe', icon: 'fa-bullseye',     getValue: () => val('content-type') },
+    { key: 'kontext', icon: 'fa-circle-info',
       getValue: () => [val('description'), val('target-audience')].filter(Boolean).join(' · ') },
-    { key: 'format',  label: 'Format',  icon: 'fa-sliders',
+    { key: 'format',  icon: 'fa-sliders',
       getValue: () => {
         const parts = [];
         const len = val('content-length');
@@ -222,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return parts.join(' · ');
       },
     },
-    { key: 'persona', label: 'Persona', icon: 'fa-user-pen',
+    { key: 'persona', icon: 'fa-user-pen',
       getValue: () => {
         const parts = [];
         if (val('perspective')) parts.push(val('perspective'));
@@ -231,8 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return parts.join(' · ');
       },
     },
-    { key: 'tonfall',  label: 'Tonfall',  icon: 'fa-masks-theater', getValue: () => val('language-style') },
-    { key: 'beispiel', label: 'Beispiel', icon: 'fa-lightbulb',     getValue: () => val('beispiel') },
+    { key: 'tonfall',  icon: 'fa-masks-theater', getValue: () => val('language-style') },
+    { key: 'beispiel', icon: 'fa-lightbulb',     getValue: () => val('beispiel') },
   ];
 
   // ── Build prompts ─────────────────────────────────────────────────────────
@@ -330,28 +555,31 @@ document.addEventListener('DOMContentLoaded', () => {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  const EMPTY_STATE = `
-    <div class="pv-empty">
+  const emptyState = () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    return `<div class="pv-empty">
       <div class="pv-empty__icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-      <div class="pv-empty__title">Noch keine Eingaben</div>
-      <div class="pv-empty__sub">Wähle eine Vorlage aus dem Katalog<br>oder fülle die Felder Schritt für Schritt aus</div>
+      <div class="pv-empty__title">${t['preview.empty.title']}</div>
+      <div class="pv-empty__sub">${t['preview.empty.sub']}</div>
     </div>`;
+  };
 
   const renderVisual = () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
     const filled = PREVIEW_GROUPS.filter(g => g.getValue());
-    if (filled.length === 0) return EMPTY_STATE;
+    if (filled.length === 0) return emptyState();
     const rows = filled.map(g => `
       <div class="pv-row">
-        <span class="pv-label pv-label--${g.key}"><i class="fa-solid ${g.icon}"></i>${g.label}</span>
+        <span class="pv-label pv-label--${g.key}"><i class="fa-solid ${g.icon}"></i>${t['step.' + g.key] || g.key}</span>
         <span class="pv-value">${esc(g.getValue())}</span>
       </div>`).join('');
-    return `<div class="pv-intro">Generiere einen personalisierten Text unter Berücksichtigung folgender Details:</div>
+    return `<div class="pv-intro">${t['preview.intro']}</div>
       <div class="pv-rows">${rows}</div>`;
   };
 
   const renderFlow = () => {
     const text = getCurrentPrompt();
-    if (!text) return EMPTY_STATE;
+    if (!text) return emptyState();
     return `<div class="pv-flow">${esc(text)}</div>`;
   };
 
@@ -392,13 +620,15 @@ document.addEventListener('DOMContentLoaded', () => {
     livePrompt.classList.toggle('has-content', filled);
 
     if (filled) {
-      promptStatus.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>Bereit zum Kopieren';
+      const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+      promptStatus.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i>${t['status.ready']}`;
       promptStatus.classList.add('ready');
       const text = getCurrentPrompt();
       const words = text.trim().split(/\s+/).filter(Boolean).length;
-      wordCount.textContent = `${words} Wörter · ${text.length} Zeichen`;
+      wordCount.textContent = `${words} ${t['status.words']} · ${text.length} ${t['status.chars']}`;
     } else {
-      promptStatus.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i>Warte auf Eingaben …';
+      const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+      promptStatus.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin me-1"></i>${t['status.waiting']}`;
       promptStatus.classList.remove('ready');
       wordCount.textContent = '';
     }
@@ -486,7 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="history-item__text">${esc(entry.text)}</div>
         <button class="action-btn action-btn--outline history-item__copy" style="font-size:0.75rem;padding:.3rem .75rem;" data-index="${i}">
-          <i class="fa-solid fa-copy me-1"></i>Kopieren
+          <i class="fa-solid fa-copy me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.copy']}
         </button>`;
       historyList.appendChild(div);
     });
@@ -545,13 +775,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="library-item__text">${esc(entry.text)}</div>
         <div class="library-item__btns">
           <button class="action-btn action-btn--primary lib-btn-load" data-id="${entry.id}">
-            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i>Laden
+            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.load']}
           </button>
           <button class="action-btn action-btn--outline lib-btn-copy" data-id="${entry.id}">
-            <i class="fa-solid fa-copy me-1"></i>Kopieren
+            <i class="fa-solid fa-copy me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.copy']}
           </button>
           <button class="action-btn action-btn--ghost lib-btn-delete" data-id="${entry.id}">
-            <i class="fa-solid fa-trash me-1"></i>Löschen
+            <i class="fa-solid fa-trash me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.delete']}
           </button>
         </div>`;
       libraryList.appendChild(div);
@@ -800,11 +1030,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let allCollapsed = false;
 
   const updateToggleAllBtn = () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
     const anyOpen = !catalogBody.classList.contains('collapsed') ||
       [...document.querySelectorAll('[id^="body-"]')].some(b => !b.classList.contains('collapsed'));
     allCollapsed = !anyOpen;
     toggleAllIcon.className  = allCollapsed ? 'fa-solid fa-angles-down' : 'fa-solid fa-angles-up';
-    toggleAllLabel.textContent = allCollapsed ? 'Alle aufklappen' : 'Alle schließen';
+    toggleAllLabel.textContent = allCollapsed ? t['btn.toggleAll.open'] : t['btn.toggleAll.close'];
   };
 
   const toggleAllSections = () => {
@@ -820,8 +1051,9 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (!shouldCollapse && isCollapsed) expandBody(body, chevron);
     });
     allCollapsed = shouldCollapse;
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
     toggleAllIcon.className  = allCollapsed ? 'fa-solid fa-angles-down' : 'fa-solid fa-angles-up';
-    toggleAllLabel.textContent = allCollapsed ? 'Alle aufklappen' : 'Alle schließen';
+    toggleAllLabel.textContent = allCollapsed ? t['btn.toggleAll.open'] : t['btn.toggleAll.close'];
   };
 
   btnToggleAll.addEventListener('click', toggleAllSections);
@@ -989,20 +1221,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Prompt Variationen ────────────────────────────────────────────────────
   const buildVariations = () => {
-    const type        = val('content-type'),
-          description = val('description'),
-          audience    = val('target-audience'),
-          length      = val('content-length'),
-          formatting  = val('formatting'),
-          seo         = val('seo-keyword-option'),
-          titleSub    = val('title-subtitle-option'),
-          perspective = val('perspective'),
-          addressForm = val('address-form'),
-          style       = val('language-style'),
-          emojis      = val('emoji-option'),
-          beispiel    = val('beispiel');
+    const type = val('content-type'), description = val('description'),
+          audience = val('target-audience'), length = val('content-length'),
+          formatting = val('formatting'), seo = val('seo-keyword-option'),
+          titleSub = val('title-subtitle-option'), perspective = val('perspective'),
+          addressForm = val('address-form'), style = val('language-style'),
+          emojis = val('emoji-option'), beispiel = val('beispiel');
 
     if (!type && !description) return [];
+
+    if (uiLang === 'en') {
+      const art = ARTICLE_MAP_EN[type] ?? 'a ' + (type || '');
+      const fp = [];
+      if (length)   fp.push(LENGTH_MAP_EN[length] || length);
+      if (formatting) fp.push(FORMAT_MAP_EN[formatting] || formatting);
+      if (seo === 'Ja') fp.push('SEO keywords');
+      if (titleSub === 'ja') fp.push('title');
+      if (emojis === 'keine') fp.push('no emojis');
+      else if (emojis === 'wenige') fp.push('few emojis');
+      else if (emojis === 'viele') fp.push('many emojis');
+      const fmt = fp.join(', ');
+      const aud = AUDIENCE_MAP_EN[audience] || audience;
+      const sty = STYLE_MAP_EN[style] || style;
+
+      const v1 = [];
+      if (type) v1.push(`Write ${art}.`);
+      if (description) v1.push(`Topic: ${description}.`);
+      if (audience)    v1.push(`Audience: ${aud}.`);
+      if (fmt)         v1.push(`Format: ${fmt}.`);
+      if (style)       v1.push(`Style: ${sty}.`);
+      if (beispiel)    v1.push(`Reference: ${beispiel}`);
+
+      const v2 = [];
+      if (description) v2.push(`About "${description}": `);
+      if (type)        v2.push(`Write ${art}${audience ? ` for ${aud}` : ''}.`);
+      const det = [];
+      if (fmt)   det.push(fmt);
+      if (style) det.push(`${sty} tone`);
+      if (perspective) det.push(PERSPECTIVE_MAP_EN[perspective] || perspective);
+      if (det.length) v2.push(`Consider: ${det.join(', ')}.`);
+      if (beispiel) v2.push(`Base your style on: ${beispiel}`);
+
+      const v3 = [];
+      v3.push(style ? `You are a ${sty} copywriter.` : 'You are an experienced copywriter.');
+      if (type && description) v3.push(`Create ${art} about: ${description}.`);
+      else if (type)            v3.push(`Create ${art}.`);
+      if (audience) v3.push(`Target audience: ${aud}.`);
+      if (fmt)      v3.push(`Format: ${fmt}.`);
+      if (addressForm) v3.push(`Use ${ADDRESS_MAP_EN[addressForm] || addressForm} address form.`);
+      if (beispiel) v3.push(`Style reference: ${beispiel}`);
+
+      return [v1.join(' '), v2.join(''), v3.join(' ')].filter(v => v.trim().length > 5);
+    }
 
     const art = ARTICLE_MAP[type] ?? 'einen ';
     const fp = [];
@@ -1011,10 +1281,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (seo === 'Ja') fp.push('SEO-Keywords');
     if (titleSub === 'ja') fp.push('Titel');
     if (emojis === 'keine') fp.push('keine Emojis');
-    else if (emojis) fp.push(emojis + ' Emojis');
+    else if (emojis === 'wenige') fp.push('wenige Emojis');
+    else if (emojis === 'viele') fp.push('viele Emojis');
     const fmt = fp.join(', ');
 
-    // Variation 1 – Kompakt (Stichpunkte)
     const v1 = [];
     if (type) v1.push(`Verfasse ${art}${type}.`);
     if (description) v1.push(`Thema: ${description}.`);
@@ -1023,18 +1293,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (style)       v1.push(`Stil: ${style}.`);
     if (beispiel)    v1.push(`Referenz: ${beispiel}`);
 
-    // Variation 2 – Thema zuerst
     const v2 = [];
     if (description) v2.push(`Zum Thema „${description}": `);
     if (type)        v2.push(`Schreibe ${art}${type}${audience ? ` für ${audience}` : ''}.`);
-    const details = [];
-    if (fmt)   details.push(fmt);
-    if (style) details.push(`${style.toLowerCase()} Stil`);
-    if (perspective) details.push(perspective);
-    if (details.length) v2.push(`Berücksichtige: ${details.join(', ')}.`);
+    const det = [];
+    if (fmt)   det.push(fmt);
+    if (style) det.push(`${style.toLowerCase()} Stil`);
+    if (perspective) det.push(perspective);
+    if (det.length) v2.push(`Berücksichtige: ${det.join(', ')}.`);
     if (beispiel) v2.push(`Orientiere dich an: ${beispiel}`);
 
-    // Variation 3 – Rollen-Ansatz
     const v3 = [];
     v3.push(style ? `Du bist ein ${style.toLowerCase()} schreibender Texter.` : 'Du bist ein erfahrener Texter.');
     if (type && description) v3.push(`Erstelle ${art}${type} über: ${description}.`);
@@ -1048,18 +1316,19 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const showVariations = () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
     const vars = buildVariations();
     const list = document.getElementById('variations-list');
     if (!list) return;
     if (!vars.length) {
-      list.innerHTML = '<p class="text-muted text-center py-3">Bitte zuerst mindestens Texttyp oder Thema ausfüllen.</p>';
+      list.innerHTML = `<p class="text-muted text-center py-3">${t['variations.empty']}</p>`;
     } else {
       list.innerHTML = vars.map((v, i) => `
         <div class="variation-item" data-text="${v.replace(/"/g, '&quot;')}">
           <div class="variation-num">Variation ${i + 1}</div>
           <div class="variation-text">${esc(v)}</div>
           <button type="button" class="action-btn action-btn--outline variation-copy-btn mt-2">
-            <i class="fa-solid fa-copy me-1"></i>Kopieren
+            <i class="fa-solid fa-copy me-1"></i>${t['lib.btn.copy']}
           </button>
         </div>`).join('');
     }
@@ -1110,6 +1379,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'history.title': 'Prompt-Verlauf', 'history.empty': 'Noch keine Prompts generiert.',
       'variations.title': 'Prompt-Variationen',
       'variations.subtitle': '3 alternative Formulierungen deines Prompts – klicke auf eine, um sie zu kopieren.',
+      'variations.empty': 'Bitte zuerst mindestens Texttyp oder Thema ausfüllen.',
       'library.tab.mine': 'Meine Prompts', 'library.tab.examples': 'Beispiele',
       'btn.library': 'Bibliothek', 'btn.save': 'Speichern', 'btn.saveConfirm': 'Speichern',
       'save.title': 'In Bibliothek speichern', 'save.label': 'Name / Titel',
@@ -1118,8 +1388,28 @@ document.addEventListener('DOMContentLoaded', () => {
       'library.title': 'Prompt-Bibliothek',
       'library.empty': 'Noch keine Prompts gespeichert.',
       'library.emptyhint': 'Generiere einen Prompt und klicke auf „Speichern".',
+      'lib.btn.load': 'Laden', 'lib.btn.copy': 'Kopieren', 'lib.btn.delete': 'Löschen',
       'toast.saved': 'In Bibliothek gespeichert!',
+      'toast.copy': 'Prompt in Zwischenspeicher kopiert!',
+      'toast.share': 'Link in Zwischenspeicher kopiert!',
       'btn.next': 'Weiter', 'btn.toPreview': 'Zur Vorschau',
+      'ph.description': 'Beschreibe das Thema, den Inhalt oder das Ziel deines Textes …',
+      'ph.beispiel': 'z.B. „Schreibe wie Tim Ferriss" oder füge einen Beispieltext ein …',
+      'tooltip.contenttype': 'Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter.',
+      'tooltip.topic': 'Beschreibe das Thema so konkret wie möglich, z.B. \'5 KI-Tools für Einsteiger im Büroalltag\'.',
+      'tooltip.audience': 'Für wen schreibst du? Je genauer die Zielgruppe, desto passender der generierte Text.',
+      'tooltip.style': 'z.B. \'Journalistisch\' für Artikel, \'Werblich\' für Sales-Texte, \'Persönlich\' für Social Media.',
+      'status.ready': 'Bereit zum Kopieren', 'status.waiting': 'Warte auf Eingaben …',
+      'status.words': 'Wörter', 'status.chars': 'Zeichen',
+      'preview.empty.title': 'Noch keine Eingaben',
+      'preview.empty.sub': 'Wähle eine Vorlage aus dem Katalog<br>oder fülle die Felder Schritt für Schritt aus',
+      'preview.intro': 'Generiere einen personalisierten Text unter Berücksichtigung folgender Details:',
+      'grp.article_blog': 'Artikel & Blog', 'grp.social_media': 'Social Media',
+      'grp.marketing_seo': 'Marketing & SEO', 'grp.email_komm': 'E-Mail & Kommunikation',
+      'grp.business_karriere': 'Business & Karriere', 'grp.multimedia': 'Multimedia',
+      'grp.kreativ': 'Kreativ', 'grp.interaktiv': 'Interaktiv',
+      'grp.b2c_privat': 'B2C – Privat', 'grp.b2b_business': 'B2B – Business',
+      'grp.interests': 'Interessen & Community',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -1150,6 +1440,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'history.title': 'Prompt History', 'history.empty': 'No prompts generated yet.',
       'variations.title': 'Prompt Variations',
       'variations.subtitle': '3 alternative formulations of your prompt – click one to copy.',
+      'variations.empty': 'Please fill in at least a content type or topic first.',
       'library.tab.mine': 'My Prompts', 'library.tab.examples': 'Examples',
       'btn.library': 'Library', 'btn.save': 'Save', 'btn.saveConfirm': 'Save',
       'save.title': 'Save to Library', 'save.label': 'Name / Title',
@@ -1158,8 +1449,28 @@ document.addEventListener('DOMContentLoaded', () => {
       'library.title': 'Prompt Library',
       'library.empty': 'No prompts saved yet.',
       'library.emptyhint': 'Generate a prompt and click "Save".',
+      'lib.btn.load': 'Load', 'lib.btn.copy': 'Copy', 'lib.btn.delete': 'Delete',
       'toast.saved': 'Saved to library!',
+      'toast.copy': 'Prompt copied to clipboard!',
+      'toast.share': 'Link copied to clipboard!',
       'btn.next': 'Next', 'btn.toPreview': 'To Preview',
+      'ph.description': 'Describe the topic, content or goal of your text …',
+      'ph.beispiel': 'e.g. "Write like Tim Ferriss" or paste a sample text to match the style …',
+      'tooltip.contenttype': 'Choose the type of text, e.g. Blog Post, LinkedIn Post or Newsletter.',
+      'tooltip.topic': 'Describe the topic as specifically as possible, e.g. \'5 AI Tools for Beginners\'.',
+      'tooltip.audience': 'Who are you writing for? The more specific the audience, the better the result.',
+      'tooltip.style': 'e.g. \'Journalistic\' for articles, \'Promotional\' for sales copy, \'Personal\' for social media.',
+      'status.ready': 'Ready to copy', 'status.waiting': 'Waiting for input …',
+      'status.words': 'words', 'status.chars': 'characters',
+      'preview.empty.title': 'No input yet',
+      'preview.empty.sub': 'Choose a template from the catalog<br>or fill in the fields step by step',
+      'preview.intro': 'Generate a personalised text based on the following details:',
+      'grp.article_blog': 'Article & Blog', 'grp.social_media': 'Social Media',
+      'grp.marketing_seo': 'Marketing & SEO', 'grp.email_komm': 'Email & Communication',
+      'grp.business_karriere': 'Business & Career', 'grp.multimedia': 'Multimedia',
+      'grp.kreativ': 'Creative', 'grp.interaktiv': 'Interactive',
+      'grp.b2c_privat': 'B2C – Private', 'grp.b2b_business': 'B2B – Business',
+      'grp.interests': 'Interests & Community',
     },
   };
 
@@ -1168,17 +1479,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const applyUILang = (lang) => {
     uiLang = lang;
     const t = UI_STRINGS[lang] || UI_STRINGS.de;
+
+    // text content
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
-      if (t[key]) el.textContent = t[key];
+      if (t[key] !== undefined) el.textContent = t[key];
     });
+    // placeholders
     document.querySelectorAll('[data-i18n-ph]').forEach(el => {
       const key = el.dataset.i18nPh;
       if (t[key]) el.placeholder = t[key];
     });
+    // optgroup labels
+    document.querySelectorAll('[data-i18n-grp]').forEach(grp => {
+      const key = grp.dataset.i18nGrp;
+      if (t[key]) grp.label = t[key];
+    });
+    // dropdown option labels (value stays as German internal key)
+    const optLabels = OPTION_LABELS[lang] || OPTION_LABELS.de;
+    Object.entries(optLabels).forEach(([selectId, labels]) => {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      sel.querySelectorAll('option').forEach(opt => {
+        if (labels[opt.value] !== undefined) opt.textContent = labels[opt.value];
+      });
+    });
+    // tooltips
+    document.querySelectorAll('[data-i18n-tooltip]').forEach(el => {
+      const key = el.dataset.i18nTooltip;
+      if (!t[key]) return;
+      el.setAttribute('data-bs-title', t[key]);
+      const tip = bootstrap.Tooltip.getInstance(el);
+      if (tip) tip.setContent({ '.tooltip-inner': t[key] });
+    });
+
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
     try { localStorage.setItem('chati_ui_lang', lang); } catch {}
     renderCatalog(activeFilter);
+    renderLibrary();
+    refreshPreview();
   };
 
   btnUiLang?.addEventListener('click', () => applyUILang(uiLang === 'de' ? 'en' : 'de'));
