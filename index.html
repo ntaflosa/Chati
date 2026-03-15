@@ -535,29 +535,57 @@
             <button id="btn-qr" type="button" class="action-btn action-btn--outline">
               <i class="fa-solid fa-qrcode me-2"></i>QR
             </button>
-            <button id="btn-show" type="button" class="action-btn action-btn--outline">
-              <i class="fa-solid fa-expand me-2"></i><span data-i18n="btn.fullscreen">Vollansicht</span>
-            </button>
-            <button id="btn-export" type="button" class="action-btn action-btn--outline">
-              <i class="fa-solid fa-download me-2"></i><span data-i18n="btn.export">Exportieren</span>
-            </button>
-            <button id="btn-variations" type="button" class="action-btn action-btn--outline">
-              <i class="fa-solid fa-shuffle me-2"></i><span data-i18n="btn.variations">Variationen</span>
-            </button>
             <button id="btn-save" type="button" class="action-btn action-btn--outline action-btn--save">
               <i class="fa-solid fa-bookmark me-2"></i><span data-i18n="btn.save">Speichern</span>
             </button>
-            <div class="action-divider d-none d-sm-flex"></div>
-            <span class="action-label d-none d-sm-block" data-i18n="lbl.openin">Öffnen in:</span>
-            <button id="btn-open-copilot" type="button" class="action-btn action-btn--ghost">
-              <i class="fa-solid fa-robot me-2"></i>Copilot
-            </button>
-            <button id="btn-open-chatgpt" type="button" class="action-btn action-btn--ghost">
-              <i class="fa-solid fa-comment-dots me-2"></i>ChatGPT
-            </button>
-            <button id="btn-open-claude" type="button" class="action-btn action-btn--ghost">
-              <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Claude
-            </button>
+            <!-- ··· Weitere Aktionen -->
+            <div class="dropdown">
+              <button class="action-btn action-btn--outline" type="button" id="moreActionsBtn"
+                data-bs-toggle="dropdown" aria-expanded="false" aria-label="Weitere Aktionen">
+                <i class="fa-solid fa-ellipsis"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end chati-dropdown" aria-labelledby="moreActionsBtn">
+                <li>
+                  <button class="dropdown-item" id="btn-show">
+                    <i class="fa-solid fa-expand me-2"></i><span data-i18n="btn.fullscreen">Vollansicht</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" id="btn-export">
+                    <i class="fa-solid fa-download me-2"></i><span data-i18n="btn.export">Exportieren</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" id="btn-variations">
+                    <i class="fa-solid fa-shuffle me-2"></i><span data-i18n="btn.variations">Variationen</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <!-- Öffnen in KI-Tool -->
+            <div class="dropdown">
+              <button class="action-btn action-btn--ghost" type="button" id="openInBtn"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-robot me-2"></i><span data-i18n="lbl.openin">Öffnen in</span><i class="fa-solid fa-chevron-down ms-1" style="font-size:.7em;opacity:.7;"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end chati-dropdown" aria-labelledby="openInBtn">
+                <li>
+                  <button class="dropdown-item" id="btn-open-copilot">
+                    <i class="fa-solid fa-robot me-2"></i>Copilot
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" id="btn-open-chatgpt">
+                    <i class="fa-solid fa-comment-dots me-2"></i>ChatGPT
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" id="btn-open-claude">
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Claude
+                  </button>
+                </li>
+              </ul>
+            </div>
             <button id="btn-reset" type="button" class="action-btn action-btn--ghost ms-auto">
               <i class="fa-solid fa-rotate-left me-2"></i><span class="d-none d-sm-inline" data-i18n="btn.reset">Zurücksetzen</span>
             </button>

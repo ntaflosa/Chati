@@ -604,6 +604,8 @@ textarea.field-input { resize: vertical; min-height: 110px; line-height: 1.6; }
   .main-content { padding: 1rem 0.5rem; }
   .section-body { padding: 1.25rem 1rem; }
   .action-btn { flex: 1 1 calc(50% - 0.25rem); }
+  .action-row .dropdown { flex: 1 1 calc(50% - 0.25rem); }
+  .action-row .dropdown .action-btn { width: 100%; justify-content: center; }
   .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .help-tiles { grid-template-columns: 1fr; }
   .catalog-subtitle { display: none; }
@@ -782,6 +784,10 @@ textarea.field-input { resize: vertical; min-height: 110px; line-height: 1.6; }
 [data-theme="dark"] .modal-content { background: var(--color-surface); color: var(--color-text); }
 [data-theme="dark"] .modal-header,
 [data-theme="dark"] .modal-footer { border-color: var(--color-border); }
+[data-theme="dark"] .chati-dropdown { background: var(--color-surface-alt); border-color: var(--color-border); }
+[data-theme="dark"] .chati-dropdown .dropdown-item { color: var(--color-text); }
+[data-theme="dark"] .chati-dropdown .dropdown-item:hover,
+[data-theme="dark"] .chati-dropdown .dropdown-item:focus { background: var(--color-primary-light); color: var(--color-primary); }
 [data-theme="dark"] .modal-prompt-pre { background: var(--color-surface-alt); color: var(--color-text); border-color: var(--color-border); }
 [data-theme="dark"] .help-tile { background: var(--color-surface); border-color: var(--color-border); }
 [data-theme="dark"] .help-tile__title { color: var(--color-text); }
