@@ -942,6 +942,36 @@ label[data-bs-toggle="tooltip"]::after {
   color: #fff;
 }
 
+/* Library tabs */
+.library-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-surface);
+}
+.library-tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+.library-tab:hover { color: var(--color-primary); }
+.library-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+.library-panel { min-height: 200px; }
+
+.library-examples-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
 .library-item {
   background: var(--color-surface);
   border: 1.5px solid var(--color-border);

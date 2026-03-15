@@ -854,6 +854,95 @@ document.addEventListener('DOMContentLoaded', () => {
     historyCanvas.show();
   });
 
+  // ── Library tabs ──────────────────────────────────────────────────────────
+  let activeLibTab = 'mine';
+  let activeExampleFilter = 'alle';
+
+  const CATEGORY_LABELS_FULL = {
+    alle:         { de: 'Alle', en: 'All' },
+    Content:      { de: 'Content', en: 'Content' },
+    'Social Media': { de: 'Social Media', en: 'Social Media' },
+    Marketing:    { de: 'Marketing', en: 'Marketing' },
+    'E-Mail':     { de: 'E-Mail', en: 'E-Mail' },
+    Business:     { de: 'Business', en: 'Business' },
+    Medizin:      { de: 'Medizin', en: 'Medicine' },
+    Recht:        { de: 'Recht', en: 'Law' },
+    Bildung:      { de: 'Bildung', en: 'Education' },
+    'E-Commerce': { de: 'E-Commerce', en: 'E-Commerce' },
+  };
+
+  const renderExamples = () => {
+    const examplesFilter = document.getElementById('examples-filter');
+    const examplesList   = document.getElementById('examples-list');
+    if (!examplesFilter || !examplesList) return;
+
+    const examples = typeof LIBRARY_EXAMPLES !== 'undefined' ? LIBRARY_EXAMPLES : [];
+    const cats = ['alle', ...new Set(examples.map(e => e.category))];
+
+    examplesFilter.innerHTML = cats.map(c => `
+      <button class="filter-chip${activeExampleFilter === c ? ' active' : ''}" data-excat="${c}">
+        ${CATEGORY_LABELS_FULL[c]?.[uiLang] || c}
+      </button>`).join('');
+
+    const filtered = activeExampleFilter === 'alle'
+      ? examples
+      : examples.filter(e => e.category === activeExampleFilter);
+
+    examplesList.innerHTML = '';
+    filtered.forEach(ex => {
+      const div = document.createElement('div');
+      div.className = 'library-item';
+      div.innerHTML = `
+        <div class="library-item__header">
+          <span class="library-item__title">${esc(ex.title)}</span>
+          <div class="library-item__meta">
+            <span class="history-item__lang">${ex.lang.toUpperCase()}</span>
+            <span class="catalog-card__badge">${CATEGORY_LABELS_FULL[ex.category]?.[uiLang] || ex.category}</span>
+          </div>
+        </div>
+        <div class="library-item__text">${esc(ex.text.slice(0, 120))}…</div>
+        <div class="library-item__btns">
+          <button class="action-btn action-btn--outline ex-btn-copy" data-exid="${esc(ex.id)}">
+            <i class="fa-solid fa-copy me-1"></i>${uiLang === 'en' ? 'Copy' : 'Kopieren'}
+          </button>
+        </div>`;
+      examplesList.appendChild(div);
+    });
+  };
+
+  document.getElementById('examples-filter')?.addEventListener('click', e => {
+    const btn = e.target.closest('[data-excat]');
+    if (!btn) return;
+    activeExampleFilter = btn.dataset.excat;
+    renderExamples();
+  });
+
+  document.getElementById('examples-list')?.addEventListener('click', async e => {
+    const btn = e.target.closest('.ex-btn-copy');
+    if (!btn) return;
+    const examples = typeof LIBRARY_EXAMPLES !== 'undefined' ? LIBRARY_EXAMPLES : [];
+    const ex = examples.find(x => x.id === btn.dataset.exid);
+    if (!ex) return;
+    try { await navigator.clipboard.writeText(ex.text); }
+    catch {
+      const ta = Object.assign(document.createElement('textarea'),
+        { value: ex.text, style: 'position:fixed;opacity:0;' });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    copyToast.show();
+  });
+
+  document.getElementById('library-tabs')?.addEventListener('click', e => {
+    const tab = e.target.closest('[data-libtab]');
+    if (!tab) return;
+    activeLibTab = tab.dataset.libtab;
+    document.querySelectorAll('#library-tabs .library-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.libtab === activeLibTab));
+    document.getElementById('library-panel-mine')?.classList.toggle('d-none', activeLibTab !== 'mine');
+    document.getElementById('library-panel-examples')?.classList.toggle('d-none', activeLibTab !== 'examples');
+    if (activeLibTab === 'examples') renderExamples();
+  });
+
   btnLibrary?.addEventListener('click', () => {
     renderLibrary();
     libraryCanvas.show();
@@ -1021,6 +1110,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'history.title': 'Prompt-Verlauf', 'history.empty': 'Noch keine Prompts generiert.',
       'variations.title': 'Prompt-Variationen',
       'variations.subtitle': '3 alternative Formulierungen deines Prompts – klicke auf eine, um sie zu kopieren.',
+      'library.tab.mine': 'Meine Prompts', 'library.tab.examples': 'Beispiele',
       'btn.library': 'Bibliothek', 'btn.save': 'Speichern', 'btn.saveConfirm': 'Speichern',
       'save.title': 'In Bibliothek speichern', 'save.label': 'Name / Titel',
       'save.hint': 'Gib dem Prompt einen aussagekräftigen Namen.',
@@ -1060,6 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'history.title': 'Prompt History', 'history.empty': 'No prompts generated yet.',
       'variations.title': 'Prompt Variations',
       'variations.subtitle': '3 alternative formulations of your prompt – click one to copy.',
+      'library.tab.mine': 'My Prompts', 'library.tab.examples': 'Examples',
       'btn.library': 'Library', 'btn.save': 'Save', 'btn.saveConfirm': 'Save',
       'save.title': 'Save to Library', 'save.label': 'Name / Title',
       'save.hint': 'Give the prompt a descriptive name.',

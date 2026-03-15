@@ -748,20 +748,32 @@
   </div>
 
   <!-- ===== Bibliothek Offcanvas ===== -->
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="libraryOffcanvas" aria-labelledby="libraryOffcanvasLabel" style="width:440px;max-width:100vw;">
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="libraryOffcanvas" aria-labelledby="libraryOffcanvasLabel" style="width:460px;max-width:100vw;">
     <div class="offcanvas-header border-bottom">
       <h5 class="offcanvas-title" id="libraryOffcanvasLabel">
         <i class="fa-solid fa-bookmark me-2" style="color:var(--color-primary)"></i><span data-i18n="library.title">Prompt-Bibliothek</span>
       </h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
     </div>
-    <div class="offcanvas-body p-3">
-      <p class="text-center text-muted mt-4" id="library-empty" style="font-size:.875rem;">
-        <i class="fa-solid fa-bookmark d-block mb-2" style="font-size:2rem;opacity:.3"></i>
-        <span data-i18n="library.empty">Noch keine Prompts gespeichert.</span><br>
-        <small data-i18n="library.emptyhint">Generiere einen Prompt und klicke auf „Speichern".</small>
-      </p>
-      <div id="library-list"></div>
+    <div class="offcanvas-body p-0">
+      <div class="library-tabs" id="library-tabs">
+        <button class="library-tab active" data-libtab="mine" data-i18n="library.tab.mine">Meine Prompts</button>
+        <button class="library-tab" data-libtab="examples" data-i18n="library.tab.examples">Beispiele</button>
+      </div>
+      <!-- Meine Prompts -->
+      <div id="library-panel-mine" class="library-panel p-3">
+        <p class="text-center text-muted mt-4" id="library-empty" style="font-size:.875rem;">
+          <i class="fa-solid fa-bookmark d-block mb-2" style="font-size:2rem;opacity:.3"></i>
+          <span data-i18n="library.empty">Noch keine Prompts gespeichert.</span><br>
+          <small data-i18n="library.emptyhint">Generiere einen Prompt und klicke auf „Speichern".</small>
+        </p>
+        <div id="library-list"></div>
+      </div>
+      <!-- Beispiel-Prompts -->
+      <div id="library-panel-examples" class="library-panel p-3 d-none">
+        <div class="library-examples-filter mb-3" id="examples-filter"></div>
+        <div id="examples-list"></div>
+      </div>
     </div>
   </div>
 
@@ -804,6 +816,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="catalog.js"></script>
+  <script src="examples.js"></script>
   <script src="script.js"></script>
 </body>
 
