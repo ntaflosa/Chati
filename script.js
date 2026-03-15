@@ -51,9 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const importToast    = new bootstrap.Toast(document.getElementById('import-toast'), { delay: 2500 });
   const presetToast    = new bootstrap.Toast(document.getElementById('preset-toast'), { delay: 2000 });
   const undoToast      = new bootstrap.Toast(document.getElementById('undo-toast'),   { delay: 8000 });
+  const ctxToast       = new bootstrap.Toast(document.getElementById('ctx-toast'),    { delay: 2500 });
 
   const qrModal          = new bootstrap.Modal(document.getElementById('qrModal'));
   const placeholderModal = new bootstrap.Modal(document.getElementById('placeholderModal'));
+  const reverseModal     = new bootstrap.Modal(document.getElementById('reverseModal'));
+  const projectCtxCanvas = new bootstrap.Offcanvas(document.getElementById('projectCtxOffcanvas'));
 
   // ── Constants ─────────────────────────────────────────────────────────────
   const FIELD_IDS = [
@@ -67,8 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const LS_HISTORY_KEY   = 'chati_history';
   const LS_LIBRARY_KEY   = 'chati_library';
   const LS_PRESETS_KEY   = 'chati_presets';
-  const LS_FAVORITES_KEY = 'chati_favorites';
-  const LS_THEME_KEY     = 'chati_theme';
+  const LS_FAVORITES_KEY  = 'chati_favorites';
+  const LS_THEME_KEY      = 'chati_theme';
+  const LS_PROJECT_CTX    = 'chati_project_ctx';
   const HISTORY_MAX     = 8;
 
   const val = (id) => (document.getElementById(id)?.value ?? '').trim();
@@ -484,6 +488,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!role && !type && !description) return '';
     const s = [];
 
+    const _ctxDE = buildCtxPreviewText(loadProjectCtx());
+    if (_ctxDE) s.push(_ctxDE);
     if (role) s.push(role.endsWith('.') || role.endsWith('!') || role.endsWith('?') ? role : role + '.');
     if (type) s.push(`Erstelle ${(ARTICLE_MAP[type] ?? 'einen ')}${type}.`);
     if (description && audience) s.push(`Das Thema lautet: ${description}. Die Zielgruppe sind ${audience}.`);
@@ -522,6 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!role && !type && !description) return '';
     const s = [];
 
+    const _ctxEN = buildCtxPreviewText(loadProjectCtx());
+    if (_ctxEN) s.push(_ctxEN);
     if (role) s.push(role.endsWith('.') || role.endsWith('!') || role.endsWith('?') ? role : role + '.');
     if (type) s.push(`Create ${ARTICLE_MAP_EN[type] ?? 'a ' + type}.`);
     if (description && audience)
@@ -569,6 +577,198 @@ document.addEventListener('DOMContentLoaded', () => {
   const esc = (str) => str
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  // ── Prompt Reverse-Engineer (Feature: Analysieren) ───────────────────────
+  const analyzePrompt = (text) => {
+    const result = {};
+
+    // Role / Persona
+    const rolePatterns = [
+      /(?:du bist|sie sind|agiere als|handele als)\s+([^.!?\n]{5,120})/i,
+      /(?:act as|you are|you're)\s+([^.!?\n]{5,120})/i,
+    ];
+    for (const p of rolePatterns) {
+      const m = text.match(p);
+      if (m) { result['role-definition'] = m[0].trim().replace(/[,.]$/, ''); break; }
+    }
+
+    // Content type
+    const typePatterns = [
+      { p: /pressemitteilung|press.?release/i,             v: 'Pressemitteilung' },
+      { p: /whitepaper/i,                                  v: 'Whitepaper' },
+      { p: /case.?stud/i,                                  v: 'Case-Study' },
+      { p: /newsletter/i,                                  v: 'Newsletter' },
+      { p: /landing.?page/i,                               v: 'Landing Page' },
+      { p: /linkedin/i,                                    v: 'LinkedIn-Beitrag' },
+      { p: /instagram/i,                                   v: 'Instagram-Beitrag' },
+      { p: /facebook/i,                                    v: 'Facebook-Beitrag' },
+      { p: /tweet|twitter/i,                               v: 'Twitter-Beitrag' },
+      { p: /tiktok/i,                                      v: 'TikTok-Skript' },
+      { p: /youtube/i,                                     v: 'YouTube-Video' },
+      { p: /podcast/i,                                     v: 'Podcast-Episode' },
+      { p: /executive.?summary/i,                          v: 'Executive Summary' },
+      { p: /bericht|report(?!\w)/i,                        v: 'Bericht / Report' },
+      { p: /stellenanzeige|job.?posting/i,                 v: 'Stellenanzeige' },
+      { p: /produktbeschreibung|product.?description/i,    v: 'Produktbeschreibung' },
+      { p: /seo.?text|seo.?artikel|seo.?article/i,        v: 'SEO-Text' },
+      { p: /how.?to|schritt.?für.?schritt|step.?by.?step/i, v: 'How-to-Anleitung' },
+      { p: /kaltakquise|cold.?outreach|cold.?email/i,     v: 'Kaltakquise-E-Mail' },
+      { p: /follow.?up/i,                                  v: 'Follow-up-E-Mail' },
+      { p: /e.?mail|email/i,                               v: 'E-Mail' },
+      { p: /präsentation|presentation/i,                   v: 'Präsentation' },
+      { p: /blog.?post|blogartikel/i,                      v: 'Blog-Post' },
+      { p: /artikel|article/i,                             v: 'Artikel' },
+    ];
+    for (const { p, v } of typePatterns) {
+      if (p.test(text)) { result['content-type'] = v; break; }
+    }
+
+    // Length
+    const wordMatch = text.match(/(\d+)\s*(?:wörter|wörtern|words)/i);
+    if (wordMatch) {
+      const n = parseInt(wordMatch[1]);
+      if (n <= 100)       result['content-length'] = 'Sehr kurz (50–100 Wörter)';
+      else if (n <= 300)  result['content-length'] = 'Kurz (100–300 Wörter)';
+      else if (n <= 600)  result['content-length'] = 'Mittel (300–600 Wörter)';
+      else if (n <= 1200) result['content-length'] = 'Lang (600–1.200 Wörter)';
+      else                result['content-length'] = 'Sehr lang (1.200+ Wörter)';
+    } else if (/\bkurz\b|brief|concise/i.test(text)) {
+      result['content-length'] = 'Kurz (100–300 Wörter)';
+    } else if (/ausführlich|detailliert|detailed|comprehensive|lang\b/i.test(text)) {
+      result['content-length'] = 'Lang (600–1.200 Wörter)';
+    }
+
+    // Style
+    const stylePatterns = [
+      { p: /wissenschaftlich|academic|scholarly/i,   v: 'Wissenschaftlich' },
+      { p: /journalistisch|journalistic/i,            v: 'Journalistisch' },
+      { p: /werblich|promotional/i,                   v: 'Werblich' },
+      { p: /technisch|technical/i,                    v: 'Technisch' },
+      { p: /humorvoll|humor|witzig|funny/i,           v: 'Humorvoll' },
+      { p: /inspir/i,                                 v: 'Inspirierend' },
+      { p: /emotiona/i,                               v: 'Emotional' },
+      { p: /motivier|motivat/i,                       v: 'Motivierend' },
+      { p: /sachlich|factual|neutral/i,               v: 'Sachlich' },
+      { p: /persönlich|personal/i,                    v: 'Persönlich' },
+      { p: /storytelling/i,                           v: 'Storytelling' },
+      { p: /formell|formal|professionell|professional/i, v: 'Formell' },
+      { p: /informell|locker|casual|informal/i,       v: 'Informell' },
+    ];
+    for (const { p, v } of stylePatterns) {
+      if (p.test(text)) { result['language-style'] = v; break; }
+    }
+
+    // Audience
+    const audiencePatterns = [
+      { p: /b2b.{0,20}entscheider|b2b.{0,20}decision/i, v: 'B2B-Entscheider' },
+      { p: /manager|führungskraft|executive|c-?level/i,  v: 'Manager & Führungskräfte' },
+      { p: /startup|gründer|founder/i,                   v: 'Gründer & Startups' },
+      { p: /it.?profes|entwickler|developer|programmer/i,v: 'IT-Professionals' },
+      { p: /senior|50\+|ältere/i,                        v: 'Senioren (50+ Jahre)' },
+      { p: /jugend|teenager|16.{0,3}25/i,                v: 'Jugendliche (16–25 Jahre)' },
+      { p: /schüler|student|auszubildend/i,              v: 'Schüler & Auszubildende (15–22 Jahre)' },
+      { p: /eltern|famili|parent|family/i,               v: 'Eltern & Familien' },
+      { p: /kreativ|designer|creative/i,                 v: 'Kreative & Designer' },
+      { p: /b2b|unternehmen|geschäftskund/i,             v: 'Manager & Führungskräfte' },
+    ];
+    for (const { p, v } of audiencePatterns) {
+      if (p.test(text)) { result['target-audience'] = v; break; }
+    }
+
+    // Formatting
+    if (/bullet.?point|aufzählung|stichpunkt/i.test(text))              result['formatting'] = 'Bullet Points';
+    else if (/tabelle|tabellarisch|table/i.test(text))                  result['formatting'] = 'Tabellarisch';
+    else if (/faq/i.test(text))                                         result['formatting'] = 'FAQ-Format (Frage & Antwort)';
+    else if (/checkliste|checklist/i.test(text))                        result['formatting'] = 'Checkliste / Aufgabenliste';
+    else if (/überschrift|heading|mit abschnitt/i.test(text))           result['formatting'] = 'Überschriften + Fließtext';
+
+    // SEO
+    if (/seo.?keyword|keyword|schlüsselwort/i.test(text))              result['seo-keyword-option'] = 'Ja';
+
+    // Emojis
+    if (/ohne emoji|no emoji/i.test(text))                             result['emoji-option'] = 'keine';
+    else if (/mit emoji|emojis|use emoji/i.test(text))                 result['emoji-option'] = 'wenige';
+
+    // Topic / Description — find the core sentence
+    const topicPatterns = [
+      /(?:zum thema|über das thema|thema\s*[:\-])\s*([^.!?\n]{10,200})/i,
+      /(?:topic\s*[:\-]|about\s*[:\-]?|über\s*[:\-]?)\s*([^.!?\n]{10,200})/i,
+    ];
+    for (const p of topicPatterns) {
+      const m = text.match(p);
+      if (m) { result['description'] = m[1].trim(); break; }
+    }
+    if (!result['description']) {
+      // Fall back: first non-command sentence of reasonable length
+      const sentences = text.split(/[.!?]/).map(s => s.trim())
+        .filter(s => s.length > 25 && !/^(?:du bist|you are|act as|erstelle|create|write|schreibe|erzeuge|generate)/i.test(s));
+      if (sentences[0]) {
+        const s = sentences[0];
+        result['description'] = s.length > 160 ? s.substring(0, 160) + '…' : s;
+      }
+    }
+
+    return result;
+  };
+
+  // ── Projekt-Kontext ───────────────────────────────────────────────────────
+  const loadProjectCtx = () => {
+    try { return JSON.parse(localStorage.getItem(LS_PROJECT_CTX)) || {}; } catch { return {}; }
+  };
+  const saveProjectCtxData = (data) => {
+    try { localStorage.setItem(LS_PROJECT_CTX, JSON.stringify(data)); } catch {}
+  };
+
+  const renderProjectCtxDot = () => {
+    const dot = document.getElementById('project-ctx-dot');
+    if (!dot) return;
+    const ctx = loadProjectCtx();
+    const hasContent = ctx.active && (ctx.company || ctx.industry || ctx.extra);
+    dot.classList.toggle('d-none', !hasContent);
+  };
+
+  const buildCtxPreviewText = (ctx) => {
+    if (!ctx.active) return '';
+    const parts = [];
+    if (ctx.company)  parts.push(`Firma/Projekt: ${ctx.company}`);
+    if (ctx.industry) parts.push(`Branche: ${ctx.industry}`);
+    if (ctx.extra)    parts.push(ctx.extra);
+    return parts.length ? `[Projekt-Kontext: ${parts.join(' · ')}]` : '';
+  };
+
+  const renderCtxPreview = () => {
+    const box  = document.getElementById('ctx-preview-box');
+    const text = document.getElementById('ctx-preview-text');
+    const company  = (document.getElementById('ctx-company')?.value  || '').trim();
+    const industry = (document.getElementById('ctx-industry')?.value || '').trim();
+    const extra    = (document.getElementById('ctx-extra')?.value    || '').trim();
+    const active   = document.getElementById('ctx-toggle')?.checked;
+    if (box && text) {
+      const hasAny = company || industry || extra;
+      box.classList.toggle('d-none', !hasAny || !active);
+      if (hasAny && active) {
+        const parts = [];
+        if (company)  parts.push(`Firma/Projekt: ${company}`);
+        if (industry) parts.push(`Branche: ${industry}`);
+        if (extra)    parts.push(extra);
+        text.textContent = `[Projekt-Kontext: ${parts.join(' · ')}]`;
+      }
+    }
+  };
+
+  const openProjectCtx = () => {
+    const ctx = loadProjectCtx();
+    const toggle  = document.getElementById('ctx-toggle');
+    const company = document.getElementById('ctx-company');
+    const industry= document.getElementById('ctx-industry');
+    const extra   = document.getElementById('ctx-extra');
+    if (toggle)   toggle.checked   = !!ctx.active;
+    if (company)  company.value    = ctx.company  || '';
+    if (industry) industry.value   = ctx.industry || '';
+    if (extra)    extra.value      = ctx.extra    || '';
+    renderCtxPreview();
+    projectCtxCanvas.show();
+  };
 
   const emptyState = () => {
     const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
@@ -1979,6 +2179,41 @@ document.addEventListener('DOMContentLoaded', () => {
       'vault.empty': 'Noch leer – Rolle eingeben und speichern',
       'vault.hint.empty': 'Bitte zuerst eine Rolle / KI-Persona eingeben.',
       'vault.max': 'Maximal 10 Personas gespeichert.',
+      // v2.0 Reverse-Engineer
+      'btn.reverse': 'Analysieren',
+      'reverse.title': 'Prompt analysieren & importieren',
+      'reverse.hint': 'Füge einen beliebigen bestehenden Prompt ein – Chati erkennt automatisch Texttyp, Zielgruppe, Tonfall und mehr.',
+      'reverse.placeholder': 'Prompt hier einfügen …',
+      'reverse.btn.analyze': 'Analysieren',
+      'reverse.btn.apply': 'In Formular übernehmen',
+      'reverse.results.title': 'Erkannte Felder:',
+      'reverse.empty': 'Keine Felder erkannt. Versuche einen längeren, detaillierteren Prompt.',
+      'reverse.field.role-definition': 'Rolle / KI-Persona',
+      'reverse.field.content-type': 'Texttyp',
+      'reverse.field.content-length': 'Textlänge',
+      'reverse.field.language-style': 'Sprachstil',
+      'reverse.field.target-audience': 'Zielgruppe',
+      'reverse.field.formatting': 'Formatierung',
+      'reverse.field.seo-keyword-option': 'SEO-Keywords',
+      'reverse.field.emoji-option': 'Emojis',
+      'reverse.field.description': 'Thema / Inhalt',
+      // v2.0 Projekt-Kontext
+      'btn.projectCtx': 'Kontext',
+      'ctx.title': 'Projekt-Kontext',
+      'ctx.hint': 'Speichere Infos zu deinem Projekt – sie werden automatisch in jeden generierten Prompt eingebaut.',
+      'ctx.active': 'Kontext aktivieren',
+      'ctx.lbl.company': 'Firma / Projekt',
+      'ctx.lbl.industry': 'Branche',
+      'ctx.lbl.extra': 'Weiterer Kontext',
+      'ctx.ph.company': 'z.B. TechStartup Berlin GmbH',
+      'ctx.ph.industry': 'z.B. SaaS / B2B-Software',
+      'ctx.ph.extra': 'z.B. Ton immer professionell, Zielgruppe sind CFOs im Mittelstand.',
+      'ctx.hint.extra': 'Max. 300 Zeichen – dieser Text wird direkt in jeden Prompt eingefügt.',
+      'ctx.preview.label': 'Prompt-Vorschau des Kontexts:',
+      'ctx.btn.save': 'Speichern',
+      'ctx.btn.clear': 'Löschen',
+      'ctx.toast.saved': 'Projekt-Kontext gespeichert!',
+      'ctx.toast.cleared': 'Projekt-Kontext gelöscht.',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -2108,6 +2343,41 @@ document.addEventListener('DOMContentLoaded', () => {
       'vault.empty': 'Empty – type a role above and save it',
       'vault.hint.empty': 'Please enter a role / AI persona first.',
       'vault.max': 'Maximum of 10 personas reached.',
+      // v2.0 Reverse-Engineer
+      'btn.reverse': 'Analyze',
+      'reverse.title': 'Analyze & import prompt',
+      'reverse.hint': 'Paste any existing prompt – Chati automatically detects content type, audience, tone and more.',
+      'reverse.placeholder': 'Paste prompt here …',
+      'reverse.btn.analyze': 'Analyze',
+      'reverse.btn.apply': 'Apply to form',
+      'reverse.results.title': 'Detected fields:',
+      'reverse.empty': 'No fields detected. Try a longer, more detailed prompt.',
+      'reverse.field.role-definition': 'Role / AI Persona',
+      'reverse.field.content-type': 'Content Type',
+      'reverse.field.content-length': 'Text Length',
+      'reverse.field.language-style': 'Writing Style',
+      'reverse.field.target-audience': 'Target Audience',
+      'reverse.field.formatting': 'Formatting',
+      'reverse.field.seo-keyword-option': 'SEO Keywords',
+      'reverse.field.emoji-option': 'Emojis',
+      'reverse.field.description': 'Topic / Content',
+      // v2.0 Projekt-Kontext
+      'btn.projectCtx': 'Context',
+      'ctx.title': 'Project Context',
+      'ctx.hint': 'Save info about your project – it will be automatically injected into every generated prompt.',
+      'ctx.active': 'Activate context',
+      'ctx.lbl.company': 'Company / Project',
+      'ctx.lbl.industry': 'Industry',
+      'ctx.lbl.extra': 'Additional Context',
+      'ctx.ph.company': 'e.g. TechStartup Berlin GmbH',
+      'ctx.ph.industry': 'e.g. SaaS / B2B Software',
+      'ctx.ph.extra': 'e.g. Always professional tone, targeting CFOs in mid-size companies.',
+      'ctx.hint.extra': 'Max. 300 characters – this text is injected directly into every prompt.',
+      'ctx.preview.label': 'Prompt preview of context:',
+      'ctx.btn.save': 'Save',
+      'ctx.btn.clear': 'Clear',
+      'ctx.toast.saved': 'Project context saved!',
+      'ctx.toast.cleared': 'Project context cleared.',
     },
   };
 
@@ -2756,6 +3026,133 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') { document.getElementById('persona-vault-cancel')?.click(); }
   });
 
+  // ── Prompt Reverse-Engineer ───────────────────────────────────────────────
+  let lastAnalyzed = {};
+
+  document.getElementById('btn-reverse')?.addEventListener('click', () => {
+    const inp = document.getElementById('reverse-input');
+    const results = document.getElementById('reverse-results');
+    const empty   = document.getElementById('reverse-empty');
+    const applyBtn = document.getElementById('reverse-apply-btn');
+    if (inp) inp.value = '';
+    if (results) results.classList.add('d-none');
+    if (empty) empty.classList.add('d-none');
+    if (applyBtn) applyBtn.classList.add('d-none');
+    lastAnalyzed = {};
+    reverseModal.show();
+    setTimeout(() => inp?.focus(), 350);
+  });
+
+  document.getElementById('reverse-input')?.addEventListener('input', () => {
+    const inp = document.getElementById('reverse-input');
+    const counter = document.getElementById('reverse-char-count');
+    if (counter && inp) counter.textContent = inp.value.length > 0 ? `${inp.value.length} Zeichen` : '';
+  });
+
+  document.getElementById('reverse-analyze-btn')?.addEventListener('click', () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    const inp     = document.getElementById('reverse-input');
+    const list    = document.getElementById('reverse-results-list');
+    const results = document.getElementById('reverse-results');
+    const empty   = document.getElementById('reverse-empty');
+    const applyBtn= document.getElementById('reverse-apply-btn');
+    const text = inp?.value.trim() || '';
+    if (!text) return;
+
+    lastAnalyzed = analyzePrompt(text);
+    const keys = Object.keys(lastAnalyzed);
+
+    results.classList.add('d-none');
+    empty.classList.add('d-none');
+    applyBtn.classList.add('d-none');
+
+    if (!keys.length) {
+      empty.classList.remove('d-none');
+      return;
+    }
+
+    const fieldNameKey = (k) => t[`reverse.field.${k}`] || k;
+    list.innerHTML = keys.map(k => {
+      const label = esc(fieldNameKey(k));
+      const value = esc(String(lastAnalyzed[k]));
+      return `<div class="reverse-result-row">
+        <span class="reverse-result-row__label">${label}</span>
+        <span class="reverse-result-row__value">${value}</span>
+      </div>`;
+    }).join('');
+
+    results.classList.remove('d-none');
+    applyBtn.classList.remove('d-none');
+  });
+
+  document.getElementById('reverse-apply-btn')?.addEventListener('click', () => {
+    const fields = lastAnalyzed;
+    Object.entries(fields).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = value;
+      // Flash the field briefly
+      el.classList.add('field-flash');
+      setTimeout(() => el.classList.remove('field-flash'), 800);
+    });
+    // Open any section that got filled
+    const sectionMap = {
+      'role-definition': 'body-aufgabe', 'content-type': 'body-aufgabe',
+      'description': 'body-kontext', 'target-audience': 'body-kontext',
+      'content-length': 'body-format', 'formatting': 'body-format',
+      'seo-keyword-option': 'body-format', 'emoji-option': 'body-format',
+      'language-style': 'body-tonfall',
+    };
+    const sectionsToOpen = new Set(Object.keys(fields).map(k => sectionMap[k]).filter(Boolean));
+    sectionsToOpen.forEach(id => openSection(id));
+    refreshPreview();
+    lastAnalyzed = {};
+  });
+
+  // ── Projekt-Kontext ───────────────────────────────────────────────────────
+  document.getElementById('btn-project-ctx')?.addEventListener('click', openProjectCtx);
+
+  ['ctx-company', 'ctx-industry', 'ctx-extra'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', renderCtxPreview);
+  });
+  document.getElementById('ctx-toggle')?.addEventListener('change', renderCtxPreview);
+
+  document.getElementById('ctx-save-btn')?.addEventListener('click', () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    const ctx = {
+      active:   document.getElementById('ctx-toggle')?.checked || false,
+      company:  (document.getElementById('ctx-company')?.value  || '').trim(),
+      industry: (document.getElementById('ctx-industry')?.value || '').trim(),
+      extra:    (document.getElementById('ctx-extra')?.value    || '').trim(),
+    };
+    saveProjectCtxData(ctx);
+    renderProjectCtxDot();
+    refreshPreview();
+    const toastText = document.getElementById('ctx-toast-text');
+    if (toastText) toastText.textContent = t['ctx.toast.saved'] || 'Projekt-Kontext gespeichert!';
+    ctxToast.show();
+    projectCtxCanvas.hide();
+  });
+
+  document.getElementById('ctx-clear-btn')?.addEventListener('click', () => {
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    saveProjectCtxData({});
+    const toggle  = document.getElementById('ctx-toggle');
+    const company = document.getElementById('ctx-company');
+    const industry= document.getElementById('ctx-industry');
+    const extra   = document.getElementById('ctx-extra');
+    if (toggle)   toggle.checked  = false;
+    if (company)  company.value   = '';
+    if (industry) industry.value  = '';
+    if (extra)    extra.value     = '';
+    renderCtxPreview();
+    renderProjectCtxDot();
+    refreshPreview();
+    const toastText = document.getElementById('ctx-toast-text');
+    if (toastText) toastText.textContent = t['ctx.toast.cleared'] || 'Projekt-Kontext gelöscht.';
+    ctxToast.show();
+  });
+
   // ── Fokus-Modus ───────────────────────────────────────────────────────────
   const toggleFocusMode = () => {
     focusMode = !focusMode;
@@ -2874,6 +3271,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Feature 20: Mini-Prompt-Coach popovers
   initCoachPopovers();
+
+  // v2.0: Projekt-Kontext dot indicator
+  renderProjectCtxDot();
 
   // Feature 3: '?' key opens shortcuts modal
   document.addEventListener('keydown', e => {

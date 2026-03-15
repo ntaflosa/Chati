@@ -1970,8 +1970,10 @@ kbd {
   /* ── Header Mobile-Optimierung ────────────────────────────────────────── */
 
   /* Weniger wichtige Header-Buttons auf Mobile ausblenden */
-  #btn-toggle-all { display: none !important; }  /* Desktop-Feature */
-  #btn-shortcuts  { display: none !important; }  /* Keyboard-only, nutzlos ohne Tastatur */
+  #btn-toggle-all  { display: none !important; }  /* Desktop-Feature */
+  #btn-shortcuts   { display: none !important; }  /* Keyboard-only, nutzlos ohne Tastatur */
+  #btn-reverse     { display: none !important; }  /* Analyse-Feature, Paste erfordert Desktop */
+  #btn-project-ctx { display: none !important; }  /* Power-Feature, sekundär auf Mobile */
 
   /* Header-Button-Gruppe: weniger Abstand, kleineres Padding */
   #header-actions {
@@ -2010,4 +2012,67 @@ kbd {
   #header-actions .help-btn { padding: 0.3rem 0.4rem; min-height: 38px; min-width: 38px; }
   .persona-vault__chips { flex-wrap: wrap; overflow-x: unset; }
   .persona-chip { max-width: 100%; flex: 1 1 auto; }
+}
+
+/* ── Projekt-Kontext: Indicator Dot ────────────────────────────────────────── */
+.project-ctx-btn { position: relative; }
+.project-ctx-dot {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 1.5px solid var(--header-bg, #fff);
+}
+
+/* ── Projekt-Kontext: Offcanvas fields & preview ────────────────────────────── */
+.ctx-preview-box {
+  background: var(--color-surface-alt, #f1f5f9);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  padding: 0.65rem 0.875rem;
+  margin-top: 0.5rem;
+}
+.ctx-preview-box__label {
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--color-text-muted, #64748b);
+  margin-bottom: 0.35rem;
+}
+.ctx-preview-box__text {
+  font-size: .8rem;
+  color: var(--color-text, #1e293b);
+  word-break: break-word;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Reverse-Engineer: Result rows ──────────────────────────────────────────── */
+.reverse-results-header {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.reverse-result-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  font-size: .875rem;
+}
+.reverse-result-row:last-child { border-bottom: none; }
+.reverse-result-row__label {
+  flex-shrink: 0;
+  min-width: 130px;
+  font-weight: 600;
+  color: var(--color-primary, #7c3aed);
+  font-size: .8rem;
+}
+.reverse-result-row__value {
+  color: var(--color-text, #1e293b);
+  word-break: break-word;
 }

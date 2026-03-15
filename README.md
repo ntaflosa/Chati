@@ -1,7 +1,7 @@
 # Chati – KI Prompt-Generator
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.9-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-2.0-brightgreen.svg)
 ![Technologien](https://img.shields.io/badge/Technologien-HTML5%20%7C%20CSS3%20%7C%20JavaScript%20%7C%20Bootstrap%205-blue)
 ![PWA](https://img.shields.io/badge/PWA-ready-purple.svg)
 
@@ -231,6 +231,10 @@ In `examples.js` ein weiteres Objekt ans `LIBRARY_EXAMPLES`-Array anhängen:
 ---
 
 ## Changelog
+
+### v2.0
+- **Prompt-Reverse-Engineer** – Beliebigen fremden Prompt einfügen → Chati erkennt automatisch Texttyp, Zielgruppe, Tonfall, Länge, Formatierung und mehr und befüllt alle Felder mit einem Klick. Einzigartige Funktion, die kein anderer Prompt-Generator bietet.
+- **Projekt-Kontext-Gedächtnis** – Persistentes Projektbriefing (Firma, Branche, Zusatzkontext) in localStorage gespeichert. Wird automatisch als `[Projekt-Kontext: …]`-Block in jeden generierten Prompt vorangestellt. Ein grüner Indikator-Punkt am Button zeigt an, wenn der Kontext aktiv ist.
 
 ### v1.9
 - **Persona-Tresor**: Bis zu 10 wiederverwendbare KI-Personas speichern und per Chip-Klick laden
