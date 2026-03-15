@@ -64,7 +64,7 @@
             <i class="fa-solid fa-globe"></i>
             <span class="d-none d-sm-inline ms-1" id="ui-lang-label">EN</span>
           </button>
-          <span class="version-badge">v1.6</span>
+          <span class="version-badge">v1.7</span>
         </div>
       </div>
     </div>
@@ -85,18 +85,23 @@
           <i class="fa-solid fa-chevron-up section-chevron" id="catalog-chevron"></i>
         </div>
         <div class="section-body" id="catalog-body">
-          <div class="catalog-filters mb-4" id="catalog-filters">
-            <button class="filter-chip active" data-filter="alle" data-i18n="filter.all">Alle</button>
-            <button class="filter-chip" data-filter="favoriten" data-i18n="filter.favorites">⭐ Favoriten</button>
-            <button class="filter-chip" data-filter="Content">Content</button>
-            <button class="filter-chip" data-filter="Social Media">Social Media</button>
-            <button class="filter-chip" data-filter="Marketing">Marketing</button>
-            <button class="filter-chip" data-filter="E-Mail">E-Mail</button>
-            <button class="filter-chip" data-filter="Business">Business</button>
-            <button class="filter-chip" data-filter="Medizin"><i class="fa-solid fa-heart-pulse me-1"></i><span data-i18n="filter.medizin">Medizin</span></button>
-            <button class="filter-chip" data-filter="Recht"><i class="fa-solid fa-scale-balanced me-1"></i><span data-i18n="filter.recht">Recht</span></button>
-            <button class="filter-chip" data-filter="Bildung"><i class="fa-solid fa-graduation-cap me-1"></i><span data-i18n="filter.bildung">Bildung</span></button>
-            <button class="filter-chip" data-filter="E-Commerce"><i class="fa-solid fa-store me-1"></i>E-Commerce</button>
+          <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
+            <div class="catalog-filters" id="catalog-filters">
+              <button class="filter-chip active" data-filter="alle" data-i18n="filter.all">Alle</button>
+              <button class="filter-chip" data-filter="favoriten" data-i18n="filter.favorites">⭐ Favoriten</button>
+              <button class="filter-chip" data-filter="Content">Content</button>
+              <button class="filter-chip" data-filter="Social Media">Social Media</button>
+              <button class="filter-chip" data-filter="Marketing">Marketing</button>
+              <button class="filter-chip" data-filter="E-Mail">E-Mail</button>
+              <button class="filter-chip" data-filter="Business">Business</button>
+              <button class="filter-chip" data-filter="Medizin"><i class="fa-solid fa-heart-pulse me-1"></i><span data-i18n="filter.medizin">Medizin</span></button>
+              <button class="filter-chip" data-filter="Recht"><i class="fa-solid fa-scale-balanced me-1"></i><span data-i18n="filter.recht">Recht</span></button>
+              <button class="filter-chip" data-filter="Bildung"><i class="fa-solid fa-graduation-cap me-1"></i><span data-i18n="filter.bildung">Bildung</span></button>
+              <button class="filter-chip" data-filter="E-Commerce"><i class="fa-solid fa-store me-1"></i>E-Commerce</button>
+            </div>
+            <button id="btn-inspire" class="action-btn action-btn--outline flex-shrink-0" style="font-size:.8rem;padding:.3rem .75rem;white-space:nowrap;" title="Zufällige Felder befüllen">
+              <i class="fa-solid fa-dice me-1"></i><span data-i18n="btn.inspire">Inspirier mich</span>
+            </button>
           </div>
           <div class="catalog-grid" id="catalog-grid"></div>
         </div>
@@ -560,6 +565,12 @@
                     <i class="fa-solid fa-shuffle me-2"></i><span data-i18n="btn.variations">Variationen</span>
                   </button>
                 </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <button class="dropdown-item" id="btn-focus">
+                    <i class="fa-solid fa-eye me-2" id="focus-mode-icon"></i><span id="focus-mode-label" data-i18n="btn.focus">Fokus-Modus</span>
+                  </button>
+                </li>
               </ul>
             </div>
             <!-- Öffnen in KI-Tool -->
@@ -840,6 +851,9 @@
       </div>
       <!-- Meine Prompts -->
       <div id="library-panel-mine" class="library-panel p-3">
+        <div class="mb-3">
+          <input type="search" id="library-search" class="form-control form-control-sm" placeholder="Suchen …" data-i18n-ph="lib.search.placeholder">
+        </div>
         <p class="text-center text-muted mt-4" id="library-empty" style="font-size:.875rem;">
           <i class="fa-solid fa-bookmark d-block mb-2" style="font-size:2rem;opacity:.3"></i>
           <span data-i18n="library.empty">Noch keine Prompts gespeichert.</span><br>
@@ -883,11 +897,16 @@
       </h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
     </div>
-    <div class="offcanvas-body p-3" id="history-list">
-      <p class="text-center text-muted mt-4" id="history-empty" style="font-size:.875rem;">
-        <i class="fa-solid fa-inbox d-block mb-2" style="font-size:2rem;opacity:.3"></i>
-        <span data-i18n="history.empty">Noch keine Prompts generiert.</span>
-      </p>
+    <div class="offcanvas-body p-0 d-flex flex-column">
+      <div class="px-3 pt-3 pb-2 border-bottom">
+        <input type="search" id="history-search" class="form-control form-control-sm" placeholder="Suchen …" data-i18n-ph="lib.search.placeholder">
+      </div>
+      <div class="p-3 flex-grow-1 overflow-auto" id="history-list">
+        <p class="text-center text-muted mt-4" id="history-empty" style="font-size:.875rem;">
+          <i class="fa-solid fa-inbox d-block mb-2" style="font-size:2rem;opacity:.3"></i>
+          <span data-i18n="history.empty">Noch keine Prompts generiert.</span>
+        </p>
+      </div>
     </div>
   </div>
 

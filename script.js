@@ -593,9 +593,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const renderFlow = () => {
-    const text = getCurrentPrompt();
+    const text = editedPromptText !== null ? editedPromptText : getCurrentPrompt();
     if (!text) return emptyState();
-    return `<div class="pv-flow">${esc(text)}</div>`;
+    return `<div class="pv-flow pv-flow--editable" contenteditable="true" spellcheck="false" data-gramm="false">${esc(text)}</div>`;
   };
 
   // ── Score dots ────────────────────────────────────────────────────────────
@@ -615,6 +615,16 @@ document.addEventListener('DOMContentLoaded', () => {
         (count >= 5 ? ' score-counter--ready' : count >= 3 ? ' score-counter--partial' : '');
     }
   };
+
+  // ── Editable prompt state ─────────────────────────────────────────────────
+  let editedPromptText = null;
+
+  // ── Library search state ──────────────────────────────────────────────────
+  let libSearch = '';
+  let histSearch = '';
+
+  // ── Focus mode state ──────────────────────────────────────────────────────
+  let focusMode = false;
 
   // ── Active tab state ──────────────────────────────────────────────────────
   let activeTab = 'visual';
@@ -719,9 +729,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const renderHistory = () => {
     if (!historyList) return;
-    const items = loadHistory();
-    if (historyEmpty) historyEmpty.style.display = items.length ? 'none' : '';
-    historyList.querySelectorAll('.history-item').forEach(n => n.remove());
+    const allItems = loadHistory();
+    const q = histSearch.trim().toLowerCase();
+    const items = q ? allItems.filter(e => e.text.toLowerCase().includes(q)) : allItems;
+    if (historyEmpty) historyEmpty.style.display = allItems.length ? 'none' : '';
+    historyList.querySelectorAll('.history-item, .history-no-results').forEach(n => n.remove());
+    if (allItems.length && !items.length) {
+      const p = document.createElement('p');
+      p.className = 'history-no-results text-center text-muted py-3';
+      p.style.fontSize = '.875rem';
+      p.innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.search.empty'] || 'Keine Treffer'}`;
+      historyList.appendChild(p);
+      return;
+    }
     items.forEach((entry, i) => {
       const div = document.createElement('div');
       div.className = 'history-item';
@@ -774,9 +794,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const renderLibrary = () => {
     if (!libraryList) return;
-    const items = loadLibrary();
-    if (libraryEmpty) libraryEmpty.style.display = items.length ? 'none' : '';
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    const allItems = loadLibrary();
+    const q = libSearch.trim().toLowerCase();
+    const items = q
+      ? allItems.filter(e => e.title.toLowerCase().includes(q) || e.text.toLowerCase().includes(q))
+      : allItems;
+    if (libraryEmpty) libraryEmpty.style.display = allItems.length ? 'none' : '';
     libraryList.innerHTML = '';
+    if (allItems.length && !items.length) {
+      libraryList.innerHTML = `<p class="text-center text-muted py-3" style="font-size:.875rem;"><i class="fa-solid fa-magnifying-glass me-1"></i>${t['lib.search.empty'] || 'Keine Treffer'}</p>`;
+      return;
+    }
     items.forEach(entry => {
       const div = document.createElement('div');
       div.className = 'library-item';
@@ -791,13 +820,16 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="library-item__text">${esc(entry.text)}</div>
         <div class="library-item__btns">
           <button class="action-btn action-btn--primary lib-btn-load" data-id="${entry.id}">
-            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.load']}
+            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i>${t['lib.btn.load']}
           </button>
           <button class="action-btn action-btn--outline lib-btn-copy" data-id="${entry.id}">
-            <i class="fa-solid fa-copy me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.copy']}
+            <i class="fa-solid fa-copy me-1"></i>${t['lib.btn.copy']}
+          </button>
+          <button class="action-btn action-btn--outline lib-btn-duplicate" data-id="${entry.id}">
+            <i class="fa-solid fa-clone me-1"></i>${t['lib.btn.duplicate']}
           </button>
           <button class="action-btn action-btn--ghost lib-btn-delete" data-id="${entry.id}">
-            <i class="fa-solid fa-trash me-1"></i>${(UI_STRINGS[uiLang] || UI_STRINGS.de)['lib.btn.delete']}
+            <i class="fa-solid fa-trash me-1"></i>${t['lib.btn.delete']}
           </button>
         </div>`;
       libraryList.appendChild(div);
@@ -838,6 +870,13 @@ document.addEventListener('DOMContentLoaded', () => {
       doLoad(entry.fields);
     }
 
+    if (e.target.closest('.lib-btn-duplicate')) {
+      const copy = { ...entry, id: Date.now(), title: entry.title + ' (Kopie)' };
+      const updated = [copy, ...items];
+      try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(updated)); } catch {}
+      renderLibrary();
+    }
+
     if (e.target.closest('.lib-btn-delete')) {
       const updated = items.filter(i => i.id !== idNum);
       try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(updated)); } catch {}
@@ -845,9 +884,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ── Get final prompt text (respects manual edits) ─────────────────────────
+  const getFinalPromptText = () =>
+    (editedPromptText !== null && activeTab === 'flow')
+      ? editedPromptText.trim()
+      : getCurrentPrompt().trim();
+
   // ── Clipboard ─────────────────────────────────────────────────────────────
   const copyPrompt = async () => {
-    const text = getCurrentPrompt().trim();
+    const text = getFinalPromptText();
     if (!text) return;
     try { await navigator.clipboard.writeText(text); }
     catch {
@@ -1134,8 +1179,19 @@ document.addEventListener('DOMContentLoaded', () => {
   btnToggleAll.addEventListener('click', toggleAllSections);
 
   // ── Event listeners ───────────────────────────────────────────────────────
-  document.addEventListener('input',  refreshPreview);
-  document.addEventListener('change', refreshPreview);
+  document.addEventListener('input', (e) => {
+    // Intercept edits in the contenteditable prompt – don't re-render, just capture
+    if (e.target.closest?.('.pv-flow')) {
+      editedPromptText = e.target.closest('.pv-flow').textContent;
+      return;
+    }
+    editedPromptText = null;
+    refreshPreview();
+  });
+  document.addEventListener('change', (e) => {
+    editedPromptText = null;
+    refreshPreview();
+  });
 
   previewTabs.addEventListener('click', e => {
     const tab = e.target.closest('.preview-tab');
@@ -1146,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', () => {
   modalBtnCopy.addEventListener('click', copyPrompt);
 
   btnShow.addEventListener('click', () => {
-    modalPromptText.textContent = getCurrentPrompt();
+    modalPromptText.textContent = getFinalPromptText();
     promptModal.show();
   });
 
@@ -1283,7 +1339,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── TXT Export ────────────────────────────────────────────────────────────
   const downloadPrompt = () => {
-    const text = getCurrentPrompt().trim();
+    const text = getFinalPromptText();
     if (!text) return;
     const date = new Date().toISOString().slice(0, 10);
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -1523,6 +1579,12 @@ document.addEventListener('DOMContentLoaded', () => {
       'btn.placeholderConfirm': 'Übernehmen',
       'analyzer.tip.role': 'Füge eine Rollendefinition hinzu (z.B. „Du bist ein erfahrener Marketing-Experte") – der wirksamste Prompt-Trick überhaupt.',
       'presets.save.hint': 'Speichert alle 13 Formularfelder als wiederverwendbare Vorlage.',
+      'lib.btn.duplicate': 'Duplizieren',
+      'btn.inspire': 'Inspirier mich',
+      'btn.focus': 'Fokus-Modus',
+      'btn.focusExit': 'Fokus beenden',
+      'lib.search.placeholder': 'Suchen …',
+      'lib.search.empty': 'Keine Treffer',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -1619,6 +1681,12 @@ document.addEventListener('DOMContentLoaded', () => {
       'btn.placeholderConfirm': 'Apply',
       'analyzer.tip.role': 'Add a role definition (e.g. "You are an experienced marketing expert") – the single most powerful prompt technique.',
       'presets.save.hint': 'Saves all 13 form fields as a reusable template.',
+      'lib.btn.duplicate': 'Duplicate',
+      'btn.inspire': 'Inspire me',
+      'btn.focus': 'Focus Mode',
+      'btn.focusExit': 'Exit Focus',
+      'lib.search.placeholder': 'Search …',
+      'lib.search.empty': 'No results',
     },
   };
 
@@ -1664,6 +1732,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // translate favorites filter chip
     const favChip = document.querySelector('[data-filter="favoriten"]');
     if (favChip && t['filter.favorites']) favChip.textContent = t['filter.favorites'];
+
+    // update focus mode label (if focus mode is active, show exit label)
+    const fmLabel = document.getElementById('focus-mode-label');
+    if (fmLabel) fmLabel.textContent = focusMode ? t['btn.focusExit'] : t['btn.focus'];
 
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
     try { localStorage.setItem('chati_ui_lang', lang); } catch {}
@@ -1984,6 +2056,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const a = Object.assign(document.createElement('a'), { href: src, download: 'chati-qr.png' });
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   });
+
+  // ── Library & History Search ──────────────────────────────────────────────
+  document.getElementById('library-search')?.addEventListener('input', (e) => {
+    libSearch = e.target.value;
+    renderLibrary();
+  });
+
+  document.getElementById('history-search')?.addEventListener('input', (e) => {
+    histSearch = e.target.value;
+    renderHistory();
+  });
+
+  // ── Inspirier mich ────────────────────────────────────────────────────────
+  const INSPIRE_TOPICS = [
+    'Die 5 wichtigsten KI-Tools für den Büroalltag',
+    'Nachhaltige Ernährung: Wie du mit kleinen Änderungen viel bewirkst',
+    'Remote Work erfolgreich gestalten: Tipps für mehr Produktivität',
+    'Personal Branding auf LinkedIn: So baust du dein Netzwerk auf',
+    'E-Commerce-Trends 2025: Was Online-Händler jetzt wissen müssen',
+    'Mentale Gesundheit am Arbeitsplatz: Warum sie wichtiger ist denn je',
+    'Zeitmanagement im Vergleich: Welche Methode wirklich funktioniert',
+    'Startup-Kultur vs. Konzern: Vor- und Nachteile im direkten Vergleich',
+    'Social Media Detox: Was passiert, wenn du eine Woche offline gehst',
+    'Finanzen mit 30: Wie du jetzt mit der Altersvorsorge anfängst',
+    'Kreativität fördern: 10 einfache Übungen für den Alltag',
+    'Digital Nomads: Freiheit oder Illusion? Ein ehrlicher Erfahrungsbericht',
+    'Kundengewinnung ohne Budget: Growth Hacks für Startups',
+    'Work-Life-Balance: Ein Mythos oder wirklich erreichbares Ziel?',
+    'Die Psychologie hinter viralen Social-Media-Posts',
+    'Agile Methoden in kleinen Teams: Was wirklich funktioniert',
+    'E-Mail-Marketing 2025: Noch relevant oder schon überholt?',
+    'Gesunde Routinen für Gründer: Morgen, Tag und Abend strukturieren',
+    'Kundenbindung im digitalen Zeitalter: Strategien und Praxisbeispiele',
+    'Storytelling im Marketing: Wie du mit Geschichten verkaufst',
+    'Produktivitäts-Apps im Vergleich: Was hilft wirklich?',
+    'Community Building: Wie du eine treue Follower-Gemeinschaft aufbaust',
+  ];
+
+  const INSPIRE_ROLES = [
+    'Du bist ein erfahrener Marketing-Experte mit Fokus auf digitale Kanäle.',
+    'Du bist ein kreativer Texter mit 10 Jahren Agenturerfahrung.',
+    'Du bist ein Business-Coach für Selbstständige und Unternehmer.',
+    'Du bist ein SEO-Spezialist mit tiefem technischen Know-how.',
+    'Du bist ein Social-Media-Manager mit Expertise in Engagement-Strategien.',
+    'Du bist ein empathischer Berater für persönliche Entwicklung.',
+    '', '', // no role (weighted more common)
+  ];
+
+  const inspireRandom = () => {
+    const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const randSelect = (id) => {
+      const opts = Array.from(document.getElementById(id)?.options || [])
+        .filter(o => o.value).map(o => o.value);
+      return opts.length ? rand(opts) : '';
+    };
+    const el = (id) => document.getElementById(id);
+    if (el('content-type'))    el('content-type').value    = randSelect('content-type');
+    if (el('description'))     el('description').value     = rand(INSPIRE_TOPICS);
+    if (el('target-audience')) el('target-audience').value = randSelect('target-audience');
+    if (el('content-length'))  el('content-length').value  = randSelect('content-length');
+    if (el('formatting'))      el('formatting').value      = randSelect('formatting');
+    if (el('language-style'))  el('language-style').value  = randSelect('language-style');
+    if (el('perspective'))     el('perspective').value     = randSelect('perspective');
+    if (el('address-form'))    el('address-form').value    = randSelect('address-form');
+    const emojiChoice = rand(['keine', 'keine', 'wenige', 'wenige', 'viele']);
+    if (el('emoji-option'))          el('emoji-option').value          = emojiChoice;
+    if (el('seo-keyword-option'))    el('seo-keyword-option').value    = rand(['Ja', 'Nein']);
+    if (el('title-subtitle-option')) el('title-subtitle-option').value = rand(['ja', 'nein']);
+    if (el('role-definition'))       el('role-definition').value       = rand(INSPIRE_ROLES);
+    if (el('beispiel'))              el('beispiel').value              = '';
+    editedPromptText = null;
+    activeCardId = null;
+    renderCatalog(activeFilter);
+    refreshPreview();
+    autoExpandFilled();
+  };
+
+  document.getElementById('btn-inspire')?.addEventListener('click', inspireRandom);
+
+  // ── Fokus-Modus ───────────────────────────────────────────────────────────
+  const toggleFocusMode = () => {
+    focusMode = !focusMode;
+    const toToggle = [
+      document.getElementById('catalog-body')?.closest('.section-card'),
+      ...STEP_BODIES.map(id => document.getElementById(id)?.closest('.section-card')),
+    ].filter(Boolean);
+    toToggle.forEach(card => { card.style.display = focusMode ? 'none' : ''; });
+
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    const label = document.getElementById('focus-mode-label');
+    const icon  = document.getElementById('focus-mode-icon');
+    if (label) label.textContent = focusMode ? t['btn.focusExit'] : t['btn.focus'];
+    if (icon)  icon.className    = `fa-solid ${focusMode ? 'fa-eye-slash' : 'fa-eye'} me-2`;
+
+    // Scroll to preview
+    if (focusMode) {
+      setTimeout(() => {
+        document.querySelector('[data-target="body-preview"]')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  };
+
+  document.getElementById('btn-focus')?.addEventListener('click', toggleFocusMode);
 
   // ── Keyboard Shortcuts ────────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
