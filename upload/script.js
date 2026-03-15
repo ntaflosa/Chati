@@ -50,19 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const openToast      = new bootstrap.Toast(document.getElementById('open-toast'),   { delay: 3000 });
   const importToast    = new bootstrap.Toast(document.getElementById('import-toast'), { delay: 2500 });
   const presetToast    = new bootstrap.Toast(document.getElementById('preset-toast'), { delay: 2000 });
+  const undoToast      = new bootstrap.Toast(document.getElementById('undo-toast'),   { delay: 8000 });
+
+  const qrModal          = new bootstrap.Modal(document.getElementById('qrModal'));
+  const placeholderModal = new bootstrap.Modal(document.getElementById('placeholderModal'));
 
   // ── Constants ─────────────────────────────────────────────────────────────
   const FIELD_IDS = [
+    'role-definition',
     'content-type', 'description', 'content-length', 'target-audience',
     'language-style', 'perspective', 'emoji-option', 'address-form',
     'formatting', 'seo-keyword-option', 'title-subtitle-option', 'beispiel',
   ];
 
-  const LS_FORM_KEY     = 'chati_form';
-  const LS_HISTORY_KEY  = 'chati_history';
-  const LS_LIBRARY_KEY  = 'chati_library';
-  const LS_PRESETS_KEY  = 'chati_presets';
-  const LS_THEME_KEY    = 'chati_theme';
+  const LS_FORM_KEY      = 'chati_form';
+  const LS_HISTORY_KEY   = 'chati_history';
+  const LS_LIBRARY_KEY   = 'chati_library';
+  const LS_PRESETS_KEY   = 'chati_presets';
+  const LS_FAVORITES_KEY = 'chati_favorites';
+  const LS_THEME_KEY     = 'chati_theme';
   const HISTORY_MAX     = 8;
 
   const val = (id) => (document.getElementById(id)?.value ?? '').trim();
@@ -433,7 +439,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Preview groups ────────────────────────────────────────────────────────
   const PREVIEW_GROUPS = [
-    { key: 'aufgabe', icon: 'fa-bullseye',     getValue: () => val('content-type') },
+    { key: 'aufgabe', icon: 'fa-bullseye',
+      getValue: () => [val('role-definition'), val('content-type')].filter(Boolean).join(' · ') },
     { key: 'kontext', icon: 'fa-circle-info',
       getValue: () => [val('description'), val('target-audience')].filter(Boolean).join(' · ') },
     { key: 'format',  icon: 'fa-sliders',
@@ -466,16 +473,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Build prompts ─────────────────────────────────────────────────────────
   const buildFlowPrompt = () => {
-    const type = val('content-type'), description = val('description'),
+    const role = val('role-definition'),
+          type = val('content-type'), description = val('description'),
           audience = val('target-audience'), length = val('content-length'),
           formatting = val('formatting'), seo = val('seo-keyword-option'),
           titleSub = val('title-subtitle-option'), perspective = val('perspective'),
           addressForm = val('address-form'), style = val('language-style'),
           emojis = val('emoji-option'), beispiel = val('beispiel');
 
-    if (!type && !description) return '';
+    if (!role && !type && !description) return '';
     const s = [];
 
+    if (role) s.push(role.endsWith('.') || role.endsWith('!') || role.endsWith('?') ? role : role + '.');
     if (type) s.push(`Erstelle ${(ARTICLE_MAP[type] ?? 'einen ')}${type}.`);
     if (description && audience) s.push(`Das Thema lautet: ${description}. Die Zielgruppe sind ${audience}.`);
     else if (description) s.push(`Das Thema lautet: ${description}.`);
@@ -502,16 +511,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const buildFlowPromptEN = () => {
-    const type = val('content-type'), description = val('description'),
+    const role = val('role-definition'),
+          type = val('content-type'), description = val('description'),
           audience = val('target-audience'), length = val('content-length'),
           formatting = val('formatting'), seo = val('seo-keyword-option'),
           titleSub = val('title-subtitle-option'), perspective = val('perspective'),
           addressForm = val('address-form'), style = val('language-style'),
           emojis = val('emoji-option'), beispiel = val('beispiel');
 
-    if (!type && !description) return '';
+    if (!role && !type && !description) return '';
     const s = [];
 
+    if (role) s.push(role.endsWith('.') || role.endsWith('!') || role.endsWith('?') ? role : role + '.');
     if (type) s.push(`Create ${ARTICLE_MAP_EN[type] ?? 'a ' + type}.`);
     if (description && audience)
       s.push(`The topic is: ${description}. The target audience is ${AUDIENCE_MAP_EN[audience] || audience}.`);
@@ -811,14 +822,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (e.target.closest('.lib-btn-load')) {
-      FIELD_IDS.forEach(fid => {
-        const el = document.getElementById(fid);
-        if (el) el.value = entry.fields?.[fid] || '';
-      });
-      activeCardId = null;
-      renderCatalog(activeFilter);
-      refreshPreview();
-      libraryCanvas.hide();
+      const doLoad = (fields) => {
+        FIELD_IDS.forEach(fid => {
+          const el = document.getElementById(fid);
+          if (el) el.value = fields?.[fid] || '';
+        });
+        activeCardId = null;
+        renderCatalog(activeFilter);
+        refreshPreview();
+        autoExpandFilled();
+        libraryCanvas.hide();
+      };
+      const phs = getPlaceholders(entry.fields || {});
+      if (phs.size) { openPlaceholderModal(entry.fields, phs, doLoad); return; }
+      doLoad(entry.fields);
     }
 
     if (e.target.closest('.lib-btn-delete')) {
@@ -843,14 +860,40 @@ document.addEventListener('DOMContentLoaded', () => {
     copyToast.show();
   };
 
-  // ── Reset ─────────────────────────────────────────────────────────────────
+  // ── Reset with Undo ───────────────────────────────────────────────────────
+  let lastFormState = null;
+
   const resetForm = () => {
+    lastFormState = Object.fromEntries(FIELD_IDS.map(id => [id, val(id)]));
     FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     activeCardId = null;
     renderCatalog(activeFilter);
     try { localStorage.removeItem(LS_FORM_KEY); } catch {}
     refreshPreview();
+    // Show undo toast with translated label
+    const resetSpan = document.querySelector('#undo-toast [data-i18n="toast.reset"]');
+    const undoBtn   = document.getElementById('btn-undo-reset');
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    if (resetSpan) resetSpan.textContent = t['toast.reset'];
+    if (undoBtn)   undoBtn.textContent   = t['btn.undo'];
+    undoToast.show();
   };
+
+  document.getElementById('btn-undo-reset')?.addEventListener('click', () => {
+    if (!lastFormState) return;
+    FIELD_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = lastFormState[id] || '';
+    });
+    lastFormState = null;
+    undoToast.hide();
+    refreshPreview();
+    autoExpandFilled();
+  });
+
+  document.getElementById('undo-toast')?.addEventListener('hidden.bs.toast', () => {
+    lastFormState = null;
+  });
 
   // ── Dark mode ─────────────────────────────────────────────────────────────
   const applyTheme = (dark) => {
@@ -870,9 +913,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryDisplay = (cat) => CATEGORY_LABELS[cat]?.[uiLang] || cat;
   const getActiveCatalog = () => (uiLang === 'en' && typeof PROMPT_CATALOG_EN !== 'undefined') ? PROMPT_CATALOG_EN : PROMPT_CATALOG;
 
+  // ── Favorites ─────────────────────────────────────────────────────────────
+  const loadFavorites = () => {
+    try { return JSON.parse(localStorage.getItem(LS_FAVORITES_KEY)) || []; } catch { return []; }
+  };
+
+  const toggleFavorite = (id) => {
+    const favs = loadFavorites();
+    const idx = favs.indexOf(id);
+    if (idx === -1) favs.push(id); else favs.splice(idx, 1);
+    try { localStorage.setItem(LS_FAVORITES_KEY, JSON.stringify(favs)); } catch {}
+    renderCatalog(activeFilter);
+  };
+
   const renderCatalog = (filter = 'alle') => {
     const catalog = getActiveCatalog();
-    const items = filter === 'alle' ? catalog : catalog.filter(t => t.category === filter);
+    const favs = loadFavorites();
+    let items;
+    if (filter === 'favoriten') {
+      items = catalog.filter(t => favs.includes(t.id));
+    } else {
+      items = filter === 'alle' ? [...catalog] : catalog.filter(t => t.category === filter);
+      items.sort((a, b) => (favs.includes(b.id) ? 1 : 0) - (favs.includes(a.id) ? 1 : 0));
+    }
     catalogGrid.innerHTML = items.map(t => `
       <div class="catalog-card${activeCardId === t.id ? ' active' : ''}"
         data-id="${t.id}" role="button" tabindex="0" aria-label="Template: ${t.name}">
@@ -881,6 +944,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="catalog-card__name">${t.name}</div>
           <span class="catalog-card__badge">${categoryDisplay(t.category)}</span>
         </div>
+        <button class="catalog-fav${favs.includes(t.id) ? ' is-fav' : ''}" data-fav-id="${t.id}"
+          aria-label="Favorit" title="${uiLang === 'en' ? 'Toggle Favourite' : 'Favorit umschalten'}">
+          <i class="fa-${favs.includes(t.id) ? 'solid' : 'regular'} fa-star"></i>
+        </button>
       </div>`).join('');
   };
 
@@ -912,12 +979,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   catalogGrid.addEventListener('click', e => {
+    const favBtn = e.target.closest('.catalog-fav');
+    if (favBtn) { e.stopPropagation(); toggleFavorite(favBtn.dataset.favId); return; }
     const card = e.target.closest('.catalog-card');
     if (card) applyTemplate(card.dataset.id);
   });
 
   catalogGrid.addEventListener('keydown', e => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.target.closest('.catalog-fav')) return;
     const card = e.target.closest('.catalog-card');
     if (card) { e.preventDefault(); applyTemplate(card.dataset.id); }
   });
@@ -1439,6 +1509,20 @@ document.addEventListener('DOMContentLoaded', () => {
       'analyzer.tip.style': 'Wähle einen Sprachstil, um den Ton des Textes zu steuern.',
       'analyzer.tip.example': 'Füge eine Stilreferenz hinzu (z.B. „Schreibe wie ...") für authentischere Ausgaben.',
       'analyzer.quality.basic': 'Basis', 'analyzer.quality.good': 'Gut', 'analyzer.quality.excellent': 'Ausgezeichnet',
+      'lbl.role': 'Rolle / KI-Persona',
+      'ph.role': 'z.B. Du bist ein erfahrener Marketing-Experte mit 10 Jahren B2B-Erfahrung …',
+      'hint.role': 'Optional aber wirkungsvoll – definiert die Perspektive der KI.',
+      'filter.favorites': '⭐ Favoriten',
+      'toast.reset': 'Formular zurückgesetzt',
+      'btn.undo': 'Rückgängig',
+      'qr.title': 'Prompt teilen via QR-Code',
+      'qr.hint': 'Scanne den Code, um den Prompt auf einem anderen Gerät zu öffnen.',
+      'btn.qrdownload': 'PNG herunterladen',
+      'placeholder.title': 'Platzhalter ausfüllen',
+      'placeholder.hint': 'Ersetze die {{Platzhalter}} in doppelten Klammern mit deinen eigenen Werten.',
+      'btn.placeholderConfirm': 'Übernehmen',
+      'analyzer.tip.role': 'Füge eine Rollendefinition hinzu (z.B. „Du bist ein erfahrener Marketing-Experte") – der wirksamste Prompt-Trick überhaupt.',
+      'presets.save.hint': 'Speichert alle 13 Formularfelder als wiederverwendbare Vorlage.',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -1521,6 +1605,20 @@ document.addEventListener('DOMContentLoaded', () => {
       'analyzer.tip.style': 'Choose a writing style to control the tone of the text.',
       'analyzer.tip.example': 'Add a style reference (e.g. "Write like ...") for more authentic output.',
       'analyzer.quality.basic': 'Basic', 'analyzer.quality.good': 'Good', 'analyzer.quality.excellent': 'Excellent',
+      'lbl.role': 'Role / AI Persona',
+      'ph.role': 'e.g. You are an experienced marketing expert with 10 years of B2B experience …',
+      'hint.role': 'Optional but powerful – defines the perspective of the AI.',
+      'filter.favorites': '⭐ Favourites',
+      'toast.reset': 'Form reset',
+      'btn.undo': 'Undo',
+      'qr.title': 'Share Prompt via QR Code',
+      'qr.hint': 'Scan the code to open the prompt on another device.',
+      'btn.qrdownload': 'Download PNG',
+      'placeholder.title': 'Fill in Placeholders',
+      'placeholder.hint': 'Replace the {{placeholders}} in double brackets with your own values.',
+      'btn.placeholderConfirm': 'Apply',
+      'analyzer.tip.role': 'Add a role definition (e.g. "You are an experienced marketing expert") – the single most powerful prompt technique.',
+      'presets.save.hint': 'Saves all 13 form fields as a reusable template.',
     },
   };
 
@@ -1562,6 +1660,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const tip = bootstrap.Tooltip.getInstance(el);
       if (tip) tip.setContent({ '.tooltip-inner': t[key] });
     });
+
+    // translate favorites filter chip
+    const favChip = document.querySelector('[data-filter="favoriten"]');
+    if (favChip && t['filter.favorites']) favChip.textContent = t['filter.favorites'];
 
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
     try { localStorage.setItem('chati_ui_lang', lang); } catch {}
@@ -1688,15 +1790,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!preset) return;
 
     if (e.target.closest('.preset-btn-load')) {
-      FIELD_IDS.forEach(fid => {
-        const el = document.getElementById(fid);
-        if (el) el.value = preset.fields[fid] || '';
-      });
-      activeCardId = null;
-      renderCatalog(activeFilter);
-      refreshPreview();
-      autoExpandFilled();
-      libraryCanvas.hide();
+      const doLoad = (fields) => {
+        FIELD_IDS.forEach(fid => {
+          const el = document.getElementById(fid);
+          if (el) el.value = fields?.[fid] || '';
+        });
+        activeCardId = null;
+        renderCatalog(activeFilter);
+        refreshPreview();
+        autoExpandFilled();
+        libraryCanvas.hide();
+      };
+      const phs = getPlaceholders(preset.fields || {});
+      if (phs.size) { openPlaceholderModal(preset.fields, phs, doLoad); return; }
+      doLoad(preset.fields);
     }
     if (e.target.closest('.preset-btn-delete')) {
       const updated = presets.filter(p => p.id !== pid);
@@ -1742,9 +1849,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const qualityKey = score >= 5 ? 'analyzer.quality.excellent' : score >= 3 ? 'analyzer.quality.good' : 'analyzer.quality.basic';
     const qualityClass = score >= 5 ? 'excellent' : score >= 3 ? 'good' : 'basic';
+    // Role tip has highest priority; fall back to first missing dimension tip
+    const roleEmpty    = !val('role-definition');
     const firstMissing = checks.find(c => !c.ok);
-    const tipHtml = firstMissing
-      ? `<div class="analyzer-tip"><i class="fa-solid fa-lightbulb me-1"></i><strong>${t['analyzer.tip.prefix']}</strong> ${firstMissing.tip}</div>`
+    const activeTip    = roleEmpty
+      ? { icon: 'fa-user-tie', text: t['analyzer.tip.role'] }
+      : firstMissing
+        ? { icon: 'fa-lightbulb', text: firstMissing.tip }
+        : null;
+    const tipHtml = activeTip
+      ? `<div class="analyzer-tip"><i class="fa-solid ${activeTip.icon} me-1"></i><strong>${t['analyzer.tip.prefix']}</strong> ${activeTip.text}</div>`
       : '';
 
     const badges = checks.map(c =>
@@ -1760,6 +1874,116 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="analyzer-badges">${badges}</div>
       ${tipHtml}`;
   };
+
+  // ── Prompt-Schablonen: Platzhalter-Erkennung ─────────────────────────────
+  const PLACEHOLDER_RE = /\{\{([^}]+)\}\}/g;
+
+  const getPlaceholders = (fields) => {
+    const found = new Map();
+    Object.values(fields).forEach(v => {
+      if (typeof v !== 'string') return;
+      const re = new RegExp(PLACEHOLDER_RE.source, 'g');
+      let m;
+      while ((m = re.exec(v)) !== null) {
+        if (!found.has(m[1])) found.set(m[1], '');
+      }
+    });
+    return found;
+  };
+
+  const fillPlaceholders = (fields, values) => {
+    const result = {};
+    Object.entries(fields).forEach(([k, v]) => {
+      result[k] = typeof v === 'string'
+        ? v.replace(/\{\{([^}]+)\}\}/g, (_, name) => values[name] ?? `{{${name}}}`)
+        : v;
+    });
+    return result;
+  };
+
+  let _phCallback = null;
+  let _phFields   = null;
+
+  const openPlaceholderModal = (fields, placeholders, callback) => {
+    _phCallback = callback;
+    _phFields   = fields;
+    const container = document.getElementById('placeholder-fields');
+    if (!container) return;
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    container.innerHTML = '';
+    placeholders.forEach((_, name) => {
+      const div = document.createElement('div');
+      div.className = 'mb-3';
+      div.innerHTML = `
+        <label class="form-label fw-semibold" style="font-family:monospace;color:var(--color-primary);">{{${esc(name)}}}</label>
+        <input type="text" class="form-control placeholder-input" data-phname="${esc(name)}" placeholder="${esc(name)}">`;
+      container.appendChild(div);
+    });
+    // update modal title
+    const titleEl = document.querySelector('#placeholderModal [data-i18n="placeholder.title"]');
+    if (titleEl) titleEl.textContent = t['placeholder.title'];
+    const hintEl = document.querySelector('#placeholderModal [data-i18n="placeholder.hint"]');
+    if (hintEl) hintEl.textContent = t['placeholder.hint'];
+    const confirmBtn = document.querySelector('#btn-placeholder-confirm [data-i18n="btn.placeholderConfirm"]');
+    if (confirmBtn) confirmBtn.textContent = t['btn.placeholderConfirm'];
+    placeholderModal.show();
+    setTimeout(() => container.querySelector('.placeholder-input')?.focus(), 350);
+  };
+
+  document.getElementById('btn-placeholder-confirm')?.addEventListener('click', () => {
+    const values = {};
+    document.querySelectorAll('#placeholder-fields .placeholder-input').forEach(inp => {
+      values[inp.dataset.phname] = inp.value;
+    });
+    const filledFields = fillPlaceholders(_phFields || {}, values);
+    _phCallback?.(filledFields);
+    placeholderModal.hide();
+    _phCallback = null;
+    _phFields   = null;
+  });
+
+  document.getElementById('placeholder-fields')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-placeholder-confirm')?.click();
+  });
+
+  // ── QR-Code ───────────────────────────────────────────────────────────────
+  const showQR = () => {
+    if (typeof QRCode === 'undefined') return;
+    const params = new URLSearchParams();
+    FIELD_IDS.forEach(id => { const v = val(id); if (v) params.set(id, v); });
+    if (![...params.keys()].length) return;
+    if (uiLang && uiLang !== 'de') params.set('lang', uiLang);
+    const url = `${location.origin}${location.pathname}?${params.toString()}`;
+    const container = document.getElementById('qr-code-container');
+    if (!container) return;
+    container.innerHTML = '';
+    new QRCode(container, {
+      text: url,
+      width: 180,
+      height: 180,
+      colorDark: '#7c3aed',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+    // update modal labels
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    const titleEl = document.querySelector('#qrModal [data-i18n="qr.title"]');
+    if (titleEl) titleEl.textContent = t['qr.title'];
+    const hintEl = document.querySelector('#qrModal [data-i18n="qr.hint"]');
+    if (hintEl) hintEl.textContent = t['qr.hint'];
+    qrModal.show();
+  };
+
+  document.getElementById('btn-qr')?.addEventListener('click', showQR);
+
+  document.getElementById('btn-qr-download')?.addEventListener('click', () => {
+    const canvas = document.querySelector('#qr-code-container canvas');
+    const img    = document.querySelector('#qr-code-container img');
+    const src    = canvas ? canvas.toDataURL('image/png') : img?.src;
+    if (!src) return;
+    const a = Object.assign(document.createElement('a'), { href: src, download: 'chati-qr.png' });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  });
 
   // ── Keyboard Shortcuts ────────────────────────────────────────────────────
   document.addEventListener('keydown', e => {

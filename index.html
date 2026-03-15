@@ -64,7 +64,7 @@
             <i class="fa-solid fa-globe"></i>
             <span class="d-none d-sm-inline ms-1" id="ui-lang-label">EN</span>
           </button>
-          <span class="version-badge">v1.5</span>
+          <span class="version-badge">v1.6</span>
         </div>
       </div>
     </div>
@@ -87,6 +87,7 @@
         <div class="section-body" id="catalog-body">
           <div class="catalog-filters mb-4" id="catalog-filters">
             <button class="filter-chip active" data-filter="alle" data-i18n="filter.all">Alle</button>
+            <button class="filter-chip" data-filter="favoriten" data-i18n="filter.favorites">⭐ Favoriten</button>
             <button class="filter-chip" data-filter="Content">Content</button>
             <button class="filter-chip" data-filter="Social Media">Social Media</button>
             <button class="filter-chip" data-filter="Marketing">Marketing</button>
@@ -117,6 +118,13 @@
         <div class="section-body" id="body-aufgabe">
           <p class="section-hint"><i class="fa-solid fa-lightbulb me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
           <div class="row g-3">
+            <div class="col-12 col-lg-10">
+              <label for="role-definition" class="field-label" data-i18n="lbl.role">Rolle / KI-Persona</label>
+              <input type="text" id="role-definition" class="form-control field-input"
+                placeholder="z.B. Du bist ein erfahrener Marketing-Experte mit 10 Jahren B2B-Erfahrung …"
+                data-i18n-ph="ph.role">
+              <div class="form-text mt-1" data-i18n="hint.role">Optional aber wirkungsvoll – definiert die Perspektive der KI.</div>
+            </div>
             <div class="col-md-8 col-lg-6">
               <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter." data-i18n-tooltip="tooltip.contenttype">Texttyp / Verwendungszweck</label>
               <select id="content-type" class="form-select field-input">
@@ -524,6 +532,9 @@
             <button id="btn-share" type="button" class="action-btn action-btn--outline">
               <i class="fa-solid fa-share-nodes me-2"></i><span data-i18n="btn.share">Teilen</span>
             </button>
+            <button id="btn-qr" type="button" class="action-btn action-btn--outline">
+              <i class="fa-solid fa-qrcode me-2"></i>QR
+            </button>
             <button id="btn-show" type="button" class="action-btn action-btn--outline">
               <i class="fa-solid fa-expand me-2"></i><span data-i18n="btn.fullscreen">Vollansicht</span>
             </button>
@@ -623,6 +634,13 @@
       <div class="d-flex">
         <div class="toast-body"><i class="fa-solid fa-floppy-disk me-2"></i><span data-i18n="toast.presetSaved">Vorlage gespeichert!</span></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
+      </div>
+    </div>
+    <div id="undo-toast" class="toast border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="8000" style="background:#1e293b;color:#fff;min-width:280px;">
+      <div class="toast-body d-flex align-items-center gap-3">
+        <span class="flex-grow-1"><i class="fa-solid fa-rotate-left me-2"></i><span data-i18n="toast.reset">Formular zurückgesetzt</span></span>
+        <button id="btn-undo-reset" class="btn btn-sm fw-semibold" style="background:var(--color-primary);color:#fff;border:none;font-size:.8rem;white-space:nowrap;" data-i18n="btn.undo">Rückgängig</button>
+        <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="toast" aria-label="Schließen"></button>
       </div>
     </div>
   </div>
@@ -866,6 +884,55 @@
     </div>
   </div>
 
+  <!-- ===== QR-Code Modal ===== -->
+  <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="qrModalLabel">
+            <i class="fa-solid fa-qrcode me-2"></i><span data-i18n="qr.title">Prompt teilen via QR-Code</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <p class="text-muted mb-3" style="font-size:.875rem;" data-i18n="qr.hint">Scanne den Code, um den Prompt auf einem anderen Gerät zu öffnen.</p>
+          <div id="qr-code-container" class="d-inline-block p-3 rounded" style="background:#fff;"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-qr-download" type="button" class="action-btn action-btn--outline">
+            <i class="fa-solid fa-download me-2"></i><span data-i18n="btn.qrdownload">PNG herunterladen</span>
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Platzhalter-Modal ===== -->
+  <div class="modal fade" id="placeholderModal" tabindex="-1" aria-labelledby="placeholderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="placeholderModalLabel">
+            <i class="fa-solid fa-fill-drip me-2" style="color:var(--color-primary)"></i><span data-i18n="placeholder.title">Platzhalter ausfüllen</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-3" style="font-size:.875rem;" data-i18n="placeholder.hint">Ersetze die Platzhalter mit deinen Werten.</p>
+          <div id="placeholder-fields"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
+          <button id="btn-placeholder-confirm" type="button" class="action-btn action-btn--primary">
+            <i class="fa-solid fa-check me-2"></i><span data-i18n="btn.placeholderConfirm">Übernehmen</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="catalog.js"></script>
   <script src="examples.js"></script>
