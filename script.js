@@ -429,7 +429,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── URL sharing ───────────────────────────────────────────────────────────
   const restoreFromUrl = () => {
     const params = new URLSearchParams(location.search);
-    if (![...params.keys()].some(k => FIELD_IDS.includes(k))) return;
+    if (![...params.keys()].some(k => FIELD_IDS.includes(k) || k === 'lang')) return;
+    const urlLang = params.get('lang');
+    if (urlLang === 'en') applyUILang('en');
     FIELD_IDS.forEach(id => {
       const v = params.get(id);
       if (v !== null) { const el = document.getElementById(id); if (el) el.value = v; }
@@ -441,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams();
     FIELD_IDS.forEach(id => { const v = val(id); if (v) params.set(id, v); });
     if (![...params.keys()].length) return;
+    if (uiLang && uiLang !== 'de') params.set('lang', uiLang);
     const url = `${location.origin}${location.pathname}?${params.toString()}`;
     try { await navigator.clipboard.writeText(url); }
     catch {
@@ -628,15 +631,20 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeFilter = 'alle';
   let activeCardId = null;
 
+  const CATEGORY_LABELS = { Medizin: { de: 'Medizin', en: 'Medicine' }, Recht: { de: 'Recht', en: 'Law' }, Bildung: { de: 'Bildung', en: 'Education' } };
+  const categoryDisplay = (cat) => CATEGORY_LABELS[cat]?.[uiLang] || cat;
+  const getActiveCatalog = () => (uiLang === 'en' && typeof PROMPT_CATALOG_EN !== 'undefined') ? PROMPT_CATALOG_EN : PROMPT_CATALOG;
+
   const renderCatalog = (filter = 'alle') => {
-    const items = filter === 'alle' ? PROMPT_CATALOG : PROMPT_CATALOG.filter(t => t.category === filter);
+    const catalog = getActiveCatalog();
+    const items = filter === 'alle' ? catalog : catalog.filter(t => t.category === filter);
     catalogGrid.innerHTML = items.map(t => `
       <div class="catalog-card${activeCardId === t.id ? ' active' : ''}"
-        data-id="${t.id}" role="button" tabindex="0" aria-label="Vorlage: ${t.name}">
+        data-id="${t.id}" role="button" tabindex="0" aria-label="Template: ${t.name}">
         <div class="catalog-card__icon"><i class="${t.icon}"></i></div>
         <div class="catalog-card__body">
           <div class="catalog-card__name">${t.name}</div>
-          <span class="catalog-card__badge">${t.category}</span>
+          <span class="catalog-card__badge">${categoryDisplay(t.category)}</span>
         </div>
       </div>`).join('');
   };
@@ -649,7 +657,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (el) el.value = value;
     });
     const descEl = document.getElementById('description');
-    if (descEl && !descEl.value.trim()) descEl.placeholder = tpl.descriptionHint;
+    const tplDisplay = getActiveCatalog().find(t => t.id === id) || tpl;
+    if (descEl && !descEl.value.trim()) descEl.placeholder = tplDisplay.descriptionHint;
     activeCardId = id;
     renderCatalog(activeFilter);
     refreshPreview();
@@ -989,7 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'btn.history': 'Verlauf', 'btn.help': 'Hilfe',
       'catalog.title': 'Prompt-Katalog',
       'catalog.subtitle': '– Vorlage wählen und alle Felder automatisch befüllen',
-      'filter.all': 'Alle',
+      'filter.all': 'Alle', 'filter.medizin': 'Medizin', 'filter.recht': 'Recht', 'filter.bildung': 'Bildung',
       'step.aufgabe': 'Aufgabe', 'step.kontext': 'Kontext', 'step.format': 'Format',
       'step.persona': 'Persona', 'step.tonfall': 'Tonfall', 'step.beispiel': 'Beispiel',
       'badge.essential': 'Essenziell', 'badge.important': 'Wichtig', 'badge.optional': 'Optional',
@@ -1028,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'btn.history': 'History', 'btn.help': 'Help',
       'catalog.title': 'Prompt Catalog',
       'catalog.subtitle': '– Choose a template and auto-fill all fields',
-      'filter.all': 'All',
+      'filter.all': 'All', 'filter.medizin': 'Medicine', 'filter.recht': 'Law', 'filter.bildung': 'Education',
       'step.aufgabe': 'Task', 'step.kontext': 'Context', 'step.format': 'Format',
       'step.persona': 'Persona', 'step.tonfall': 'Tone', 'step.beispiel': 'Example',
       'badge.essential': 'Essential', 'badge.important': 'Important', 'badge.optional': 'Optional',
@@ -1078,6 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
     try { localStorage.setItem('chati_ui_lang', lang); } catch {}
+    renderCatalog(activeFilter);
   };
 
   btnUiLang?.addEventListener('click', () => applyUILang(uiLang === 'de' ? 'en' : 'de'));

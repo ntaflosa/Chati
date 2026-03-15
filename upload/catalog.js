@@ -798,3 +798,68 @@ const PROMPT_CATALOG = [
   },
 
 ];
+
+/**
+ * English Prompt Catalog
+ * Same IDs, icons, categories and field values as PROMPT_CATALOG.
+ * Only name and descriptionHint are translated.
+ */
+const PROMPT_CATALOG_EN = [
+
+  // ── Content ──────────────────────────────────────────────────────────────
+  { id: 'seo-blogartikel',      name: 'SEO Blog Post',        icon: 'fa-solid fa-magnifying-glass',   category: 'Content',      descriptionHint: 'Topic, main keyword, desired search intent …' },
+  { id: 'whitepaper',           name: 'Whitepaper',            icon: 'fa-solid fa-file-lines',         category: 'Content',      descriptionHint: 'Specialist topic, problem statement, core thesis and objective …' },
+  { id: 'pressemitteilung',     name: 'Press Release',         icon: 'fa-solid fa-newspaper',          category: 'Content',      descriptionHint: 'Occasion, company, key message and quote …' },
+  { id: 'youtube-beschreibung', name: 'YouTube Description',   icon: 'fa-brands fa-youtube',           category: 'Content',      descriptionHint: 'Video topic, main content, keywords and links …' },
+  { id: 'howto-artikel',        name: 'How-To Article',        icon: 'fa-solid fa-list-check',         category: 'Content',      descriptionHint: 'What should be explained? For whom? What problem is solved? …' },
+  { id: 'case-study',           name: 'Case Study',            icon: 'fa-solid fa-chart-line',         category: 'Content',      descriptionHint: 'Client name, problem, solution, measurable results and quote …' },
+  { id: 'podcast-outline',      name: 'Podcast Episode',       icon: 'fa-solid fa-microphone-lines',   category: 'Content',      descriptionHint: 'Episode title, main topic, guest (if any), 3 key points …' },
+
+  // ── Social Media ──────────────────────────────────────────────────────────
+  { id: 'linkedin-post',        name: 'LinkedIn Post',         icon: 'fa-brands fa-linkedin',          category: 'Social Media', descriptionHint: 'Topic, personal experience or professional insight …' },
+  { id: 'instagram-caption',    name: 'Instagram Caption',     icon: 'fa-brands fa-instagram',         category: 'Social Media', descriptionHint: 'Image content, mood, product or experience …' },
+  { id: 'twitter-post',         name: 'Twitter / X Post',      icon: 'fa-brands fa-x-twitter',         category: 'Social Media', descriptionHint: 'Core statement, opinion or question (max. 280 characters) …' },
+  { id: 'facebook-beitrag',     name: 'Facebook Post',         icon: 'fa-brands fa-facebook',          category: 'Social Media', descriptionHint: 'Topic, community question or announcement …' },
+  { id: 'tiktok-skript',        name: 'TikTok Script',         icon: 'fa-brands fa-tiktok',            category: 'Social Media', descriptionHint: 'Hook (first 3 sec.), main message, call-to-action, trend or sound …' },
+  { id: 'xing-beitrag',         name: 'Xing Post',             icon: 'fa-brands fa-xing',              category: 'Social Media', descriptionHint: 'Professional insight, project update, industry news or career tip …' },
+
+  // ── Marketing ─────────────────────────────────────────────────────────────
+  { id: 'produktbeschreibung',  name: 'Product Description',   icon: 'fa-solid fa-tag',                category: 'Marketing',    descriptionHint: 'Product name, features, benefits and target customer …' },
+  { id: 'newsletter',           name: 'Newsletter',            icon: 'fa-solid fa-envelope-open-text', category: 'Marketing',    descriptionHint: 'Issue topic, announcements, highlights …' },
+  { id: 'landing-page',         name: 'Landing Page',          icon: 'fa-solid fa-rectangle-ad',       category: 'Marketing',    descriptionHint: 'Product/service, USP, desired call-to-action …' },
+  { id: 'faq-seite',            name: 'FAQ Page',              icon: 'fa-solid fa-circle-question',    category: 'Marketing',    descriptionHint: 'Product/service, common customer questions, typical objections …' },
+
+  // ── E-Mail ────────────────────────────────────────────────────────────────
+  { id: 'kalt-akquise',         name: 'Cold Outreach Email',   icon: 'fa-solid fa-paper-plane',        category: 'E-Mail',       descriptionHint: 'Company, offer, contact person and value proposition …' },
+  { id: 'follow-up',            name: 'Follow-Up Email',       icon: 'fa-solid fa-reply',              category: 'E-Mail',       descriptionHint: 'Previous contact, open points, next step …' },
+  { id: 'angebots-email',       name: 'Sales Email',           icon: 'fa-solid fa-percent',            category: 'E-Mail',       descriptionHint: 'Offer, price advantages, validity period …' },
+  { id: 'onboarding-email',     name: 'Onboarding Email',      icon: 'fa-solid fa-handshake',          category: 'E-Mail',       descriptionHint: 'Product/service, first steps, key features, support contact …' },
+  { id: 'feedback-anfrage',     name: 'Feedback Request',      icon: 'fa-solid fa-star-half-stroke',   category: 'E-Mail',       descriptionHint: 'Product/service, purchase date or usage period, platform (Google, Trustpilot …) …' },
+
+  // ── Business ──────────────────────────────────────────────────────────────
+  { id: 'praesentation',        name: 'Presentation',          icon: 'fa-solid fa-display',            category: 'Business',     descriptionHint: 'Topic, goal, audience, approx. number of slides, key message …' },
+  { id: 'stellenanzeige',       name: 'Job Posting',           icon: 'fa-solid fa-briefcase',          category: 'Business',     descriptionHint: 'Position, company, tasks, requirements, benefits and culture …' },
+  { id: 'bewerbungsschreiben',  name: 'Cover Letter',          icon: 'fa-solid fa-file-signature',     category: 'Business',     descriptionHint: 'Target position, company, strengths, relevant experience, motivation …' },
+  { id: 'angebot-proposal',     name: 'Offer / Proposal',      icon: 'fa-solid fa-file-invoice',       category: 'Business',     descriptionHint: 'Client, problem statement, proposed solution, scope, price and timeline …' },
+
+  // ── Medizin ───────────────────────────────────────────────────────────────
+  { id: 'patienteninformation', name: 'Patient Information',   icon: 'fa-solid fa-heart-pulse',        category: 'Medizin',      descriptionHint: 'Condition or treatment, target group (patients / relatives), key information …' },
+  { id: 'klinik-newsletter',    name: 'Clinic Newsletter',     icon: 'fa-solid fa-hospital',           category: 'Medizin',      descriptionHint: 'Clinic/practice, issue topic, new services, appointments, health tips …' },
+  { id: 'aufklaerungstext',     name: 'Informed Consent Text', icon: 'fa-solid fa-stethoscope',        category: 'Medizin',      descriptionHint: 'Procedure or examination, risks, process, preparation, aftercare …' },
+
+  // ── Recht ─────────────────────────────────────────────────────────────────
+  { id: 'mandantenschreiben',   name: 'Client Letter',         icon: 'fa-solid fa-scale-balanced',     category: 'Recht',        descriptionHint: 'Facts, relevant legal situation, next steps, recommendation to client …' },
+  { id: 'abmahnung',            name: 'Legal Warning',         icon: 'fa-solid fa-triangle-exclamation', category: 'Recht',      descriptionHint: 'Violation, affected party, demand, deadline and legal basis …' },
+  { id: 'datenschutzerklaerung', name: 'Privacy Policy',       icon: 'fa-solid fa-shield-halved',      category: 'Recht',        descriptionHint: 'Website/app, data collected, purpose, third parties, contact details …' },
+
+  // ── Bildung ───────────────────────────────────────────────────────────────
+  { id: 'unterrichtsplan',      name: 'Lesson Plan',           icon: 'fa-solid fa-chalkboard-user',    category: 'Bildung',      descriptionHint: 'Subject, class/age, lesson topic, learning objectives, methods and materials …' },
+  { id: 'kursankuendigung',     name: 'Course Announcement',   icon: 'fa-solid fa-graduation-cap',     category: 'Bildung',      descriptionHint: 'Course name, target group, content, benefits, date, price and registration …' },
+  { id: 'elternbrief',          name: 'Parent Letter',         icon: 'fa-solid fa-envelope',           category: 'Bildung',      descriptionHint: 'School, class, occasion (trip, event, information), important details …' },
+
+  // ── E-Commerce ────────────────────────────────────────────────────────────
+  { id: 'kategoriebeschreibung', name: 'Category Description', icon: 'fa-solid fa-store',              category: 'E-Commerce',   descriptionHint: 'Shop category, included products, USP, customer benefit and brand …' },
+  { id: 'versandbestaetigung',  name: 'Shipping Confirmation', icon: 'fa-solid fa-truck-fast',         category: 'E-Commerce',   descriptionHint: 'Shop name, ordered products, delivery window, tracking info, contact …' },
+  { id: 'retouren-text',        name: 'Returns & Refunds',     icon: 'fa-solid fa-rotate-left',        category: 'E-Commerce',   descriptionHint: 'Shop name, return period, return process, refund method, contact …' },
+
+];
