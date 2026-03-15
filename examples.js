@@ -265,4 +265,186 @@ const LIBRARY_EXAMPLES = [
     text: 'You are an experienced e-commerce SEO copywriter.\n\nWrite an SEO-optimised category description for:\n"Running Shoes & Trail Running" \u2013 outdoor sports store\n\nTarget audience: Hobby runners and athletes (25\u201345).\n\nGuidelines:\n- Length: approx. 200 words\n- Format: 1\u20132 opening sentences \u2192 body text \u2192 3 USPs as bullet points \u2192 CTA sentence\n- Style: Promotional, sporty-enthusiastic, authentic\n- Perspective: We (store voice) \u00b7 Informal address \u00b7 No emojis\n- SEO keywords: "buy running shoes", "trail running shoes", "outdoor running shoes"\n- Also create an H1 title for the category page',
   },
 
+  // ── Copilot – Outlook ─────────────────────────────────────────────────────
+
+  {
+    id: 'ex-copilot-outlook-zusammenfassung',
+    title: 'Copilot: E-Mail-Thread zusammenfassen',
+    category: 'Copilot \u2013 Outlook',
+    lang: 'de',
+    text: 'Fasse diesen E-Mail-Thread zusammen.\n\nBitte gib aus:\n- Die wichtigsten Punkte und Entscheidungen (Bullet Points)\n- Offene Aufgaben oder Folgema\u00dfnahmen mit Verantwortlichen\n- Den aktuellen Status der Konversation in einem Satz\n\nFormat: Kurz und \u00fcbersichtlich, maximal 150 W\u00f6rter.',
+  },
+
+  {
+    id: 'ex-copilot-outlook-antwort',
+    title: 'Copilot: Professionelle E-Mail-Antwort verfassen',
+    category: 'Copilot \u2013 Outlook',
+    lang: 'de',
+    text: 'Schreibe eine professionelle Antwort auf diese E-Mail.\n\nTon: H\u00f6flich, sachlich und l\u00f6sungsorientiert.\nL\u00e4nge: Maximal 5 S\u00e4tze.\nStruktur: Kurze Best\u00e4tigung des Anliegens \u2192 meine Antwort / Position \u2192 n\u00e4chster Schritt.\n\nVermeide Floskeln wie \u201eWie Sie wissen\u201c oder \u201eIn Bezug auf Ihre E-Mail\u201c.',
+  },
+
+  {
+    id: 'ex-copilot-outlook-terminanfrage',
+    title: 'Copilot: Meeting-Einladung erstellen',
+    category: 'Copilot \u2013 Outlook',
+    lang: 'de',
+    text: 'Erstelle eine Meeting-Einladung f\u00fcr folgende Besprechung:\n\nThema: Projektbriefing Q3-Roadmap\nTeilnehmer: Projektteam (5 Personen)\nDauer: 60 Minuten\nZiel: Ziele und Meilensteine f\u00fcr Q3 festlegen\n\nFormuliere:\n- Einen pr\u00e4gnanten Betreff\n- Eine kurze Agenda mit 3 Punkten\n- Eine freundliche, professionelle Einladungstext (max. 80 W\u00f6rter)\n- Hinweis auf vorbereitende Materialien (Platzhalter)',
+  },
+
+  {
+    id: 'ex-copilot-outlook-newsletter',
+    title: 'Copilot: Internen Newsletter-Beitrag schreiben',
+    category: 'Copilot \u2013 Outlook',
+    lang: 'de',
+    text: 'Schreibe einen Beitrag f\u00fcr unseren internen Mitarbeiter-Newsletter.\n\nThema: Launch unseres neuen Mitarbeiterportal-Intranets\nZielgruppe: Alle Mitarbeitenden (ca. 200 Personen)\nTon: Einladend, positiv, informativ\n\nStruktur:\n- Kurze Einleitung (Was gibt es Neues?)\n- 3 Highlights / neue Funktionen (Bullet Points)\n- Call to Action: Mitarbeitende zum Ausprobieren animieren\n- L\u00e4nge: ca. 150 W\u00f6rter',
+  },
+
+  // ── Copilot – Excel ───────────────────────────────────────────────────────
+
+  {
+    id: 'ex-copilot-excel-formel',
+    title: 'Copilot: Formel erkl\u00e4ren & optimieren',
+    category: 'Copilot \u2013 Excel',
+    lang: 'de',
+    text: 'Erkl\u00e4re mir diese Excel-Formel in einfachen Worten und schlage eine verbesserte oder k\u00fcrzere Variante vor, falls m\u00f6glich:\n\n[Formel hier einf\u00fcgen]\n\nBitte gib aus:\n1. Was die Formel berechnet (1\u20132 S\u00e4tze)\n2. Was jeder Teil der Formel bedeutet\n3. Optional: Verbesserte Version mit Erkl\u00e4rung\n\nNiveau: F\u00fcr Excel-Nutzer mit Grundkenntnissen.',
+  },
+
+  {
+    id: 'ex-copilot-excel-analyse',
+    title: 'Copilot: Daten analysieren & Trends erkennen',
+    category: 'Copilot \u2013 Excel',
+    lang: 'de',
+    text: 'Analysiere die Daten in dieser Tabelle und identifiziere die wichtigsten Erkenntnisse.\n\nBitte erstelle:\n- Eine Zusammenfassung der Haupttrends (3\u20135 Bullet Points)\n- Den h\u00f6chsten und niedrigsten Wert mit Kontext\n- Einen Hinweis auf auff\u00e4llige Ausrei\u00dfer oder Muster\n- Eine Handlungsempfehlung basierend auf den Daten\n\nFormat: Klar strukturiert, business-tauglich.',
+  },
+
+  {
+    id: 'ex-copilot-excel-dashboard',
+    title: 'Copilot: Dashboard-Konzept vorschlagen',
+    category: 'Copilot \u2013 Excel',
+    lang: 'de',
+    text: 'Ich m\u00f6chte ein \u00dcbersichts-Dashboard f\u00fcr diese Verkaufsdaten erstellen.\n\nSchlage mir vor:\n- Welche 4\u20135 KPIs am wichtigsten sind\n- Welche Diagrammtypen sich eignen (z.\u00a0B. Balken, Linie, Torte) und warum\n- Wie die Tabelle sinnvoll strukturiert werden k\u00f6nnte\n- Welche Spalten / Zeilen f\u00fcr das Dashboard aufbereitet werden sollten\n\nZiel: Monatliches Reporting f\u00fcr die Gesch\u00e4ftsleitung.',
+  },
+
+  // ── Copilot – Word ────────────────────────────────────────────────────────
+
+  {
+    id: 'ex-copilot-word-bericht',
+    title: 'Copilot: Projektstatusbericht erstellen',
+    category: 'Copilot \u2013 Word',
+    lang: 'de',
+    text: 'Erstelle einen Projektstatusbericht f\u00fcr das folgende Projekt:\n\nProjekt: [Projektname]\nZeitraum: [Monat / Quartal]\nStatus: [Gr\u00fcn / Gelb / Rot]\n\nStruktur:\n1. Executive Summary (3\u20134 S\u00e4tze)\n2. Erledigte Meilensteine\n3. Offene Aufgaben & Risiken\n4. N\u00e4chste Schritte\n\nTon: Professionell, pr\u00e4zise, f\u00fcr Management-Publikum geeignet.\nL\u00e4nge: ca. 300\u2013400 W\u00f6rter.',
+  },
+
+  {
+    id: 'ex-copilot-word-umschreiben',
+    title: 'Copilot: Text verbessern & umschreiben',
+    category: 'Copilot \u2013 Word',
+    lang: 'de',
+    text: 'Verbessere den folgenden Text f\u00fcr ein professionelles Gesch\u00e4ftsdokument:\n\n[Text hier einf\u00fcgen]\n\nBitte:\n- Korrigiere Grammatik und Rechtschreibung\n- Verbessere den Sprachfluss und die Lesbarkeit\n- Passe den Ton auf ein formelles Business-Niveau an\n- Behalte die urspr\u00fcngliche Aussage bei\n\nZeige mir die \u00fcberarbeitete Version mit kurzen Hinweisen zu den wichtigsten \u00c4nderungen.',
+  },
+
+  {
+    id: 'ex-copilot-word-vorlage',
+    title: 'Copilot: Dokumentvorlage generieren',
+    category: 'Copilot \u2013 Word',
+    lang: 'de',
+    text: 'Erstelle eine professionelle Vorlage f\u00fcr ein Angebotsschreiben.\n\nDas Angebot richtet sich an B2B-Kunden f\u00fcr IT-Dienstleistungen.\n\nVorlage soll enthalten:\n- Briefkopf-Bereich (Platzhalter f\u00fcr Logo, Adresse, Datum)\n- Betreffzeile\n- Anrede\n- Einleitung: Bezug auf Anfrage\n- Hauptteil: Leistungsbeschreibung (3 Punkte, Platzhalter)\n- Preistabelle (Platzhalter)\n- Abschluss & Unterschriftsbereich\n\nTon: Formell, vertrauensweckend, kundenorientiert.',
+  },
+
+  // ── Copilot – PowerPoint ──────────────────────────────────────────────────
+
+  {
+    id: 'ex-copilot-ppt-praesentation',
+    title: 'Copilot: Pr\u00e4sentation strukturieren',
+    category: 'Copilot \u2013 PowerPoint',
+    lang: 'de',
+    text: 'Erstelle eine Gliederung f\u00fcr eine PowerPoint-Pr\u00e4sentation zu folgendem Thema:\n\nThema: Einf\u00fchrung von Microsoft Copilot im Unternehmen\nZielgruppe: F\u00fchrungskr\u00e4fte und Entscheider\nDauer: 15 Minuten (ca. 10\u201312 Folien)\n\nGib f\u00fcr jede Folie an:\n- Folientitel\n- 3\u20134 Kernaussagen / Bullet Points\n- Empfohlenes Visual (Diagramm, Bild, Icon)\n\nStil: \u00dcberzeugend, datenbasiert, executive-ready.',
+  },
+
+  {
+    id: 'ex-copilot-ppt-sprechernotizen',
+    title: 'Copilot: Sprechernotizen ausarbeiten',
+    category: 'Copilot \u2013 PowerPoint',
+    lang: 'de',
+    text: 'Schreibe ausf\u00fchrliche Sprechernotizen f\u00fcr die folgende Folie:\n\n[Folieninhalt / Bullet Points hier einf\u00fcgen]\n\nAnforderungen:\n- Ca. 80\u2013100 W\u00f6rter pro Folie\n- Nat\u00fcrliche, gesprochene Sprache (kein Vorleseton)\n- \u00dcbergangssatz zur n\u00e4chsten Folie am Ende\n- Ber\u00fccksichtige: Publikum sind Manager, keine Techniker',
+  },
+
+  {
+    id: 'ex-copilot-ppt-zusammenfassung',
+    title: 'Copilot: Pr\u00e4sentation zusammenfassen',
+    category: 'Copilot \u2013 PowerPoint',
+    lang: 'de',
+    text: 'Fasse den Inhalt dieser Pr\u00e4sentation zusammen.\n\nBitte erstelle:\n1. Eine Executive Summary (5\u20136 S\u00e4tze, das Wichtigste auf einen Blick)\n2. Die 3 zentralen Kernbotschaften\n3. Offene Fragen oder Handlungsbedarf (falls erkennbar)\n\nFormat: Klar strukturiert, f\u00fcr eine E-Mail an Kollegen geeignet, die die Pr\u00e4sentation nicht gesehen haben.',
+  },
+
+  // ── Copilot – Teams ───────────────────────────────────────────────────────
+
+  {
+    id: 'ex-copilot-teams-protokoll',
+    title: 'Copilot: Meeting-Protokoll erstellen',
+    category: 'Copilot \u2013 Teams',
+    lang: 'de',
+    text: 'Erstelle ein strukturiertes Meeting-Protokoll f\u00fcr dieses Meeting.\n\nBitte dokumentiere:\n- Datum, Uhrzeit, Teilnehmende\n- Besprochene Themen (Bullet Points je Agendapunkt)\n- Getroffene Entscheidungen (klar hervorheben)\n- Aufgaben / Action Items mit Verantwortlichem und Deadline\n- N\u00e4chstes Meeting (falls erw\u00e4hnt)\n\nFormat: \u00dcbersichtlich, actionable, maximal 1 Seite.',
+  },
+
+  {
+    id: 'ex-copilot-teams-chat-zusammenfassung',
+    title: 'Copilot: Chat-Verlauf zusammenfassen',
+    category: 'Copilot \u2013 Teams',
+    lang: 'de',
+    text: 'Fasse diesen Teams-Chat-Verlauf f\u00fcr mich zusammen.\n\nIch m\u00f6chte wissen:\n- Was wurde diskutiert oder entschieden?\n- Gibt es offene Fragen oder Aufgaben f\u00fcr mich?\n- Was sind die n\u00e4chsten Schritte?\n\nFormat: Kurze Stichpunkte, maximal 100 W\u00f6rter. Hebe Action Items f\u00fcr mich fett hervor.',
+  },
+
+  {
+    id: 'ex-copilot-teams-nachricht',
+    title: 'Copilot: Team-Nachricht formulieren',
+    category: 'Copilot \u2013 Teams',
+    lang: 'de',
+    text: 'Formuliere eine kurze Teams-Nachricht an mein Team.\n\nInhalt: Wir verschieben den Release-Termin von [Datum alt] auf [Datum neu] aufgrund von [Grund].\n\nAnforderungen:\n- Ton: Transparent, positiv und l\u00f6sungsorientiert\n- L\u00e4nge: Maximal 5 S\u00e4tze\n- Schluss: Einladung zu R\u00fcckfragen\n- Keine langen Begr\u00fcndungen, keine Schuldzuweisungen',
+  },
+
+  // ── Copilot – Chat ────────────────────────────────────────────────────────
+
+  {
+    id: 'ex-copilot-chat-recherche',
+    title: 'Copilot: Thema recherchieren & erkl\u00e4ren',
+    category: 'Copilot \u2013 Chat',
+    lang: 'de',
+    text: 'Erkl\u00e4re mir das Thema \u201e[Thema einf\u00fcgen]\u201c \u2013 kurz, verst\u00e4ndlich und praxisnah.\n\nMein Hintergrund: [Einsteiger / Fortgeschrittener / Experte]\nVerwendungszweck: [z.\u00a0B. Vorbereitung auf ein Meeting / Kundengespräch / Entscheidungsvorlage]\n\nBitte liefere:\n1. Eine einfache Definition (2\u20133 S\u00e4tze)\n2. Die wichtigsten Aspekte (Bullet Points)\n3. Ein konkretes Praxisbeispiel\n4. Was ich als n\u00e4chstes wissen / tun sollte',
+  },
+
+  {
+    id: 'ex-copilot-chat-brainstorming',
+    title: 'Copilot: Ideen brainstormen',
+    category: 'Copilot \u2013 Chat',
+    lang: 'de',
+    text: 'Hilf mir beim Brainstorming f\u00fcr folgende Herausforderung:\n\nHerausforderung: [Beschreibung einf\u00fcgen]\nZielgruppe: [Wer ist betroffen oder soll profitieren?]\nRandbedingungen: [Budget / Zeit / Ressourcen]\n\nGeneriere 10 kreative Ideen \u2013 von pragmatisch bis au\u00dfergew\u00f6hnlich.\n\nFormat: Nummerierte Liste, je Idee 1\u20132 S\u00e4tze Erkl\u00e4rung. Markiere die 3 Ideen, die du f\u00fcr am vielversprechendsten h\u00e4ltst.',
+  },
+
+  {
+    id: 'ex-copilot-chat-entscheidung',
+    title: 'Copilot: Entscheidungsvorlage erstellen',
+    category: 'Copilot \u2013 Chat',
+    lang: 'de',
+    text: 'Hilf mir, eine strukturierte Entscheidungsvorlage zu erstellen.\n\nEntscheidung: [Was soll entschieden werden?]\nOptionen: [Option A vs. Option B vs. Option C]\nKriterien: [z.\u00a0B. Kosten, Zeit, Risiko, strategische Passung]\n\nBitte erstelle:\n1. Eine Bewertungsmatrix (Optionen vs. Kriterien, Punkte 1\u20135)\n2. Pro & Contra je Option\n3. Eine begr\u00fcndete Empfehlung\n\nFormat: Tabellarisch, gesch\u00e4ftstauglich.',
+  },
+
+  // ── GitHub Copilot ────────────────────────────────────────────────────────
+
+  {
+    id: 'ex-github-copilot-coderevision',
+    title: 'GitHub Copilot: Code-Review durchf\u00fchren',
+    category: 'GitHub Copilot',
+    lang: 'de',
+    text: 'F\u00fchre ein Code-Review f\u00fcr den folgenden Code durch:\n\n[Code hier einf\u00fcgen]\n\nBitte pr\u00fcfe auf:\n- Fehler oder potenzielle Bugs\n- Performance-Probleme\n- Sicherheitsl\u00fccken\n- Lesbarkeit und Clean-Code-Prinzipien\n- Verbesserungsvorschl\u00e4ge mit Begr\u00fcndung\n\nFormat: Strukturiertes Review mit Schweregrad je Punkt (Kritisch / Mittel / Hinweis).',
+  },
+
+  {
+    id: 'ex-github-copilot-unittest',
+    title: 'GitHub Copilot: Unit Tests generieren',
+    category: 'GitHub Copilot',
+    lang: 'de',
+    text: 'Generiere Unit Tests f\u00fcr die folgende Funktion:\n\n[Funktion hier einf\u00fcgen]\n\nAnforderungen:\n- Testframework: [Jest / PyTest / JUnit / andere]\n- Testabdeckung: Happy Path, Edge Cases, Fehlerbedingungen\n- Jeder Test mit sprechendem Namen und kurzer Beschreibung\n- Mocking-Strategie angeben falls externe Abh\u00e4ngigkeiten vorhanden\n\nZiel: Vollst\u00e4ndige Testabdeckung der \u00f6ffentlichen Schnittstelle.',
+  },
+
 ];

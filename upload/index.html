@@ -40,7 +40,7 @@
           <h1 class="header-title mb-0">Chati</h1>
           <p class="header-subtitle mb-0" data-i18n="header.subtitle">KI Prompt-Generator</p>
         </div>
-        <div class="ms-auto d-flex align-items-center gap-2">
+        <div class="ms-auto d-flex align-items-center gap-2" id="header-actions">
           <button id="btn-toggle-all" class="help-btn" aria-label="Alle Abschnitte auf-/zuklappen">
             <i class="fa-solid fa-angles-up" id="toggle-all-icon"></i>
             <span class="d-none d-sm-inline ms-1" id="toggle-all-label" data-i18n="btn.toggleAll.close">Alle schließen</span>
@@ -83,6 +83,9 @@
               </div>
             </div>
           </div>
+          <button id="btn-shortcuts" class="help-btn" aria-label="Tastaturkürzel" data-bs-toggle="tooltip" title="Tastaturkürzel anzeigen">
+            <i class="fa-solid fa-keyboard"></i>
+          </button>
           <button id="btn-help" class="help-btn" aria-label="Hilfe: Wie baut man einen Prompt?">
             <i class="fa-solid fa-circle-question"></i>
             <span class="d-none d-sm-inline ms-1" data-i18n="btn.help">Hilfe</span>
@@ -91,7 +94,7 @@
             <i class="fa-solid fa-globe"></i>
             <span class="d-none d-sm-inline ms-1" id="ui-lang-label">EN</span>
           </button>
-          <span class="version-badge">v1.7</span>
+          <span class="version-badge">v1.9</span>
         </div>
       </div>
     </div>
@@ -112,6 +115,10 @@
           <i class="fa-solid fa-chevron-up section-chevron" id="catalog-chevron"></i>
         </div>
         <div class="section-body" id="catalog-body">
+          <div class="catalog-search-row mb-2">
+            <input type="search" id="catalog-search" class="form-control form-control-sm"
+              placeholder="Katalog durchsuchen …" data-i18n-ph="catalog.search.placeholder" autocomplete="off">
+          </div>
           <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
             <div class="catalog-filters" id="catalog-filters">
               <button class="filter-chip active" data-filter="alle" data-i18n="filter.all">Alle</button>
@@ -151,14 +158,40 @@
           <p class="section-hint"><i class="fa-solid fa-lightbulb me-1"></i><span data-i18n="hint.aufgabe">Was genau willst du erreichen?</span></p>
           <div class="row g-3">
             <div class="col-12 col-lg-10">
-              <label for="role-definition" class="field-label" data-i18n="lbl.role">Rolle / KI-Persona</label>
+              <div class="field-label-row">
+                <label for="role-definition" class="field-label" data-i18n="lbl.role">Rolle / KI-Persona</label>
+                <button class="coach-btn" data-coach-id="role-definition" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+              </div>
               <input type="text" id="role-definition" class="form-control field-input"
                 placeholder="z.B. Du bist ein erfahrener Marketing-Experte mit 10 Jahren B2B-Erfahrung …"
                 data-i18n-ph="ph.role">
               <div class="form-text mt-1" data-i18n="hint.role">Optional aber wirkungsvoll – definiert die Perspektive der KI.</div>
+              <!-- ── Persona-Tresor ── -->
+              <div class="persona-vault mt-2" id="persona-vault">
+                <div class="persona-vault__bar">
+                  <span class="persona-vault__lbl"><i class="fa-solid fa-id-card me-1"></i><span data-i18n="vault.title">Persona-Tresor</span></span>
+                  <button class="persona-vault__add" id="persona-vault-add" type="button" title="Aktuelle Rolle als Persona speichern"><i class="fa-solid fa-plus me-1"></i><span data-i18n="vault.add">Speichern</span></button>
+                </div>
+                <div class="persona-vault__chips" id="persona-chips"></div>
+                <div class="persona-vault__form d-none" id="persona-vault-form">
+                  <div class="d-flex gap-1 align-items-center mt-1">
+                    <input type="text" class="form-control form-control-sm" id="persona-vault-name"
+                      placeholder="Kurzname, z.B. CFO …" maxlength="30" autocomplete="off" data-i18n-ph="vault.nameph">
+                    <button class="action-btn action-btn--primary" id="persona-vault-confirm" type="button" style="font-size:.78rem;padding:.3rem .7rem;white-space:nowrap;">
+                      <i class="fa-solid fa-check me-1"></i><span data-i18n="vault.confirm">OK</span>
+                    </button>
+                    <button class="action-btn action-btn--outline" id="persona-vault-cancel" type="button" style="font-size:.78rem;padding:.3rem .6rem;">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="col-md-8 col-lg-6">
-              <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter." data-i18n-tooltip="tooltip.contenttype">Texttyp / Verwendungszweck</label>
+              <div class="field-label-row">
+                <label for="content-type" class="field-label" data-i18n="lbl.contenttype" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Wähle den Typ des Textes, z.B. Blog-Post, LinkedIn-Beitrag oder Newsletter." data-i18n-tooltip="tooltip.contenttype">Texttyp / Verwendungszweck</label>
+                <button class="coach-btn" data-coach-id="content-type" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+              </div>
               <select id="content-type" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="Artikel &amp; Blog" data-i18n-grp="grp.article_blog">
@@ -269,13 +302,19 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.kontext">Um was geht's? Was ist der Hintergrund?</span></p>
           <div class="row g-3">
             <div class="col-lg-8">
-              <label for="description" class="field-label" data-i18n="lbl.topic" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Beschreibe das Thema so konkret wie möglich, z.B. '5 KI-Tools für Einsteiger im Büroalltag'." data-i18n-tooltip="tooltip.topic">Thema &amp; Inhalt</label>
+              <div class="field-label-row">
+                <label for="description" class="field-label" data-i18n="lbl.topic" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Beschreibe das Thema so konkret wie möglich, z.B. '5 KI-Tools für Einsteiger im Büroalltag'." data-i18n-tooltip="tooltip.topic">Thema &amp; Inhalt</label>
+                <button class="coach-btn" data-coach-id="description" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+              </div>
               <textarea id="description" class="form-control field-input" rows="4"
                 placeholder="Beschreibe das Thema, den Inhalt oder das Ziel deines Textes …"
                 data-i18n-ph="ph.description"></textarea>
             </div>
             <div class="col-sm-6 col-lg-4">
-              <label for="target-audience" class="field-label" data-i18n="lbl.audience" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Für wen schreibst du? Je genauer die Zielgruppe, desto passender der generierte Text." data-i18n-tooltip="tooltip.audience">Zielgruppe</label>
+              <div class="field-label-row">
+                <label for="target-audience" class="field-label" data-i18n="lbl.audience" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Für wen schreibst du? Je genauer die Zielgruppe, desto passender der generierte Text." data-i18n-tooltip="tooltip.audience">Zielgruppe</label>
+                <button class="coach-btn" data-coach-id="target-audience" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+              </div>
               <select id="target-audience" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <optgroup label="B2C – Privat" data-i18n-grp="grp.b2c_privat">
@@ -332,7 +371,10 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.format">Wie soll die Ausgabe strukturiert sein?</span></p>
           <div class="row g-3">
             <div class="col-sm-6 col-lg-4">
-              <label for="content-length" class="field-label" data-i18n="lbl.length">Textlänge</label>
+              <div class="field-label-row">
+                <label for="content-length" class="field-label" data-i18n="lbl.length">Textlänge</label>
+                <button class="coach-btn" data-coach-id="content-length" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+              </div>
               <select id="content-length" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="Sehr kurz (50–100 Wörter)">Sehr kurz (50–100 Wörter)</option>
@@ -456,7 +498,10 @@
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.tonfall">Welche Stimmung soll der Text vermitteln?</span></p>
           <div class="row g-3">
             <div class="col-sm-6 col-lg-4">
-              <label for="language-style" class="field-label" data-i18n="lbl.style" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="z.B. 'Journalistisch' für Artikel, 'Werblich' für Sales-Texte, 'Persönlich' für Social Media." data-i18n-tooltip="tooltip.style">Sprachstil</label>
+              <div class="field-label-row">
+                <label for="language-style" class="field-label" data-i18n="lbl.style" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="z.B. 'Journalistisch' für Artikel, 'Werblich' für Sales-Texte, 'Persönlich' für Social Media." data-i18n-tooltip="tooltip.style">Sprachstil</label>
+                <button class="coach-btn" data-coach-id="language-style" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+              </div>
               <select id="language-style" class="form-select field-input">
                 <option value="">Bitte wählen</option>
                 <option value="Emotional">Emotional (bewegt, berührt)</option>
@@ -504,7 +549,10 @@
         </div>
         <div class="section-body" id="body-beispiel">
           <p class="section-hint"><i class="fa-solid fa-circle-question me-1"></i><span data-i18n="hint.beispiel">Ctrl+C → Ctrl+V: Gib einen Referenztext oder Stilhinweis an</span></p>
-          <label for="beispiel" class="field-label" data-i18n="lbl.example">Stilreferenz oder Beispieltext</label>
+          <div class="field-label-row">
+            <label for="beispiel" class="field-label" data-i18n="lbl.example">Stilreferenz oder Beispieltext</label>
+            <button class="coach-btn" data-coach-id="beispiel" type="button" aria-label="Warum ist das wichtig?"><i class="fa-solid fa-graduation-cap"></i></button>
+          </div>
           <textarea id="beispiel" class="form-control field-input" rows="3"
             placeholder='z.B. „Schreibe wie Tim Ferriss" oder füge einen Beispieltext ein, dem der Stil entsprechen soll …'
             data-i18n-ph="ph.beispiel"></textarea>
@@ -586,7 +634,17 @@
                 </li>
                 <li>
                   <button class="dropdown-item" id="btn-export">
-                    <i class="fa-solid fa-download me-2"></i><span data-i18n="btn.export">Exportieren</span>
+                    <i class="fa-solid fa-download me-2"></i><span data-i18n="btn.export">Exportieren (.txt)</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" id="btn-export-md">
+                    <i class="fa-brands fa-markdown me-2"></i><span data-i18n="btn.export.md">Als Markdown (.md)</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" id="btn-compare">
+                    <i class="fa-solid fa-code-compare me-2"></i><span data-i18n="btn.compare">DE / EN vergleichen</span>
                   </button>
                 </li>
                 <li>
@@ -1003,6 +1061,104 @@
           <button id="btn-placeholder-confirm" type="button" class="action-btn action-btn--primary">
             <i class="fa-solid fa-check me-2"></i><span data-i18n="btn.placeholderConfirm">Übernehmen</span>
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Floating Copy Button (appears on text selection) ===== -->
+  <div id="float-copy-btn" class="float-copy-btn d-none" role="button" aria-label="Kopieren">
+    <i class="fa-solid fa-copy me-1"></i><span data-i18n="btn.copy">Kopieren</span>
+  </div>
+
+  <!-- ===== Onboarding Tour Overlay ===== -->
+  <div id="onboarding-overlay" class="onboarding-overlay d-none" role="dialog" aria-modal="true" aria-label="Einführung">
+    <div class="onboarding-backdrop"></div>
+    <div class="onboarding-card" id="onboarding-card">
+      <div class="onboarding-progress">
+        <span id="onboarding-step-label" class="onboarding-step-label"></span>
+        <div class="onboarding-dots" id="onboarding-dots"></div>
+      </div>
+      <div class="onboarding-body">
+        <div class="onboarding-icon" id="onboarding-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <h5 class="onboarding-title" id="onboarding-title">Willkommen bei Chati</h5>
+        <p class="onboarding-text" id="onboarding-text"></p>
+      </div>
+      <div class="onboarding-footer">
+        <button id="btn-onboarding-skip" class="onboarding-skip" data-i18n="onboarding.skip">Überspringen</button>
+        <button id="btn-onboarding-next" class="action-btn action-btn--primary onboarding-next">
+          <span id="onboarding-next-label" data-i18n="onboarding.next">Weiter</span>
+          <i class="fa-solid fa-arrow-right ms-1"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Tastenkürzel-Modal ===== -->
+  <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shortcutsModalLabel">
+            <i class="fa-solid fa-keyboard me-2" style="color:var(--color-primary)"></i><span data-i18n="shortcuts.title">Tastaturkürzel</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body">
+          <div class="shortcuts-grid" id="shortcuts-grid">
+            <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>Enter</kbd><span data-i18n="shortcuts.copy">Prompt kopieren</span></div>
+            <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>S</kbd><span data-i18n="shortcuts.save">In Bibliothek speichern</span></div>
+            <div class="shortcut-row"><kbd>Esc</kbd><span></span><span data-i18n="shortcuts.reset">Formular zurücksetzen</span></div>
+            <div class="shortcut-row"><kbd>1</kbd>–<kbd>6</kbd><span></span><span data-i18n="shortcuts.steps">Zum Schritt 1–6 springen</span></div>
+            <div class="shortcut-row"><kbd>?</kbd><span></span><span data-i18n="shortcuts.this">Diese Übersicht öffnen</span></div>
+          </div>
+          <p class="text-muted mt-3 mb-0" style="font-size:.8rem;" data-i18n="shortcuts.hint">Kürzel 1–6 funktionieren nur außerhalb von Textfeldern.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Vergleich DE / EN Modal ===== -->
+  <div class="modal fade" id="compareModal" tabindex="-1" aria-labelledby="compareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="compareModalLabel">
+            <i class="fa-solid fa-code-compare me-2" style="color:var(--color-primary)"></i><span data-i18n="compare.title">Prompt-Vergleich: DE / EN</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="compare-col">
+                <div class="compare-col__header">
+                  <i class="fa-solid fa-language me-1"></i><strong>Deutsch</strong>
+                  <button class="action-btn action-btn--outline ms-auto compare-copy-btn" data-lang="de" style="font-size:.75rem;padding:.25rem .6rem;">
+                    <i class="fa-solid fa-copy me-1"></i><span data-i18n="btn.copy">Kopieren</span>
+                  </button>
+                </div>
+                <pre id="compare-text-de" class="compare-pre"></pre>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="compare-col">
+                <div class="compare-col__header">
+                  <i class="fa-solid fa-language me-1"></i><strong>English</strong>
+                  <button class="action-btn action-btn--outline ms-auto compare-copy-btn" data-lang="en" style="font-size:.75rem;padding:.25rem .6rem;">
+                    <i class="fa-solid fa-copy me-1"></i><span data-i18n="btn.copy">Kopieren</span>
+                  </button>
+                </div>
+                <pre id="compare-text-en" class="compare-pre"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Schließen</button>
         </div>
       </div>
     </div>

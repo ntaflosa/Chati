@@ -579,15 +579,122 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>`;
   };
 
+  // Feature 2: Inline field hints mapping per group
+  const PREVIEW_HINT_FIELDS = {
+    aufgabe:  { id: 'content-type',   section: 'body-aufgabe' },
+    kontext:  { id: 'description',    section: 'body-kontext' },
+    format:   { id: 'content-length', section: 'body-format' },
+    persona:  { id: 'perspective',    section: 'body-persona' },
+    tonfall:  { id: 'language-style', section: 'body-tonfall' },
+    beispiel: { id: 'beispiel',       section: 'body-beispiel' },
+  };
+
+  // ── Mini-Prompt-Coach data (Feature 20) ──────────────────────────────────
+  const COACH_DATA = {
+    de: {
+      'role-definition': {
+        why: 'Die KI-Persona ist der wirksamste Prompt-Trick überhaupt: Sie gibt der KI einen konkreten Expertenstatus, eine klare Perspektive und den richtigen Ton.',
+        bad: 'Schreibe einen Artikel über gesunde Ernährung.',
+        good: 'Du bist ein zertifizierter Ernährungsberater mit 8 Jahren Erfahrung in der Sportmedizin. Schreibe einen Artikel über gesunde Ernährung.',
+      },
+      'content-type': {
+        why: 'Der Texttyp definiert Format, Struktur und Länge der KI-Ausgabe. Ohne ihn liefert die KI generische Ergebnisse statt einem gezielten Format.',
+        bad: 'Schreibe etwas über unser neues Produkt.',
+        good: 'Erstelle eine Pressemitteilung über unser neues Produkt.',
+      },
+      'description': {
+        why: 'Je konkreter das Thema, desto relevanter die Ausgabe. Vage Themen führen zu generischen Texten ohne echten Mehrwert.',
+        bad: 'Schreibe über KI.',
+        good: 'Das Thema lautet: 5 praktische KI-Tools für Marketing-Manager im B2B-Bereich – mit konkreten Anwendungsbeispielen und ROI-Tipps.',
+      },
+      'target-audience': {
+        why: 'Die Zielgruppe steuert Vokabular, Komplexität und Relevanz. Ohne sie schreibt die KI für niemanden konkret.',
+        bad: 'Erkläre was Cloud Computing ist.',
+        good: 'Erkläre was Cloud Computing ist. Zielgruppe: Senioren (50+) ohne technisches Vorwissen.',
+      },
+      'content-length': {
+        why: 'Ohne Längenvorgabe ignoriert die KI den Kontext und produziert oft zu lange oder zu kurze Texte.',
+        bad: 'Schreibe eine Produktbeschreibung.',
+        good: 'Schreibe eine Produktbeschreibung. Textlänge: Kurz (100–300 Wörter).',
+      },
+      'language-style': {
+        why: 'Der Sprachstil entscheidet, ob dein Text verkauft, informiert oder überzeugt. Gleicher Inhalt – völlig andere Wirkung.',
+        bad: 'Schreibe einen LinkedIn-Post über unsere neue App.',
+        good: 'Schreibe einen LinkedIn-Post über unsere neue App. Sprachstil: Inspirierend.',
+      },
+      'beispiel': {
+        why: 'Eine Stilreferenz ist wie ein Fingerabdruck für die KI – sie adaptiert deinen einzigartigen Schreibstil statt generischer Formulierungen zu verwenden.',
+        bad: 'Schreibe wie ein Profi.',
+        good: 'Orientiere dich an folgendem Beispiel und übernimm Tonalität und Satzstruktur: [Beispieltext hier einfügen]',
+      },
+    },
+    en: {
+      'role-definition': {
+        why: 'The AI persona is the most powerful prompt technique: it gives the AI a concrete expert status, a clear perspective and the right tone.',
+        bad: 'Write an article about healthy eating.',
+        good: 'You are a certified nutritionist with 8 years of experience in sports medicine. Write an article about healthy eating.',
+      },
+      'content-type': {
+        why: 'The content type fundamentally defines the format, structure, and length of the AI output. Without it, AI delivers generic results.',
+        bad: 'Write something about our new product.',
+        good: 'Create a press release about our new product.',
+      },
+      'description': {
+        why: 'The more specific the topic, the more relevant the output. Vague topics lead to generic texts with no real value.',
+        bad: 'Write about AI.',
+        good: 'Topic: 5 practical AI tools for B2B marketing managers — with concrete use cases and ROI tips.',
+      },
+      'target-audience': {
+        why: 'The target audience controls vocabulary, complexity and relevance. Without it, the AI writes for no one specific.',
+        bad: 'Explain what cloud computing is.',
+        good: 'Explain what cloud computing is. Target audience: seniors (50+) with no technical background.',
+      },
+      'content-length': {
+        why: 'Without a length specification, the AI ignores context and often produces texts that are too long or too short.',
+        bad: 'Write a product description.',
+        good: 'Write a product description. Length: short (100–300 words).',
+      },
+      'language-style': {
+        why: 'The language style decides whether your text sells, informs or persuades. Same content — completely different impact.',
+        bad: 'Write a LinkedIn post about our new app.',
+        good: 'Write a LinkedIn post about our new app. Style: inspiring.',
+      },
+      'beispiel': {
+        why: 'A style reference is like a fingerprint for the AI — it adapts your unique writing style instead of using generic formulations.',
+        bad: 'Write like a pro.',
+        good: 'Follow this example and adopt its tone and sentence structure: [insert example text here]',
+      },
+    },
+  };
+
   const renderVisual = () => {
     const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
-    const filled = PREVIEW_GROUPS.filter(g => g.getValue());
-    if (filled.length === 0) return emptyState();
-    const rows = filled.map(g => `
-      <div class="pv-row">
+    const anyFilled = PREVIEW_GROUPS.some(g => g.getValue());
+    if (!anyFilled) return emptyState();
+
+    const hintLabel = uiLang === 'en' ? 'Click to fill' : 'Klicken zum Ausfüllen';
+
+    const rows = PREVIEW_GROUPS.map(g => {
+      const value = g.getValue();
+      if (value) {
+        return `<div class="pv-row">
+          <span class="pv-label pv-label--${g.key}"><i class="fa-solid ${g.icon}"></i>${t['step.' + g.key] || g.key}</span>
+          <span class="pv-value">${esc(value)}</span>
+        </div>`;
+      }
+      // Feature 2: show clickable empty hint
+      const hint = PREVIEW_HINT_FIELDS[g.key];
+      if (!hint) return '';
+      return `<div class="pv-row pv-row--empty">
         <span class="pv-label pv-label--${g.key}"><i class="fa-solid ${g.icon}"></i>${t['step.' + g.key] || g.key}</span>
-        <span class="pv-value">${esc(g.getValue())}</span>
-      </div>`).join('');
+        <span class="pv-value">
+          <button class="pv-empty-hint" data-jump-section="${hint.section}" data-jump-field="${hint.id}">
+            <i class="fa-solid fa-plus-circle"></i>${hintLabel}
+          </button>
+        </span>
+      </div>`;
+    }).join('');
+
     return `<div class="pv-intro">${t['preview.intro']}</div>
       <div class="pv-rows">${rows}</div>`;
   };
@@ -661,6 +768,18 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshScore();
     renderAnalyzer();
     saveForm();
+    // Feature 2: wire empty-hint jump buttons (re-injected on every render)
+    livePrompt.querySelectorAll('.pv-empty-hint').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sec   = btn.dataset.jumpSection;
+        const field = btn.dataset.jumpField;
+        if (sec) openSection(sec);
+        setTimeout(() => {
+          const el = document.getElementById(field);
+          if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }, 280);
+      });
+    });
   };
 
   // ── localStorage persistence ──────────────────────────────────────────────
@@ -787,9 +906,19 @@ document.addEventListener('DOMContentLoaded', () => {
       text,
       lang: activeLang,
       fields,
+      category: val('content-type') || '', // Feature 4: store category
       time: now.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
     });
     try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(items)); } catch {}
+  };
+
+  // Feature 11: Recently used templates
+  const LS_RECENT_KEY = 'chati_recent';
+  const loadRecent = () => { try { return JSON.parse(localStorage.getItem(LS_RECENT_KEY)) || []; } catch { return []; } };
+  const saveRecent = (id, name, category) => {
+    const items = loadRecent().filter(r => r.id !== id);
+    items.unshift({ id, name, category });
+    try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(items.slice(0, 5))); } catch {}
   };
 
   const renderLibrary = () => {
@@ -802,16 +931,50 @@ document.addEventListener('DOMContentLoaded', () => {
       : allItems;
     if (libraryEmpty) libraryEmpty.style.display = allItems.length ? 'none' : '';
     libraryList.innerHTML = '';
+
+    // Feature 11: Recently Used section (only when no search and at top)
+    if (!q) {
+      const recent = loadRecent();
+      if (recent.length) {
+        const recentDiv = document.createElement('div');
+        recentDiv.className = 'recently-used-section';
+        recentDiv.innerHTML = `
+          <div class="recently-used-header"><i class="fa-solid fa-clock-rotate-left me-1"></i>${uiLang === 'en' ? 'Recently Used Templates' : 'Zuletzt verwendete Vorlagen'}</div>
+          ${recent.map(r => `
+            <div class="recently-used-item" data-recent-id="${esc(String(r.id))}">
+              <i class="fa-solid fa-bolt recently-used-item__icon"></i>
+              <span class="recently-used-item__name">${esc(r.name)}</span>
+              <span class="recently-used-item__cat">${esc(r.category || '')}</span>
+            </div>`).join('')}`;
+        recentDiv.addEventListener('click', e => {
+          const item = e.target.closest('.recently-used-item');
+          if (item) { applyTemplate(item.dataset.recentId); libraryCanvas.hide(); }
+        });
+        libraryList.appendChild(recentDiv);
+      }
+    }
+
     if (allItems.length && !items.length) {
-      libraryList.innerHTML = `<p class="text-center text-muted py-3" style="font-size:.875rem;"><i class="fa-solid fa-magnifying-glass me-1"></i>${t['lib.search.empty'] || 'Keine Treffer'}</p>`;
+      const p = document.createElement('p');
+      p.className = 'text-center text-muted py-3';
+      p.style.fontSize = '.875rem';
+      p.innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>${t['lib.search.empty'] || 'Keine Treffer'}`;
+      libraryList.appendChild(p);
       return;
     }
     items.forEach(entry => {
       const div = document.createElement('div');
       div.className = 'library-item';
+      // Feature 4: category badge
+      const catBadge = entry.category
+        ? `<span class="lib-category-badge ms-1">${esc(entry.category)}</span>`
+        : '';
       div.innerHTML = `
         <div class="library-item__header">
-          <span class="library-item__title">${esc(entry.title)}</span>
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:.25rem;min-width:0;">
+            <span class="library-item__title">${esc(entry.title)}</span>
+            ${catBadge}
+          </div>
           <div class="library-item__meta">
             <span class="history-item__lang ${entry.lang === 'en' ? 'history-item__lang--en' : ''}">${(entry.lang || 'de').toUpperCase()}</span>
             <span class="history-item__time">${entry.time}</span>
@@ -983,6 +1146,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCatalog(activeFilter);
   };
 
+  let catalogSearchQuery = '';
+
   const renderCatalog = (filter = 'alle') => {
     const catalog = getActiveCatalog();
     const favs = loadFavorites();
@@ -992,6 +1157,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       items = filter === 'alle' ? [...catalog] : catalog.filter(t => t.category === filter);
       items.sort((a, b) => (favs.includes(b.id) ? 1 : 0) - (favs.includes(a.id) ? 1 : 0));
+    }
+    // Feature 10: filter by search
+    if (catalogSearchQuery) {
+      const q = catalogSearchQuery.toLowerCase();
+      items = items.filter(t => t.name.toLowerCase().includes(q) || t.category.toLowerCase().includes(q));
     }
     catalogGrid.innerHTML = items.map(t => `
       <div class="catalog-card${activeCardId === t.id ? ' active' : ''}"
@@ -1019,6 +1189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tplDisplay = getActiveCatalog().find(t => t.id === id) || tpl;
     if (descEl && !descEl.value.trim()) descEl.placeholder = tplDisplay.descriptionHint;
     activeCardId = id;
+    saveRecent(id, tplDisplay.name, tplDisplay.category); // Feature 11
     renderCatalog(activeFilter);
     refreshPreview();
     autoExpandFilled();
@@ -1047,6 +1218,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.closest('.catalog-fav')) return;
     const card = e.target.closest('.catalog-card');
     if (card) { e.preventDefault(); applyTemplate(card.dataset.id); }
+  });
+
+  // Feature 10: Catalog search
+  document.getElementById('catalog-search')?.addEventListener('input', e => {
+    catalogSearchQuery = e.target.value.trim();
+    renderCatalog(activeFilter);
   });
 
   // ── Catalog collapse ──────────────────────────────────────────────────────
@@ -1365,6 +1542,184 @@ document.addEventListener('DOMContentLoaded', () => {
     URL.revokeObjectURL(a.href);
   };
 
+  // ── Feature 8: Markdown Export ────────────────────────────────────────────
+  const downloadMarkdown = () => {
+    const text = getFinalPromptText();
+    if (!text) return;
+    const date = new Date().toISOString().slice(0, 10);
+    const type  = val('content-type');
+    const topic = val('description');
+    const titleLine = type ? `## ${type}${topic ? ' – ' + topic : ''}` : '## Prompt';
+    const metaParts = [];
+    if (val('target-audience')) metaParts.push(`**Zielgruppe:** ${val('target-audience')}`);
+    if (val('content-length'))  metaParts.push(`**Länge:** ${val('content-length')}`);
+    if (val('language-style'))  metaParts.push(`**Stil:** ${val('language-style')}`);
+    const meta = metaParts.length ? '\n\n' + metaParts.join('  \n') : '';
+    const md = `# Chati Prompt (${date})\n\n${titleLine}${meta}\n\n---\n\n${text}\n\n---\n*Erstellt mit [Chati Prompt-Generator](https://ntaflos.de)*\n`;
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `chati-prompt-${date}.md`,
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+
+  document.getElementById('btn-export-md')?.addEventListener('click', downloadMarkdown);
+
+  // ── Feature 9: Prompt Compare Modal (DE / EN) ─────────────────────────────
+  const compareModal = new bootstrap.Modal(document.getElementById('compareModal'));
+
+  document.getElementById('btn-compare')?.addEventListener('click', () => {
+    document.getElementById('compare-text-de').textContent = buildFlowPrompt()   || '–';
+    document.getElementById('compare-text-en').textContent = buildFlowPromptEN() || '–';
+    compareModal.show();
+  });
+
+  document.getElementById('compareModal')?.addEventListener('click', async e => {
+    const btn = e.target.closest('.compare-copy-btn');
+    if (!btn) return;
+    const lang = btn.dataset.lang;
+    const text = lang === 'en' ? buildFlowPromptEN() : buildFlowPrompt();
+    try { await navigator.clipboard.writeText(text); } catch {
+      const ta = Object.assign(document.createElement('textarea'),
+        { value: text, style: 'position:fixed;opacity:0;' });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    copyToast.show();
+  });
+
+  // ── Feature 3: Keyboard Shortcuts Modal ───────────────────────────────────
+  const shortcutsModal = new bootstrap.Modal(document.getElementById('shortcutsModal'));
+
+  document.getElementById('btn-shortcuts')?.addEventListener('click', () => shortcutsModal.show());
+
+  // ── Feature 5: Floating Copy Button on Selection ──────────────────────────
+  const floatCopyBtn = document.getElementById('float-copy-btn');
+
+  const hideFloatCopy = () => floatCopyBtn?.classList.add('d-none');
+
+  document.addEventListener('selectionchange', () => {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) { hideFloatCopy(); return; }
+    const range = sel.getRangeAt(0);
+    const container = range.commonAncestorContainer;
+    const inPrompt = livePrompt?.contains(container instanceof Text ? container.parentNode : container);
+    if (!inPrompt || sel.toString().trim().length < 3) { hideFloatCopy(); return; }
+    const rect = range.getBoundingClientRect();
+    if (floatCopyBtn) {
+      floatCopyBtn.classList.remove('d-none');
+      floatCopyBtn.style.top  = (rect.top + window.scrollY - 40) + 'px';
+      floatCopyBtn.style.left = (rect.left + window.scrollX + rect.width / 2 - 50) + 'px';
+    }
+  });
+
+  floatCopyBtn?.addEventListener('mousedown', async e => {
+    e.preventDefault();
+    const text = window.getSelection()?.toString() || '';
+    if (!text) return;
+    try { await navigator.clipboard.writeText(text); } catch {
+      const ta = Object.assign(document.createElement('textarea'),
+        { value: text, style: 'position:fixed;opacity:0;' });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    hideFloatCopy();
+    copyToast.show();
+  });
+
+  document.addEventListener('click', e => {
+    if (!livePrompt?.contains(e.target)) hideFloatCopy();
+  });
+
+  // ── Feature 6: Onboarding Tour ────────────────────────────────────────────
+  const LS_ONBOARDED_KEY = 'chati_onboarded';
+
+  const ONBOARDING_STEPS = [
+    {
+      icon: 'fa-wand-magic-sparkles',
+      title: { de: 'Willkommen bei Chati!', en: 'Welcome to Chati!' },
+      text:  { de: 'Chati hilft dir, perfekte KI-Prompts in wenigen Schritten zu erstellen – strukturiert, professionell und wiederverwendbar.', en: 'Chati helps you build perfect AI prompts in a few steps – structured, professional and reusable.' },
+    },
+    {
+      icon: 'fa-book-open',
+      title: { de: 'Prompt-Katalog', en: 'Prompt Catalog' },
+      text:  { de: 'Starte mit einer Vorlage aus dem Katalog – alle Felder werden automatisch befüllt. Du kannst alles danach anpassen.', en: 'Start with a template from the catalog – all fields are filled automatically. You can customize everything afterwards.' },
+    },
+    {
+      icon: 'fa-list-ol',
+      title: { de: '6 Schritte zum perfekten Prompt', en: '6 Steps to the Perfect Prompt' },
+      text:  { de: 'Fülle die 6 Schritte aus: Aufgabe, Kontext, Format, Persona, Tonfall und Beispiel. Die ersten zwei sind Pflicht – der Rest macht den Unterschied.', en: 'Fill in 6 steps: Task, Context, Format, Persona, Tone and Example. The first two are required – the rest make the difference.' },
+    },
+    {
+      icon: 'fa-eye',
+      title: { de: 'Live-Vorschau', en: 'Live Preview' },
+      text:  { de: 'Die Vorschau aktualisiert sich in Echtzeit. Sieh dir den Prompt visuell oder als Fließtext an – und wechsle zwischen Deutsch und Englisch.', en: 'The preview updates in real time. View the prompt visually or as flowing text – and switch between German and English.' },
+    },
+    {
+      icon: 'fa-copy',
+      title: { de: 'Kopieren & Loslegen', en: 'Copy & Go' },
+      text:  { de: 'Klicke auf „Kopieren" oder drücke Ctrl+Enter – dann in ChatGPT, Copilot oder Claude einfügen. Tipp: „Speichern" sichert deine Prompts in der Bibliothek.', en: 'Click "Copy" or press Ctrl+Enter – then paste into ChatGPT, Copilot or Claude. Tip: "Save" stores your prompts in the library.' },
+    },
+  ];
+
+  let onboardingStep = 0;
+
+  const renderOnboardingStep = () => {
+    const overlay = document.getElementById('onboarding-overlay');
+    if (!overlay) return;
+    const step = ONBOARDING_STEPS[onboardingStep];
+    const lang = uiLang || 'de';
+    document.getElementById('onboarding-icon').innerHTML = `<i class="fa-solid ${step.icon}"></i>`;
+    document.getElementById('onboarding-title').textContent = step.title[lang] || step.title.de;
+    document.getElementById('onboarding-text').textContent  = step.text[lang]  || step.text.de;
+    document.getElementById('onboarding-step-label').textContent =
+      `${onboardingStep + 1} / ${ONBOARDING_STEPS.length}`;
+    // Dots
+    const dotsEl = document.getElementById('onboarding-dots');
+    if (dotsEl) {
+      dotsEl.innerHTML = ONBOARDING_STEPS.map((_, i) =>
+        `<div class="onboarding-dot${i === onboardingStep ? ' active' : ''}"></div>`).join('');
+    }
+    // Next button label
+    const isLast = onboardingStep === ONBOARDING_STEPS.length - 1;
+    const nextLabel = document.getElementById('onboarding-next-label');
+    if (nextLabel) {
+      nextLabel.textContent = isLast
+        ? (lang === 'en' ? 'Get started!' : 'Loslegen!')
+        : (lang === 'en' ? 'Next' : 'Weiter');
+    }
+  };
+
+  const startOnboarding = () => {
+    const overlay = document.getElementById('onboarding-overlay');
+    if (!overlay) return;
+    onboardingStep = 0;
+    renderOnboardingStep();
+    overlay.classList.remove('d-none');
+  };
+
+  const closeOnboarding = () => {
+    const overlay = document.getElementById('onboarding-overlay');
+    overlay?.classList.add('d-none');
+    try { localStorage.setItem(LS_ONBOARDED_KEY, '1'); } catch {}
+  };
+
+  document.getElementById('btn-onboarding-next')?.addEventListener('click', () => {
+    if (onboardingStep < ONBOARDING_STEPS.length - 1) {
+      onboardingStep++;
+      renderOnboardingStep();
+    } else {
+      closeOnboarding();
+    }
+  });
+
+  document.getElementById('btn-onboarding-skip')?.addEventListener('click', closeOnboarding);
+  document.getElementById('onboarding-overlay')?.addEventListener('click', e => {
+    if (e.target.classList.contains('onboarding-backdrop')) closeOnboarding();
+  });
+
   // ── Prompt Variationen ────────────────────────────────────────────────────
   const buildVariations = () => {
     const type = val('content-type'), description = val('description'),
@@ -1601,6 +1956,29 @@ document.addEventListener('DOMContentLoaded', () => {
       'lib.search.empty': 'Keine Treffer',
       'theme.choose': 'Design wählen',
       'theme.light': 'Hell', 'theme.dark': 'Dunkel', 'theme.violet': 'Violett',
+      // v1.8 new
+      'btn.export': 'Exportieren (.txt)',
+      'btn.export.md': 'Als Markdown (.md)',
+      'btn.compare': 'DE / EN vergleichen',
+      'compare.title': 'Prompt-Vergleich: DE / EN',
+      'shortcuts.title': 'Tastaturkürzel',
+      'shortcuts.copy': 'Prompt kopieren',
+      'shortcuts.save': 'In Bibliothek speichern',
+      'shortcuts.reset': 'Formular zurücksetzen',
+      'shortcuts.steps': 'Zum Schritt 1–6 springen',
+      'shortcuts.this': 'Diese Übersicht öffnen',
+      'shortcuts.hint': 'Kürzel 1–6 funktionieren nur außerhalb von Textfeldern.',
+      'onboarding.skip': 'Überspringen',
+      'onboarding.next': 'Weiter',
+      'catalog.search.placeholder': 'Katalog durchsuchen …',
+      // v1.9 vault
+      'vault.title': 'Persona-Tresor',
+      'vault.add': 'Speichern',
+      'vault.nameph': 'Kurzname, z.B. CFO …',
+      'vault.confirm': 'OK',
+      'vault.empty': 'Noch leer – Rolle eingeben und speichern',
+      'vault.hint.empty': 'Bitte zuerst eine Rolle / KI-Persona eingeben.',
+      'vault.max': 'Maximal 10 Personas gespeichert.',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -1707,6 +2085,29 @@ document.addEventListener('DOMContentLoaded', () => {
       'lib.search.empty': 'No results',
       'theme.choose': 'Choose theme',
       'theme.light': 'Light', 'theme.dark': 'Dark', 'theme.violet': 'Violet',
+      // v1.8 new
+      'btn.export': 'Export (.txt)',
+      'btn.export.md': 'Export as Markdown (.md)',
+      'btn.compare': 'Compare DE / EN',
+      'compare.title': 'Prompt Comparison: DE / EN',
+      'shortcuts.title': 'Keyboard Shortcuts',
+      'shortcuts.copy': 'Copy prompt',
+      'shortcuts.save': 'Save to library',
+      'shortcuts.reset': 'Reset form',
+      'shortcuts.steps': 'Jump to step 1–6',
+      'shortcuts.this': 'Open this overview',
+      'shortcuts.hint': 'Keys 1–6 only work outside text fields.',
+      'onboarding.skip': 'Skip',
+      'onboarding.next': 'Next',
+      'catalog.search.placeholder': 'Search catalog …',
+      // v1.9 vault
+      'vault.title': 'Persona Vault',
+      'vault.add': 'Save',
+      'vault.nameph': 'Short name, e.g. CFO …',
+      'vault.confirm': 'OK',
+      'vault.empty': 'Empty – type a role above and save it',
+      'vault.hint.empty': 'Please enter a role / AI persona first.',
+      'vault.max': 'Maximum of 10 personas reached.',
     },
   };
 
@@ -1764,6 +2165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPresets();
     if (activeLibTab === 'examples') renderExamples();
     refreshPreview();
+    renderVault();
+    initCoachPopovers();
   };
 
   btnUiLang?.addEventListener('click', () => applyUILang(uiLang === 'de' ? 'en' : 'de'));
@@ -1921,11 +2324,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') document.getElementById('btn-preset-save')?.click();
   });
 
-  // ── Smart Prompt Analyzer ─────────────────────────────────────────────────
+  // ── Smart Prompt Analyzer (v1.8: progress bar + clickable tips) ───────────
   const renderAnalyzer = () => {
     const panel = document.getElementById('analyzer-panel');
     if (!panel) return;
     const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+
+    // Field→section mappings for jump links (Feature 12)
+    const FIELD_SECTIONS = {
+      'content-type':    'body-aufgabe',
+      'description':     'body-kontext',
+      'target-audience': 'body-kontext',
+      'content-length':  'body-format',
+      'language-style':  'body-tonfall',
+      'beispiel':        'body-beispiel',
+      'role-definition': 'body-aufgabe',
+    };
 
     const checks = [
       { id: 'content-type',   label: t['step.aufgabe'],  tip: t['analyzer.tip.type'],     ok: !!val('content-type') },
@@ -1939,19 +2353,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const score = checks.filter(c => c.ok).length;
     if (score === 0) { panel.innerHTML = ''; return; }
 
-    const qualityKey = score >= 5 ? 'analyzer.quality.excellent' : score >= 3 ? 'analyzer.quality.good' : 'analyzer.quality.basic';
     const qualityClass = score >= 5 ? 'excellent' : score >= 3 ? 'good' : 'basic';
+    const qualityKey   = score >= 5 ? 'analyzer.quality.excellent' : score >= 3 ? 'analyzer.quality.good' : 'analyzer.quality.basic';
+    const pct = Math.round((score / 6) * 100);
+
     // Role tip has highest priority; fall back to first missing dimension tip
     const roleEmpty    = !val('role-definition');
     const firstMissing = checks.find(c => !c.ok);
-    const activeTip    = roleEmpty
-      ? { icon: 'fa-user-tie', text: t['analyzer.tip.role'] }
-      : firstMissing
-        ? { icon: 'fa-lightbulb', text: firstMissing.tip }
-        : null;
-    const tipHtml = activeTip
-      ? `<div class="analyzer-tip"><i class="fa-solid ${activeTip.icon} me-1"></i><strong>${t['analyzer.tip.prefix']}</strong> ${activeTip.text}</div>`
-      : '';
+    let tipHtml = '';
+    if (roleEmpty || firstMissing) {
+      const tipId   = roleEmpty ? 'role-definition' : firstMissing.id;
+      const tipIcon = roleEmpty ? 'fa-user-tie' : 'fa-lightbulb';
+      const tipText = roleEmpty ? t['analyzer.tip.role'] : firstMissing.tip;
+      const section = FIELD_SECTIONS[tipId] || '';
+      const jumpLabel = uiLang === 'en' ? 'Go to field →' : 'Zum Feld →';
+      tipHtml = `<div class="analyzer-tip">
+        <i class="fa-solid ${tipIcon} me-1"></i><strong>${t['analyzer.tip.prefix']}</strong> ${esc(tipText)}
+        ${section ? `<button class="analyzer-tip-link ms-1" data-jump-section="${section}" data-jump-field="${tipId}">${jumpLabel}</button>` : ''}
+      </div>`;
+    }
 
     const badges = checks.map(c =>
       `<span class="analyzer-badge analyzer-badge--${c.ok ? 'ok' : 'miss'}">
@@ -1961,11 +2381,77 @@ document.addEventListener('DOMContentLoaded', () => {
     panel.innerHTML = `
       <div class="analyzer-header">
         <span class="analyzer-title"><i class="fa-solid fa-chart-bar me-1"></i>${t['analyzer.title']}</span>
-        <span class="analyzer-score analyzer-score--${qualityClass}">${t[qualityKey]} · ${score}/6</span>
+        <span class="quality-bar-score quality-bar-score--${qualityClass}">${t[qualityKey]} · ${score}/6</span>
+      </div>
+      <div class="quality-bar-wrap">
+        <div class="quality-bar-track">
+          <div class="quality-bar-fill quality-bar-fill--${qualityClass}" style="width:${pct}%"></div>
+        </div>
       </div>
       <div class="analyzer-badges">${badges}</div>
       ${tipHtml}`;
+
+    // Wire jump links (Feature 12)
+    panel.querySelectorAll('.analyzer-tip-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sec   = btn.dataset.jumpSection;
+        const field = btn.dataset.jumpField;
+        if (sec) openSection(sec);
+        setTimeout(() => {
+          const el = document.getElementById(field);
+          if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }, 280);
+      });
+    });
   };
+
+  // ── Mini-Prompt-Coach: Popovers (Feature 20) ─────────────────────────────
+  const initCoachPopovers = () => {
+    const cd = COACH_DATA[uiLang] || COACH_DATA.de;
+    const titleLabel = uiLang === 'en' ? 'Why does this matter?' : 'Warum ist das wichtig?';
+    const badLabel   = uiLang === 'en' ? '✗ Without' : '✗ Ohne';
+    const goodLabel  = uiLang === 'en' ? '✓ With' : '✓ Mit';
+
+    document.querySelectorAll('.coach-btn').forEach(btn => {
+      const existing = bootstrap.Popover.getInstance(btn);
+      if (existing) existing.dispose();
+
+      const fieldId = btn.dataset.coachId;
+      const data = cd[fieldId];
+      if (!data) return;
+
+      const content = `<div class="coach-pop">
+        <p class="coach-pop__why">${esc(data.why)}</p>
+        <div class="coach-pop__example coach-pop__example--bad">
+          <span class="coach-pop__lbl">${badLabel}</span>
+          <span class="coach-pop__text">${esc(data.bad)}</span>
+        </div>
+        <div class="coach-pop__example coach-pop__example--good">
+          <span class="coach-pop__lbl">${goodLabel}</span>
+          <span class="coach-pop__text">${esc(data.good)}</span>
+        </div>
+      </div>`;
+
+      new bootstrap.Popover(btn, {
+        html: true,
+        title: `<i class="fa-solid fa-graduation-cap me-1"></i>${titleLabel}`,
+        content,
+        trigger: 'click',
+        placement: 'auto',
+        customClass: 'coach-popover',
+        sanitize: false,
+      });
+    });
+  };
+
+  // Close coach popovers on outside click (registered once)
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.coach-btn') && !e.target.closest('.coach-popover')) {
+      document.querySelectorAll('.coach-btn').forEach(btn => {
+        bootstrap.Popover.getInstance(btn)?.hide();
+      });
+    }
+  });
 
   // ── Prompt-Schablonen: Platzhalter-Erkennung ─────────────────────────────
   const PLACEHOLDER_RE = /\{\{([^}]+)\}\}/g;
@@ -2155,6 +2641,121 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-inspire')?.addEventListener('click', inspireRandom);
 
+  // ── Persona-Vault (Feature: Persona-Vault v1.9) ───────────────────────────
+  const LS_VAULT_KEY = 'chati_vault';
+  const VAULT_MAX    = 10;
+
+  const loadVault = () => {
+    try { return JSON.parse(localStorage.getItem(LS_VAULT_KEY)) || []; } catch { return []; }
+  };
+
+  const saveVaultData = (items) => {
+    try { localStorage.setItem(LS_VAULT_KEY, JSON.stringify(items)); } catch {}
+  };
+
+  const renderVault = () => {
+    const chips = document.getElementById('persona-chips');
+    if (!chips) return;
+    const items = loadVault();
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+
+    if (items.length === 0) {
+      chips.innerHTML = `<span class="persona-vault__empty">${t['vault.empty']}</span>`;
+    } else {
+      chips.innerHTML = items.map(p =>
+        `<button class="persona-chip" data-vault-id="${esc(p.id)}" type="button" title="${esc(p.text)}">
+          <i class="fa-solid fa-user-tie persona-chip__icon"></i>
+          <span class="persona-chip__name">${esc(p.name)}</span>
+          <span class="persona-chip__del" data-del-id="${esc(p.id)}" aria-label="Löschen">×</span>
+        </button>`
+      ).join('');
+    }
+
+    // Wire chip clicks
+    chips.querySelectorAll('.persona-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        if (e.target.closest('.persona-chip__del')) return;
+        const persona = loadVault().find(p => p.id === chip.dataset.vaultId);
+        if (!persona) return;
+        const field = document.getElementById('role-definition');
+        if (field) {
+          field.value = persona.text;
+          refreshPreview();
+          chip.classList.add('persona-chip--active');
+          setTimeout(() => chip.classList.remove('persona-chip--active'), 1400);
+        }
+      });
+    });
+
+    // Wire delete buttons
+    chips.querySelectorAll('.persona-chip__del').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        saveVaultData(loadVault().filter(p => p.id !== btn.dataset.delId));
+        renderVault();
+      });
+    });
+
+    // Update add button state
+    const addBtn = document.getElementById('persona-vault-add');
+    if (addBtn) {
+      const full = items.length >= VAULT_MAX;
+      addBtn.disabled = full;
+      if (full) addBtn.title = (UI_STRINGS[uiLang] || UI_STRINGS.de)['vault.max'];
+    }
+  };
+
+  // Show inline form on "+ Speichern" click
+  document.getElementById('persona-vault-add')?.addEventListener('click', () => {
+    const text = val('role-definition');
+    if (!text) {
+      const field = document.getElementById('role-definition');
+      if (field) {
+        field.classList.add('field-flash');
+        field.focus();
+        setTimeout(() => field.classList.remove('field-flash'), 800);
+      }
+      return;
+    }
+    if (loadVault().length >= VAULT_MAX) return;
+    const form = document.getElementById('persona-vault-form');
+    if (form) {
+      form.classList.remove('d-none');
+      document.getElementById('persona-vault-name')?.focus();
+    }
+  });
+
+  // Cancel: hide form
+  document.getElementById('persona-vault-cancel')?.addEventListener('click', () => {
+    const form = document.getElementById('persona-vault-form');
+    const nameIn = document.getElementById('persona-vault-name');
+    if (form) form.classList.add('d-none');
+    if (nameIn) nameIn.value = '';
+  });
+
+  // Confirm: save persona
+  const vaultConfirmSave = () => {
+    const text = val('role-definition');
+    if (!text) return;
+    const nameIn = document.getElementById('persona-vault-name');
+    const rawName = nameIn?.value.trim() || '';
+    const name = rawName || (text.length > 22 ? text.slice(0, 22) + '…' : text);
+    const items = loadVault();
+    if (items.length >= VAULT_MAX) return;
+    items.push({ id: Date.now().toString(), name, text });
+    saveVaultData(items);
+    renderVault();
+    const form = document.getElementById('persona-vault-form');
+    if (form) form.classList.add('d-none');
+    if (nameIn) nameIn.value = '';
+  };
+
+  document.getElementById('persona-vault-confirm')?.addEventListener('click', vaultConfirmSave);
+  document.getElementById('persona-vault-name')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); vaultConfirmSave(); }
+    if (e.key === 'Escape') { document.getElementById('persona-vault-cancel')?.click(); }
+  });
+
   // ── Fokus-Modus ───────────────────────────────────────────────────────────
   const toggleFocusMode = () => {
     focusMode = !focusMode;
@@ -2260,5 +2861,27 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
+
+  // Feature 6: Start onboarding on first visit
+  try {
+    if (!localStorage.getItem(LS_ONBOARDED_KEY)) {
+      setTimeout(startOnboarding, 800);
+    }
+  } catch { /* private mode */ }
+
+  // Persona-Vault
+  renderVault();
+
+  // Feature 20: Mini-Prompt-Coach popovers
+  initCoachPopovers();
+
+  // Feature 3: '?' key opens shortcuts modal
+  document.addEventListener('keydown', e => {
+    const isTyping = document.activeElement?.matches('input,textarea,[contenteditable]');
+    if (!isTyping && e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      e.preventDefault();
+      shortcutsModal.show();
+    }
+  });
 
 });
