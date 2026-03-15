@@ -516,6 +516,7 @@
             </div>
             <span id="word-count" class="preview-counter"></span>
           </div>
+          <div id="analyzer-panel" class="analyzer-panel mt-3"></div>
           <div class="action-row mt-3">
             <button id="btn-copy" type="button" class="action-btn action-btn--primary">
               <i class="fa-solid fa-copy me-2"></i><span data-i18n="btn.copy">Kopieren</span>
@@ -537,11 +538,14 @@
             </button>
             <div class="action-divider d-none d-sm-flex"></div>
             <span class="action-label d-none d-sm-block" data-i18n="lbl.openin">Öffnen in:</span>
-            <button type="button" onclick="window.open('https://copilot.microsoft.com')" class="action-btn action-btn--ghost">
+            <button id="btn-open-copilot" type="button" class="action-btn action-btn--ghost">
               <i class="fa-solid fa-robot me-2"></i>Copilot
             </button>
-            <button type="button" onclick="window.open('https://chat.openai.com/chat')" class="action-btn action-btn--ghost">
+            <button id="btn-open-chatgpt" type="button" class="action-btn action-btn--ghost">
               <i class="fa-solid fa-comment-dots me-2"></i>ChatGPT
+            </button>
+            <button id="btn-open-claude" type="button" class="action-btn action-btn--ghost">
+              <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Claude
             </button>
             <button id="btn-reset" type="button" class="action-btn action-btn--ghost ms-auto">
               <i class="fa-solid fa-rotate-left me-2"></i><span class="d-none d-sm-inline" data-i18n="btn.reset">Zurücksetzen</span>
@@ -600,6 +604,24 @@
     <div id="save-toast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" style="background:var(--color-primary);color:#fff;">
       <div class="d-flex">
         <div class="toast-body"><i class="fa-solid fa-bookmark me-2"></i><span data-i18n="toast.saved">In Bibliothek gespeichert!</span></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
+      </div>
+    </div>
+    <div id="open-toast" class="toast align-items-center text-bg-secondary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-solid fa-arrow-up-right-from-square me-2"></i><span data-i18n="toast.openin">Prompt kopiert – mit Ctrl+V einfügen</span></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
+      </div>
+    </div>
+    <div id="import-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-solid fa-file-import me-2"></i><span id="import-toast-text" data-i18n="toast.imported">Prompts importiert!</span></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
+      </div>
+    </div>
+    <div id="preset-toast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" style="background:var(--color-primary);color:#fff;">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-solid fa-floppy-disk me-2"></i><span data-i18n="toast.presetSaved">Vorlage gespeichert!</span></div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Schließen"></button>
       </div>
     </div>
@@ -753,11 +775,21 @@
       <h5 class="offcanvas-title" id="libraryOffcanvasLabel">
         <i class="fa-solid fa-bookmark me-2" style="color:var(--color-primary)"></i><span data-i18n="library.title">Prompt-Bibliothek</span>
       </h5>
+      <div class="d-flex align-items-center gap-2 ms-auto me-2">
+        <button id="btn-lib-export" class="action-btn action-btn--outline" style="font-size:.75rem;padding:.25rem .6rem;" title="Bibliothek exportieren">
+          <i class="fa-solid fa-download me-1"></i><span data-i18n="lib.export">Export</span>
+        </button>
+        <label for="lib-import-input" class="action-btn action-btn--outline mb-0" style="font-size:.75rem;padding:.25rem .6rem;cursor:pointer;" title="Bibliothek importieren">
+          <i class="fa-solid fa-upload me-1"></i><span data-i18n="lib.import">Import</span>
+        </label>
+        <input type="file" id="lib-import-input" accept=".json" style="display:none">
+      </div>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
     </div>
     <div class="offcanvas-body p-0">
       <div class="library-tabs" id="library-tabs">
         <button class="library-tab active" data-libtab="mine" data-i18n="library.tab.mine">Meine Prompts</button>
+        <button class="library-tab" data-libtab="presets" data-i18n="library.tab.presets">Vorlagen</button>
         <button class="library-tab" data-libtab="examples" data-i18n="library.tab.examples">Beispiele</button>
       </div>
       <!-- Meine Prompts -->
@@ -768,6 +800,26 @@
           <small data-i18n="library.emptyhint">Generiere einen Prompt und klicke auf „Speichern".</small>
         </p>
         <div id="library-list"></div>
+      </div>
+      <!-- Vorlagen (Presets) -->
+      <div id="library-panel-presets" class="library-panel p-3 d-none">
+        <div class="preset-save-row mb-3">
+          <label for="preset-name-input" class="form-label fw-semibold" data-i18n="presets.save.label">Aktuelle Einstellungen speichern als:</label>
+          <div class="d-flex gap-2">
+            <input type="text" id="preset-name-input" class="form-control" maxlength="60"
+              placeholder="z.B. Blog-Post Vorlage" data-i18n-ph="presets.save.placeholder">
+            <button id="btn-preset-save" class="action-btn action-btn--primary" style="white-space:nowrap;">
+              <i class="fa-solid fa-floppy-disk me-1"></i><span data-i18n="presets.save.btn">Speichern</span>
+            </button>
+          </div>
+          <div class="form-text mt-1" data-i18n="presets.save.hint">Speichert alle 12 Formularfelder als wiederverwendbare Vorlage.</div>
+        </div>
+        <p class="text-center text-muted mt-4" id="presets-empty" style="font-size:.875rem;">
+          <i class="fa-solid fa-layer-group d-block mb-2" style="font-size:2rem;opacity:.3"></i>
+          <span data-i18n="presets.empty">Noch keine Vorlagen gespeichert.</span><br>
+          <small data-i18n="presets.emptyhint">Fülle das Formular aus und speichere deine Einstellungen als Vorlage.</small>
+        </p>
+        <div id="presets-list"></div>
       </div>
       <!-- Beispiel-Prompts -->
       <div id="library-panel-examples" class="library-panel p-3 d-none">

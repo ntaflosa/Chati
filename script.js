@@ -44,9 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const historyCanvas    = new bootstrap.Offcanvas(document.getElementById('historyOffcanvas'));
   const libraryCanvas    = new bootstrap.Offcanvas(document.getElementById('libraryOffcanvas'));
   const saveModal        = new bootstrap.Modal(document.getElementById('saveModal'));
-  const copyToast      = new bootstrap.Toast(document.getElementById('copy-toast'),  { delay: 2500 });
-  const shareToast     = new bootstrap.Toast(document.getElementById('share-toast'), { delay: 2500 });
-  const saveToast      = new bootstrap.Toast(document.getElementById('save-toast'),  { delay: 2500 });
+  const copyToast      = new bootstrap.Toast(document.getElementById('copy-toast'),   { delay: 2500 });
+  const shareToast     = new bootstrap.Toast(document.getElementById('share-toast'),  { delay: 2500 });
+  const saveToast      = new bootstrap.Toast(document.getElementById('save-toast'),   { delay: 2500 });
+  const openToast      = new bootstrap.Toast(document.getElementById('open-toast'),   { delay: 3000 });
+  const importToast    = new bootstrap.Toast(document.getElementById('import-toast'), { delay: 2500 });
+  const presetToast    = new bootstrap.Toast(document.getElementById('preset-toast'), { delay: 2000 });
 
   // ── Constants ─────────────────────────────────────────────────────────────
   const FIELD_IDS = [
@@ -55,11 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
     'formatting', 'seo-keyword-option', 'title-subtitle-option', 'beispiel',
   ];
 
-  const LS_FORM_KEY    = 'chati_form';
-  const LS_HISTORY_KEY = 'chati_history';
-  const LS_LIBRARY_KEY = 'chati_library';
-  const LS_THEME_KEY   = 'chati_theme';
-  const HISTORY_MAX    = 8;
+  const LS_FORM_KEY     = 'chati_form';
+  const LS_HISTORY_KEY  = 'chati_history';
+  const LS_LIBRARY_KEY  = 'chati_library';
+  const LS_PRESETS_KEY  = 'chati_presets';
+  const LS_THEME_KEY    = 'chati_theme';
+  const HISTORY_MAX     = 8;
 
   const val = (id) => (document.getElementById(id)?.value ?? '').trim();
 
@@ -634,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     refreshScore();
+    renderAnalyzer();
     saveForm();
   };
 
@@ -1171,12 +1176,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#library-tabs .library-tab').forEach(t =>
       t.classList.toggle('active', t.dataset.libtab === activeLibTab));
     document.getElementById('library-panel-mine')?.classList.toggle('d-none', activeLibTab !== 'mine');
+    document.getElementById('library-panel-presets')?.classList.toggle('d-none', activeLibTab !== 'presets');
     document.getElementById('library-panel-examples')?.classList.toggle('d-none', activeLibTab !== 'examples');
     if (activeLibTab === 'examples') renderExamples();
+    if (activeLibTab === 'presets') renderPresets();
   });
 
   btnLibrary?.addEventListener('click', () => {
     renderLibrary();
+    renderPresets();
     libraryCanvas.show();
   });
 
@@ -1410,6 +1418,27 @@ document.addEventListener('DOMContentLoaded', () => {
       'grp.kreativ': 'Kreativ', 'grp.interaktiv': 'Interaktiv',
       'grp.b2c_privat': 'B2C – Privat', 'grp.b2b_business': 'B2B – Business',
       'grp.interests': 'Interessen & Community',
+      'toast.openin': 'Prompt kopiert – mit Ctrl+V einfügen',
+      'toast.imported': 'Prompts importiert!',
+      'toast.presetSaved': 'Vorlage gespeichert!',
+      'lib.export': 'Export', 'lib.import': 'Import',
+      'library.tab.presets': 'Vorlagen',
+      'presets.save.label': 'Aktuelle Einstellungen speichern als:',
+      'presets.save.placeholder': 'z.B. Blog-Post Vorlage',
+      'presets.save.btn': 'Speichern',
+      'presets.save.hint': 'Speichert alle 12 Formularfelder als wiederverwendbare Vorlage.',
+      'presets.empty': 'Noch keine Vorlagen gespeichert.',
+      'presets.emptyhint': 'Fülle das Formular aus und speichere deine Einstellungen als Vorlage.',
+      'presets.btn.load': 'Laden', 'presets.btn.delete': 'Löschen',
+      'analyzer.title': 'Prompt-Qualität',
+      'analyzer.tip.prefix': 'Tipp:',
+      'analyzer.tip.type': 'Wähle einen Texttyp, um die Aufgabe klar zu definieren.',
+      'analyzer.tip.topic': 'Beschreibe das Thema konkret – je mehr Details, desto besser das Ergebnis.',
+      'analyzer.tip.audience': 'Gib eine Zielgruppe an für passgenauere Ergebnisse.',
+      'analyzer.tip.length': 'Lege eine Textlänge fest, damit die KI die Ausgabe anpassen kann.',
+      'analyzer.tip.style': 'Wähle einen Sprachstil, um den Ton des Textes zu steuern.',
+      'analyzer.tip.example': 'Füge eine Stilreferenz hinzu (z.B. „Schreibe wie ...") für authentischere Ausgaben.',
+      'analyzer.quality.basic': 'Basis', 'analyzer.quality.good': 'Gut', 'analyzer.quality.excellent': 'Ausgezeichnet',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -1471,6 +1500,27 @@ document.addEventListener('DOMContentLoaded', () => {
       'grp.kreativ': 'Creative', 'grp.interaktiv': 'Interactive',
       'grp.b2c_privat': 'B2C – Private', 'grp.b2b_business': 'B2B – Business',
       'grp.interests': 'Interests & Community',
+      'toast.openin': 'Prompt copied – paste with Ctrl+V',
+      'toast.imported': 'Prompts imported!',
+      'toast.presetSaved': 'Template saved!',
+      'lib.export': 'Export', 'lib.import': 'Import',
+      'library.tab.presets': 'Templates',
+      'presets.save.label': 'Save current settings as:',
+      'presets.save.placeholder': 'e.g. Blog Post Template',
+      'presets.save.btn': 'Save',
+      'presets.save.hint': 'Saves all 12 form fields as a reusable template.',
+      'presets.empty': 'No templates saved yet.',
+      'presets.emptyhint': 'Fill in the form and save your settings as a template.',
+      'presets.btn.load': 'Load', 'presets.btn.delete': 'Delete',
+      'analyzer.title': 'Prompt Quality',
+      'analyzer.tip.prefix': 'Tip:',
+      'analyzer.tip.type': 'Choose a content type to clearly define the task.',
+      'analyzer.tip.topic': 'Describe the topic in detail – more specifics lead to better results.',
+      'analyzer.tip.audience': 'Specify a target audience for more relevant output.',
+      'analyzer.tip.length': 'Set a text length so the AI can calibrate the output.',
+      'analyzer.tip.style': 'Choose a writing style to control the tone of the text.',
+      'analyzer.tip.example': 'Add a style reference (e.g. "Write like ...") for more authentic output.',
+      'analyzer.quality.basic': 'Basic', 'analyzer.quality.good': 'Good', 'analyzer.quality.excellent': 'Excellent',
     },
   };
 
@@ -1517,10 +1567,233 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem('chati_ui_lang', lang); } catch {}
     renderCatalog(activeFilter);
     renderLibrary();
+    renderPresets();
+    if (activeLibTab === 'examples') renderExamples();
     refreshPreview();
   };
 
   btnUiLang?.addEventListener('click', () => applyUILang(uiLang === 'de' ? 'en' : 'de'));
+
+  // ── Open in AI tool ───────────────────────────────────────────────────────
+  const openInTool = async (url) => {
+    const text = getCurrentPrompt().trim();
+    if (!text) { window.open(url, '_blank', 'noopener'); return; }
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const ta = Object.assign(document.createElement('textarea'),
+        { value: text, style: 'position:fixed;opacity:0;' });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    const toastText = document.querySelector('#open-toast [data-i18n="toast.openin"]');
+    if (toastText) toastText.textContent = (UI_STRINGS[uiLang] || UI_STRINGS.de)['toast.openin'];
+    openToast.show();
+    setTimeout(() => window.open(url, '_blank', 'noopener'), 400);
+  };
+
+  document.getElementById('btn-open-copilot')?.addEventListener('click', () =>
+    openInTool('https://copilot.microsoft.com'));
+  document.getElementById('btn-open-chatgpt')?.addEventListener('click', () =>
+    openInTool('https://chatgpt.com/'));
+  document.getElementById('btn-open-claude')?.addEventListener('click', () =>
+    openInTool('https://claude.ai/new'));
+
+  // ── Library Export / Import JSON ──────────────────────────────────────────
+  const exportLibrary = () => {
+    const items = loadLibrary();
+    if (!items.length) return;
+    const date = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json;charset=utf-8' });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `chati-library-${date}.json`,
+    });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+
+  const importLibrary = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) return;
+        const existing = loadLibrary();
+        const existingIds = new Set(existing.map(i => i.id));
+        const newItems = imported.filter(i => i.id && i.title && i.text && !existingIds.has(i.id));
+        const merged = [...newItems, ...existing];
+        try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(merged)); } catch {}
+        renderLibrary();
+        const span = document.getElementById('import-toast-text');
+        const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+        if (span) span.textContent = `${newItems.length} ${t['toast.imported']}`;
+        importToast.show();
+      } catch {}
+    };
+    reader.readAsText(file);
+  };
+
+  document.getElementById('btn-lib-export')?.addEventListener('click', exportLibrary);
+  document.getElementById('lib-import-input')?.addEventListener('change', e => {
+    const file = e.target.files?.[0];
+    if (file) { importLibrary(file); e.target.value = ''; }
+  });
+
+  // ── Personal Presets (Field-Presets) ──────────────────────────────────────
+  const loadPresets = () => {
+    try { return JSON.parse(localStorage.getItem(LS_PRESETS_KEY)) || []; } catch { return []; }
+  };
+
+  const savePreset = (name) => {
+    const fields = Object.fromEntries(FIELD_IDS.map(id => [id, val(id)]).filter(([, v]) => v));
+    if (!Object.keys(fields).length) return false;
+    const presets = loadPresets();
+    presets.unshift({ id: Date.now(), name, fields });
+    try { localStorage.setItem(LS_PRESETS_KEY, JSON.stringify(presets)); return true; } catch { return false; }
+  };
+
+  const renderPresets = () => {
+    const list = document.getElementById('presets-list');
+    const empty = document.getElementById('presets-empty');
+    if (!list) return;
+    const presets = loadPresets();
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+    if (empty) empty.style.display = presets.length ? 'none' : '';
+    list.innerHTML = '';
+    presets.forEach(preset => {
+      const div = document.createElement('div');
+      div.className = 'library-item';
+      const fieldCount = Object.keys(preset.fields).length;
+      div.innerHTML = `
+        <div class="library-item__header">
+          <span class="library-item__title">${esc(preset.name)}</span>
+          <span class="catalog-card__badge" style="font-size:.7rem;">${fieldCount}/12 ${uiLang === 'en' ? 'fields' : 'Felder'}</span>
+        </div>
+        <div class="library-item__btns">
+          <button class="action-btn action-btn--primary preset-btn-load" data-pid="${preset.id}">
+            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i>${t['presets.btn.load']}
+          </button>
+          <button class="action-btn action-btn--ghost preset-btn-delete" data-pid="${preset.id}">
+            <i class="fa-solid fa-trash me-1"></i>${t['presets.btn.delete']}
+          </button>
+        </div>`;
+      list.appendChild(div);
+    });
+  };
+
+  document.getElementById('presets-list')?.addEventListener('click', e => {
+    const pid = Number(e.target.closest('[data-pid]')?.dataset.pid);
+    if (!pid) return;
+    const presets = loadPresets();
+    const preset = presets.find(p => p.id === pid);
+    if (!preset) return;
+
+    if (e.target.closest('.preset-btn-load')) {
+      FIELD_IDS.forEach(fid => {
+        const el = document.getElementById(fid);
+        if (el) el.value = preset.fields[fid] || '';
+      });
+      activeCardId = null;
+      renderCatalog(activeFilter);
+      refreshPreview();
+      autoExpandFilled();
+      libraryCanvas.hide();
+    }
+    if (e.target.closest('.preset-btn-delete')) {
+      const updated = presets.filter(p => p.id !== pid);
+      try { localStorage.setItem(LS_PRESETS_KEY, JSON.stringify(updated)); } catch {}
+      renderPresets();
+    }
+  });
+
+  document.getElementById('btn-preset-save')?.addEventListener('click', () => {
+    const nameInput = document.getElementById('preset-name-input');
+    const name = nameInput?.value.trim();
+    if (!name) { nameInput?.focus(); return; }
+    if (savePreset(name)) {
+      if (nameInput) nameInput.value = '';
+      renderPresets();
+      const span = document.querySelector('#preset-toast [data-i18n="toast.presetSaved"]');
+      if (span) span.textContent = (UI_STRINGS[uiLang] || UI_STRINGS.de)['toast.presetSaved'];
+      presetToast.show();
+    }
+  });
+
+  document.getElementById('preset-name-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btn-preset-save')?.click();
+  });
+
+  // ── Smart Prompt Analyzer ─────────────────────────────────────────────────
+  const renderAnalyzer = () => {
+    const panel = document.getElementById('analyzer-panel');
+    if (!panel) return;
+    const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
+
+    const checks = [
+      { id: 'content-type',   label: t['step.aufgabe'],  tip: t['analyzer.tip.type'],     ok: !!val('content-type') },
+      { id: 'description',    label: t['step.kontext'],   tip: t['analyzer.tip.topic'],    ok: val('description').length > 10 },
+      { id: 'target-audience',label: t['lbl.audience'],   tip: t['analyzer.tip.audience'], ok: !!val('target-audience') },
+      { id: 'content-length', label: t['lbl.length'],     tip: t['analyzer.tip.length'],   ok: !!val('content-length') },
+      { id: 'language-style', label: t['lbl.style'],      tip: t['analyzer.tip.style'],    ok: !!val('language-style') },
+      { id: 'beispiel',       label: t['step.beispiel'],  tip: t['analyzer.tip.example'],  ok: !!val('beispiel') },
+    ];
+
+    const score = checks.filter(c => c.ok).length;
+    if (score === 0) { panel.innerHTML = ''; return; }
+
+    const qualityKey = score >= 5 ? 'analyzer.quality.excellent' : score >= 3 ? 'analyzer.quality.good' : 'analyzer.quality.basic';
+    const qualityClass = score >= 5 ? 'excellent' : score >= 3 ? 'good' : 'basic';
+    const firstMissing = checks.find(c => !c.ok);
+    const tipHtml = firstMissing
+      ? `<div class="analyzer-tip"><i class="fa-solid fa-lightbulb me-1"></i><strong>${t['analyzer.tip.prefix']}</strong> ${firstMissing.tip}</div>`
+      : '';
+
+    const badges = checks.map(c =>
+      `<span class="analyzer-badge analyzer-badge--${c.ok ? 'ok' : 'miss'}">
+        <i class="fa-solid fa-${c.ok ? 'check' : 'xmark'} me-1"></i>${c.label}
+      </span>`).join('');
+
+    panel.innerHTML = `
+      <div class="analyzer-header">
+        <span class="analyzer-title"><i class="fa-solid fa-chart-bar me-1"></i>${t['analyzer.title']}</span>
+        <span class="analyzer-score analyzer-score--${qualityClass}">${t[qualityKey]} · ${score}/6</span>
+      </div>
+      <div class="analyzer-badges">${badges}</div>
+      ${tipHtml}`;
+  };
+
+  // ── Keyboard Shortcuts ────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select';
+
+    if (e.ctrlKey && e.key === 'Enter') {
+      e.preventDefault();
+      copyPrompt();
+      return;
+    }
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault();
+      const text = getCurrentPrompt().trim();
+      if (!text) return;
+      const titleInput = document.getElementById('library-title-input');
+      if (titleInput) titleInput.value = '';
+      saveModal.show();
+      setTimeout(() => titleInput?.focus(), 350);
+      return;
+    }
+    if (e.key === 'Escape' && !isTyping) {
+      const anyModalOpen = document.querySelector('.modal.show');
+      const anyOffcanvasOpen = document.querySelector('.offcanvas.show');
+      if (!anyModalOpen && !anyOffcanvasOpen) resetForm();
+      return;
+    }
+    if (!isTyping && !e.ctrlKey && !e.altKey && !e.metaKey && e.key >= '1' && e.key <= '6') {
+      const steps = ['body-aufgabe', 'body-kontext', 'body-format', 'body-persona', 'body-tonfall', 'body-beispiel'];
+      const idx = parseInt(e.key) - 1;
+      e.preventDefault();
+      openSection(steps[idx]);
+    }
+  });
 
   // ── Init ──────────────────────────────────────────────────────────────────
 
