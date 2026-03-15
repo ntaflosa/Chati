@@ -1299,3 +1299,178 @@ label[data-bs-toggle="tooltip"]::after {
   #btn-inspire { width: 100%; justify-content: center; }
   .catalog-filters { flex: 1; }
 }
+
+/* ============================================================
+   Theme Picker – Dropdown with Swatches
+   ============================================================ */
+.theme-picker {
+  min-width: 262px;
+  border: 1px solid var(--f2-stroke1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow16);
+  background: var(--f2-bg1);
+}
+
+.theme-picker__label {
+  font-size: 0.625rem; font-weight: 700;
+  color: var(--f2-fg3); text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+.theme-swatches {
+  display: flex; gap: 0.375rem; flex-wrap: wrap;
+}
+
+.theme-swatch {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  padding: 0.5rem 0.55rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  min-width: 46px;
+}
+.theme-swatch:hover {
+  background: var(--f2-bg3);
+  border-color: var(--f2-stroke1);
+}
+.theme-swatch.active {
+  border-color: var(--f2-brand-stroke);
+  background: var(--f2-brand-160);
+}
+
+.swatch-dot {
+  width: 30px; height: 30px; border-radius: var(--radius-pill);
+  display: block; box-shadow: var(--shadow2);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.swatch-light  { background: linear-gradient(135deg, #f5f5f5 50%, #ffffff 50%); }
+.swatch-dark   { background: linear-gradient(135deg, #141414 50%, #292929 50%); border-color: rgba(255,255,255,0.1); }
+.swatch-ocean  { background: linear-gradient(135deg, #00748f 50%, #edf7f9 50%); }
+.swatch-violet { background: linear-gradient(135deg, #7160e8 50%, #f3f0ff 50%); }
+.swatch-forest { background: linear-gradient(135deg, #107c10 50%, #f0f7f0 50%); }
+
+.swatch-name {
+  font-size: 0.625rem; font-weight: 500;
+  color: var(--f2-fg2); white-space: nowrap;
+}
+.theme-swatch.active .swatch-name { color: var(--f2-brand-fg); font-weight: 700; }
+
+[data-theme="dark"] .theme-picker { background: var(--f2-bg2); border-color: var(--f2-stroke1); }
+[data-theme="dark"] .theme-swatch:hover { background: var(--f2-bg1-hover); }
+[data-theme="dark"] .theme-swatch.active { background: var(--color-primary-light); border-color: var(--f2-brand-stroke); }
+[data-theme="dark"] .theme-swatch.active .swatch-name { color: var(--f2-brand-fg); }
+
+/* Colored header helper: shared overrides for all colored themes */
+.app-header--colored .header-title   { color: #fff; }
+.app-header--colored .header-subtitle { color: rgba(255,255,255,0.78); }
+.app-header--colored .version-badge  { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.28); }
+.app-header--colored .help-btn       { color: rgba(255,255,255,0.88); border-color: rgba(255,255,255,0.30); background: transparent; }
+.app-header--colored .help-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.50); color: #fff; }
+
+/* ============================================================
+   Theme: Ocean  (Teal — #00748f)
+   ============================================================ */
+[data-theme="ocean"] {
+  --f2-brand-80:      #00748f;
+  --f2-brand-70:      #005e74;
+  --f2-brand-40:      #003245;
+  --f2-brand-fg:      #00748f;
+  --f2-brand-fg2:     #005e74;
+  --f2-brand-stroke:  #00748f;
+  --f2-brand-160:     #e0f6f9;
+  --f2-brand-140:     #b3ecf2;
+  --color-primary:       #00748f;
+  --color-primary-dark:  #005e74;
+  --color-primary-light: #e0f6f9;
+}
+[data-theme="ocean"] body { background: #edf7f9; }
+[data-theme="ocean"] .app-header {
+  background: rgba(0,116,143,0.90);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom-color: rgba(0,0,0,0.10);
+}
+[data-theme="ocean"] .app-header { color: #fff; }
+[data-theme="ocean"] .header-title    { color: #fff; }
+[data-theme="ocean"] .header-subtitle { color: rgba(255,255,255,0.75); }
+[data-theme="ocean"] .version-badge   { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.28); }
+[data-theme="ocean"] .help-btn        { color: rgba(255,255,255,0.88); border-color: rgba(255,255,255,0.30); background: transparent; }
+[data-theme="ocean"] .help-btn:hover  { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.50); color: #fff; }
+[data-theme="ocean"] .header-logo     { background: rgba(255,255,255,0.22); box-shadow: 0 2px 6px rgba(0,0,0,0.20); }
+[data-theme="ocean"] .section-collapsible:hover,
+[data-theme="ocean"] .catalog-header:hover { background: #e0f6f9; }
+[data-theme="ocean"] .theme-swatch.active { border-color: #00748f; background: #e0f6f9; }
+[data-theme="ocean"] .theme-swatch.active .swatch-name { color: #00748f; }
+
+/* ============================================================
+   Theme: Violet  (Iris/Indigo — #7160e8)
+   ============================================================ */
+[data-theme="violet"] {
+  --f2-brand-80:      #7160e8;
+  --f2-brand-70:      #5b4eb5;
+  --f2-brand-40:      #37327a;
+  --f2-brand-fg:      #7160e8;
+  --f2-brand-fg2:     #5b4eb5;
+  --f2-brand-stroke:  #7160e8;
+  --f2-brand-160:     #f0ebff;
+  --f2-brand-140:     #d5c9fc;
+  --color-primary:       #7160e8;
+  --color-primary-dark:  #5b4eb5;
+  --color-primary-light: #f0ebff;
+}
+[data-theme="violet"] body { background: #f3f0ff; }
+[data-theme="violet"] .app-header {
+  background: rgba(113,96,232,0.90);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom-color: rgba(0,0,0,0.10);
+}
+[data-theme="violet"] .header-title    { color: #fff; }
+[data-theme="violet"] .header-subtitle { color: rgba(255,255,255,0.75); }
+[data-theme="violet"] .version-badge   { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.28); }
+[data-theme="violet"] .help-btn        { color: rgba(255,255,255,0.88); border-color: rgba(255,255,255,0.30); background: transparent; }
+[data-theme="violet"] .help-btn:hover  { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.50); color: #fff; }
+[data-theme="violet"] .header-logo     { background: rgba(255,255,255,0.22); box-shadow: 0 2px 6px rgba(0,0,0,0.20); }
+[data-theme="violet"] .section-collapsible:hover,
+[data-theme="violet"] .catalog-header:hover { background: #f0ebff; }
+[data-theme="violet"] .pv-flow--editable:focus { box-shadow: 0 0 0 2px rgba(113,96,232,0.22); background: rgba(113,96,232,0.03); }
+[data-theme="violet"] .live-prompt-box.has-content { border-color: #7160e8; box-shadow: 0 0 0 1px rgba(113,96,232,0.15); }
+[data-theme="violet"] .theme-swatch.active { border-color: #7160e8; background: #f0ebff; }
+[data-theme="violet"] .theme-swatch.active .swatch-name { color: #7160e8; }
+
+/* ============================================================
+   Theme: Forest  (Green — #107c10)
+   ============================================================ */
+[data-theme="forest"] {
+  --f2-brand-80:      #107c10;
+  --f2-brand-70:      #0d6b0d;
+  --f2-brand-40:      #054305;
+  --f2-brand-fg:      #107c10;
+  --f2-brand-fg2:     #0d6b0d;
+  --f2-brand-stroke:  #107c10;
+  --f2-brand-160:     #dff6dd;
+  --f2-brand-140:     #9fd89f;
+  --color-primary:       #107c10;
+  --color-primary-dark:  #0d6b0d;
+  --color-primary-light: #dff6dd;
+}
+[data-theme="forest"] body { background: #f0f7f0; }
+[data-theme="forest"] .app-header {
+  background: rgba(16,124,16,0.90);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom-color: rgba(0,0,0,0.10);
+}
+[data-theme="forest"] .header-title    { color: #fff; }
+[data-theme="forest"] .header-subtitle { color: rgba(255,255,255,0.75); }
+[data-theme="forest"] .version-badge   { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.28); }
+[data-theme="forest"] .help-btn        { color: rgba(255,255,255,0.88); border-color: rgba(255,255,255,0.30); background: transparent; }
+[data-theme="forest"] .help-btn:hover  { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.50); color: #fff; }
+[data-theme="forest"] .header-logo     { background: rgba(255,255,255,0.22); box-shadow: 0 2px 6px rgba(0,0,0,0.20); }
+[data-theme="forest"] .section-collapsible:hover,
+[data-theme="forest"] .catalog-header:hover { background: #dff6dd; }
+[data-theme="forest"] .pv-flow--editable:focus { box-shadow: 0 0 0 2px rgba(16,124,16,0.22); background: rgba(16,124,16,0.03); }
+[data-theme="forest"] .live-prompt-box.has-content { border-color: #107c10; box-shadow: 0 0 0 1px rgba(16,124,16,0.15); }
+[data-theme="forest"] .theme-swatch.active { border-color: #107c10; background: #dff6dd; }
+[data-theme="forest"] .theme-swatch.active .swatch-name { color: #107c10; }

@@ -53,9 +53,36 @@
             <i class="fa-solid fa-bookmark"></i>
             <span class="d-none d-lg-inline ms-1" data-i18n="btn.library">Bibliothek</span>
           </button>
-          <button id="btn-dark-mode" class="help-btn" aria-label="Dark Mode umschalten">
-            <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
-          </button>
+          <div class="dropdown">
+            <button id="btn-theme" class="help-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-label="Design wählen">
+              <i class="fa-solid fa-sun" id="theme-icon"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end theme-picker p-2" id="theme-picker-menu">
+              <div class="theme-picker__label mb-2" data-i18n="theme.choose">Design wählen</div>
+              <div class="theme-swatches">
+                <button class="theme-swatch" data-theme-value="light">
+                  <span class="swatch-dot swatch-light"></span>
+                  <span class="swatch-name" data-i18n="theme.light">Hell</span>
+                </button>
+                <button class="theme-swatch" data-theme-value="dark">
+                  <span class="swatch-dot swatch-dark"></span>
+                  <span class="swatch-name" data-i18n="theme.dark">Dunkel</span>
+                </button>
+                <button class="theme-swatch" data-theme-value="ocean">
+                  <span class="swatch-dot swatch-ocean"></span>
+                  <span class="swatch-name">Ocean</span>
+                </button>
+                <button class="theme-swatch" data-theme-value="violet">
+                  <span class="swatch-dot swatch-violet"></span>
+                  <span class="swatch-name" data-i18n="theme.violet">Violett</span>
+                </button>
+                <button class="theme-swatch" data-theme-value="forest">
+                  <span class="swatch-dot swatch-forest"></span>
+                  <span class="swatch-name">Forest</span>
+                </button>
+              </div>
+            </div>
+          </div>
           <button id="btn-help" class="help-btn" aria-label="Hilfe: Wie baut man einen Prompt?">
             <i class="fa-solid fa-circle-question"></i>
             <span class="d-none d-sm-inline ms-1" data-i18n="btn.help">Hilfe</span>

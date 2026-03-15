@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnShare        = document.getElementById('btn-share');
   const btnUiLang       = document.getElementById('btn-ui-lang');
   const uiLangLabel     = document.getElementById('ui-lang-label');
-  const btnDarkMode     = document.getElementById('btn-dark-mode');
-  const darkModeIcon    = document.getElementById('dark-mode-icon');
+  const btnTheme        = document.getElementById('btn-theme');
+  const themeIcon       = document.getElementById('theme-icon');
   const btnToggleAll    = document.getElementById('btn-toggle-all');
   const toggleAllIcon   = document.getElementById('toggle-all-icon');
   const toggleAllLabel  = document.getElementById('toggle-all-label');
@@ -940,15 +940,27 @@ document.addEventListener('DOMContentLoaded', () => {
     lastFormState = null;
   });
 
-  // ── Dark mode ─────────────────────────────────────────────────────────────
-  const applyTheme = (dark) => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    if (darkModeIcon) darkModeIcon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-    try { localStorage.setItem(LS_THEME_KEY, dark ? 'dark' : 'light'); } catch {}
+  // ── Theme system ──────────────────────────────────────────────────────────
+  const THEMES = ['light', 'dark', 'ocean', 'violet', 'forest'];
+  const THEME_ICONS = {
+    light: 'fa-solid fa-sun', dark: 'fa-solid fa-moon',
+    ocean: 'fa-solid fa-water', violet: 'fa-solid fa-star',
+    forest: 'fa-solid fa-leaf',
   };
 
-  btnDarkMode?.addEventListener('click', () =>
-    applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark'));
+  const applyTheme = (name) => {
+    if (!THEMES.includes(name)) name = 'light';
+    document.documentElement.setAttribute('data-theme', name);
+    if (themeIcon) themeIcon.className = THEME_ICONS[name] || 'fa-solid fa-palette';
+    document.querySelectorAll('.theme-swatch').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.themeValue === name)
+    );
+    try { localStorage.setItem(LS_THEME_KEY, name); } catch {}
+  };
+
+  document.querySelectorAll('.theme-swatch').forEach(btn =>
+    btn.addEventListener('click', () => applyTheme(btn.dataset.themeValue))
+  );
 
   // ── Catalog ───────────────────────────────────────────────────────────────
   let activeFilter = 'alle';
@@ -1585,6 +1597,8 @@ document.addEventListener('DOMContentLoaded', () => {
       'btn.focusExit': 'Fokus beenden',
       'lib.search.placeholder': 'Suchen …',
       'lib.search.empty': 'Keine Treffer',
+      'theme.choose': 'Design wählen',
+      'theme.light': 'Hell', 'theme.dark': 'Dunkel', 'theme.violet': 'Violett',
     },
     en: {
       'header.subtitle': 'AI Prompt Generator',
@@ -1687,6 +1701,8 @@ document.addEventListener('DOMContentLoaded', () => {
       'btn.focusExit': 'Exit Focus',
       'lib.search.placeholder': 'Search …',
       'lib.search.empty': 'No results',
+      'theme.choose': 'Choose theme',
+      'theme.light': 'Light', 'theme.dark': 'Dark', 'theme.violet': 'Violet',
     },
   };
 
@@ -2200,8 +2216,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Theme first (before paint)
   try {
     const t = localStorage.getItem(LS_THEME_KEY);
-    if (t === 'dark') applyTheme(true);
-  } catch {}
+    applyTheme(THEMES.includes(t) ? t : 'light');
+  } catch { applyTheme('light'); }
 
   // Bootstrap Tooltips initialisieren
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el =>
