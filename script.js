@@ -1,4 +1,5 @@
-'use strict';
+import { PROMPT_CATALOG, PROMPT_CATALOG_EN } from './catalog.js';
+import { LIBRARY_EXAMPLES } from './examples.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -73,7 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const LS_FAVORITES_KEY  = 'chati_favorites';
   const LS_THEME_KEY      = 'chati_theme';
   const LS_PROJECT_CTX    = 'chati_project_ctx';
+  const LS_RECENT_KEY     = 'chati_recent';
+  const LS_ONBOARDED_KEY  = 'chati_onboarded';
+  const LS_VAULT_KEY      = 'chati_vault';
+  const LS_UI_LANG_KEY    = 'chati_ui_lang';
   const HISTORY_MAX     = 8;
+  const VAULT_MAX       = 10;
 
   const val = (id) => (document.getElementById(id)?.value ?? '').trim();
 
@@ -1113,7 +1119,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Feature 11: Recently used templates
-  const LS_RECENT_KEY = 'chati_recent';
   const loadRecent = () => { try { return JSON.parse(localStorage.getItem(LS_RECENT_KEY)) || []; } catch { return []; } };
   const saveRecent = (id, name, category) => {
     const items = loadRecent().filter(r => r.id !== id);
@@ -1834,8 +1839,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Feature 6: Onboarding Tour ────────────────────────────────────────────
-  const LS_ONBOARDED_KEY = 'chati_onboarded';
-
   const ONBOARDING_STEPS = [
     {
       icon: 'fa-wand-magic-sparkles',
@@ -2429,7 +2432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fmLabel) fmLabel.textContent = focusMode ? t['btn.focusExit'] : t['btn.focus'];
 
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
-    try { localStorage.setItem('chati_ui_lang', lang); } catch {}
+    try { localStorage.setItem(LS_UI_LANG_KEY, lang); } catch {}
     renderCatalog(activeFilter);
     renderLibrary();
     renderPresets();
@@ -2912,9 +2915,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-inspire')?.addEventListener('click', inspireRandom);
 
   // ── Persona-Vault (Feature: Persona-Vault v1.9) ───────────────────────────
-  const LS_VAULT_KEY = 'chati_vault';
-  const VAULT_MAX    = 10;
-
   const loadVault = () => {
     try { return JSON.parse(localStorage.getItem(LS_VAULT_KEY)) || []; } catch { return []; }
   };

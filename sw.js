@@ -1,18 +1,28 @@
 'use strict';
 
-const CACHE  = 'chati-v1.4';
+const CACHE  = 'chati-v2.0';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './script.js',
   './catalog.js',
+  './examples.js',
   './manifest.json',
   './icon.svg',
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
   './favicon-32.png',
+  './src/app.js',
+  './src/constants.js',
+  './src/mappings.js',
+  './src/state.js',
+  './src/storage.js',
+  './src/prompt-builder.js',
+  './src/analyzer.js',
+  './src/score.js',
+  './src/variations.js',
 ];
 
 self.addEventListener('install', e => {
