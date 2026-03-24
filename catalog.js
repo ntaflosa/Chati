@@ -13,7 +13,7 @@
  *   descriptionHint      – Platzhaltertext fürs Beschreibungsfeld
  *   fields               – Voreinstellungen für alle Formularfelder
  */
-const PROMPT_CATALOG = [
+export const PROMPT_CATALOG = [
 
   // ── Content ──────────────────────────────────────────────────────────────
   {
@@ -804,7 +804,7 @@ const PROMPT_CATALOG = [
  * Same IDs, icons, categories and field values as PROMPT_CATALOG.
  * Only name and descriptionHint are translated.
  */
-const PROMPT_CATALOG_EN = [
+export const PROMPT_CATALOG_EN = [
 
   // ── Content ──────────────────────────────────────────────────────────────
   { id: 'seo-blogartikel',      name: 'SEO Blog Post',        icon: 'fa-solid fa-magnifying-glass',   category: 'Content',      descriptionHint: 'Topic, main keyword, desired search intent …' },

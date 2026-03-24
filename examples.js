@@ -5,7 +5,7 @@
  * Add new prompts by appending an object to the array – no backend needed.
  * Fields: id, title, category, lang ('de'|'en'), text
  */
-const LIBRARY_EXAMPLES = [
+export const LIBRARY_EXAMPLES = [
 
   // ── Content ──────────────────────────────────────────────────────────────
 

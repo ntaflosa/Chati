@@ -1,4 +1,15 @@
-'use strict';
+import { PROMPT_CATALOG, PROMPT_CATALOG_EN } from './catalog.js';
+import { LIBRARY_EXAMPLES } from './examples.js';
+import {
+  LENGTH_MAP, LENGTH_MAP_EN,
+  ADDRESS_MAP, ADDRESS_MAP_EN,
+  FORMAT_MAP_EN, STYLE_MAP_EN,
+  AUDIENCE_MAP_EN, PERSPECTIVE_MAP_EN,
+  ARTICLE_MAP, ARTICLE_MAP_EN,
+} from './src/mappings.js';
+import { analyzePrompt } from './src/analyzer.js';
+import { buildFlowPrompt, buildFlowPromptEN, buildCtxPreviewText } from './src/prompt-builder.js';
+import { buildVariations } from './src/variations.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -73,113 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const LS_FAVORITES_KEY  = 'chati_favorites';
   const LS_THEME_KEY      = 'chati_theme';
   const LS_PROJECT_CTX    = 'chati_project_ctx';
+  const LS_RECENT_KEY     = 'chati_recent';
+  const LS_ONBOARDED_KEY  = 'chati_onboarded';
+  const LS_VAULT_KEY      = 'chati_vault';
+  const LS_UI_LANG_KEY    = 'chati_ui_lang';
   const HISTORY_MAX     = 8;
+  const VAULT_MAX       = 10;
 
   const val = (id) => (document.getElementById(id)?.value ?? '').trim();
 
-  // ── Mappings ──────────────────────────────────────────────────────────────
-  const LENGTH_MAP = {
-    'Sehr kurz (50–100 Wörter)':  'Sehr kurz',
-    'Kurz (100–300 Wörter)':      'Kurz',
-    'Mittel (300–600 Wörter)':    'Mittel',
-    'Lang (600–1.200 Wörter)':    'Lang',
-    'Sehr lang (1.200+ Wörter)':  'Sehr lang',
-  };
-
-  const LENGTH_MAP_EN = {
-    'Sehr kurz (50–100 Wörter)':  'very short (50–100 words)',
-    'Kurz (100–300 Wörter)':      'short (100–300 words)',
-    'Mittel (300–600 Wörter)':    'medium (300–600 words)',
-    'Lang (600–1.200 Wörter)':    'long (600–1,200 words)',
-    'Sehr lang (1.200+ Wörter)':  'very long (1,200+ words)',
-  };
-
-  const ADDRESS_MAP    = { formal: 'Sie-Form', informell: 'Du-Form', neutral: 'Neutral', kombiniert: 'Kombiniert' };
-  const ADDRESS_MAP_EN = { formal: 'formal (Sie)', informell: 'informal (du)', neutral: 'neutral', kombiniert: 'mixed' };
-
-  const FORMAT_MAP_EN = {
-    'Fließtext':               'flowing prose',
-    'Überschriften + Fließtext': 'headings with prose',
-    'Bullet Points':           'bullet points',
-    'Nummerierte Liste':       'numbered list',
-    'Schritt-für-Schritt':     'step-by-step',
-    'Tabellarisch':            'tabular layout',
-    'Zitat':                   'quote format',
-    'FAQ-Format (Frage & Antwort)': 'FAQ format (Q&A)',
-    'Checkliste / Aufgabenliste':   'checklist / task list',
-  };
-
-  const STYLE_MAP_EN = {
-    'Emotional': 'emotional', 'Empathisch': 'empathetic', 'Formell': 'formal',
-    'Humorvoll': 'humorous', 'Informell': 'informal', 'Inspirierend': 'inspiring',
-    'Journalistisch': 'journalistic', 'Minimalistisch': 'minimalist',
-    'Motivierend': 'motivational', 'Persönlich': 'personal', 'Poetisch': 'poetic',
-    'Provokativ': 'provocative', 'Sachlich': 'factual', 'Seriös': 'serious',
-    'Storytelling': 'storytelling', 'Technisch': 'technical',
-    'Umgangssprachlich': 'colloquial', 'Werblich': 'promotional',
-    'Wissenschaftlich': 'scientific',
-  };
-
-  const AUDIENCE_MAP_EN = {
-    'Jugendliche (16–25 Jahre)':        'teenagers and young adults (16–25)',
-    'Junge Erwachsene (25–35 Jahre)':   'young adults (25–35)',
-    'Berufstätige (30–50 Jahre)':       'working professionals (30–50)',
-    'Eltern & Familien':                'parents and families',
-    'Senioren (50+ Jahre)':             'seniors (50+)',
-    'Gründer & Startups':               'founders and startups',
-    'KMU-Inhaber & Selbstständige':     'SME owners and freelancers',
-    'Manager & Führungskräfte':         'managers and executives',
-    'B2B-Entscheider':                  'B2B decision-makers',
-    'IT-Professionals':                 'IT professionals',
-    'Technik & Digitales':              'tech enthusiasts',
-    'Fitness & Gesundheit':             'fitness and health community',
-    'Mode & Lifestyle':                 'fashion and lifestyle audience',
-    'Finanzen & Investment':            'finance and investment community',
-    'Bildung & Weiterbildung':          'education and learning community',
-    'Schüler & Auszubildende (15–22 Jahre)': 'students and trainees (15–22)',
-    'Kreative & Designer':              'creatives and designers',
-    'Lehrkräfte & Pädagogen':           'teachers and educators',
-    'Sport & Outdoor':                  'sports and outdoor enthusiasts',
-    'Nachhaltigkeit & Umwelt':          'sustainability and environmental community',
-  };
-
-  const PERSPECTIVE_MAP_EN = {
-    'Du-Perspektive': 'second person (you)',
-    'Er-/Sie-Perspektive': 'third person',
-    'Ich-Perspektive': 'first person (I)',
-    'Neutral/Objektiv': 'neutral/objective',
-    'Wir-Perspektive': 'first person plural (we)',
-  };
-
-  const ARTICLE_MAP = {
-    'Artikel': 'einen ', 'Blog-Post': 'einen ', 'How-to-Anleitung': 'eine ', 'Listicle (Top-X-Artikel)': 'einen ',
-    'Interview': 'ein ', 'Whitepaper': 'ein ', 'Case-Study': 'eine ',
-    'Pressemitteilung': 'eine ', 'E-Book': 'ein ', 'Buchrezension': 'eine ', 'Zusammenfassung': 'eine ',
-    'Facebook-Beitrag': 'einen ', 'Instagram-Beitrag': 'einen ',
-    'Story-Skript (Instagram / Facebook)': 'ein ', 'Carousel-Post': 'einen ',
-    'LinkedIn-Beitrag': 'einen ', 'Twitter-Beitrag': 'einen ',
-    'TikTok-Skript': 'ein ', 'Reels-Skript': 'ein ',
-    'Threads-Beitrag': 'einen ', 'Xing-Beitrag': 'einen ',
-    'Produktbeschreibung': 'eine ', 'Verkaufstext / Sales Page': 'einen ', 'Produktvergleich': 'einen ',
-    'FAQ-Seite': 'eine ', 'Anzeige': 'eine ', 'SEO-Text': 'einen ',
-    'Newsletter': 'einen ', 'Landing Page': 'eine ',
-    'E-Mail': 'eine ', 'Kaltakquise-E-Mail': 'eine ', 'Follow-up-E-Mail': 'eine ',
-    'Onboarding-E-Mail': 'eine ', 'Kundenservice-Antwort': 'eine ',
-    'Präsentation': 'eine ', 'Executive Summary': 'ein ', 'Bericht / Report': 'einen ',
-    'Angebot / Proposal': 'ein ', 'Meeting-Protokoll': 'ein ',
-    'Stellenanzeige': 'eine ', 'Bewerbungsschreiben': 'ein ',
-    'YouTube-Video': 'ein ', 'YouTube-Short-Skript': 'ein ',
-    'Podcast-Episode': 'eine ', 'Infografik': 'eine ',
-    'Webinar': 'ein ', 'Live-Stream': 'einen ',
-    'Slogan / Claim': 'einen ', 'Kurzgeschichte': 'eine ',
-    'Gedicht / Lyrik': 'ein ', 'Drehbuch / Skript': 'ein ',
-    'Online-Quiz': 'ein ', 'Chatbot': 'einen ', 'Online-Kurs': 'einen ',
-    'Erfahrungsbericht': 'einen ', 'Checkliste': 'eine ', 'Glossar / Lexikon': 'ein ',
-    'Produkttest / Review': 'einen ', 'Meta-Description (SEO)': 'eine ',
-    'Einladungsschreiben': 'ein ', 'Dankes-E-Mail': 'eine ',
-    'Unternehmensvorstellung': 'eine ', 'Vision & Mission Statement': 'ein ',
-    'Produktname / Naming': 'ein ',
-  };
+  // Mappings → src/mappings.js
 
   // ── Option label translations (value stays German key, display text translates) ──
   const OPTION_LABELS = {
@@ -406,40 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
   };
 
-  const ARTICLE_MAP_EN = {
-    'Artikel': 'an article', 'Blog-Post': 'a blog post',
-    'How-to-Anleitung': 'a how-to guide', 'Listicle (Top-X-Artikel)': 'a listicle',
-    'Interview': 'an interview', 'Whitepaper': 'a whitepaper',
-    'Case-Study': 'a case study', 'Pressemitteilung': 'a press release', 'E-Book': 'an e-book',
-    'Buchrezension': 'a book review', 'Zusammenfassung': 'a summary',
-    'Facebook-Beitrag': 'a Facebook post', 'Instagram-Beitrag': 'an Instagram caption',
-    'Story-Skript (Instagram / Facebook)': 'a story script', 'Carousel-Post': 'a carousel post',
-    'LinkedIn-Beitrag': 'a LinkedIn post', 'Twitter-Beitrag': 'a tweet',
-    'TikTok-Skript': 'a TikTok script', 'Reels-Skript': 'a Reels script',
-    'Threads-Beitrag': 'a Threads post', 'Xing-Beitrag': 'a Xing post',
-    'Produktbeschreibung': 'a product description', 'Verkaufstext / Sales Page': 'a sales page',
-    'Produktvergleich': 'a product comparison', 'FAQ-Seite': 'an FAQ page',
-    'Anzeige': 'an advertisement', 'SEO-Text': 'an SEO article',
-    'Newsletter': 'a newsletter', 'Landing Page': 'a landing page',
-    'E-Mail': 'an email', 'Kaltakquise-E-Mail': 'a cold outreach email',
-    'Follow-up-E-Mail': 'a follow-up email', 'Onboarding-E-Mail': 'an onboarding email',
-    'Kundenservice-Antwort': 'a customer service response',
-    'Präsentation': 'a presentation', 'Executive Summary': 'an executive summary',
-    'Bericht / Report': 'a report', 'Angebot / Proposal': 'a business proposal',
-    'Meeting-Protokoll': 'a meeting minutes document',
-    'Stellenanzeige': 'a job posting', 'Bewerbungsschreiben': 'a cover letter',
-    'YouTube-Video': 'a YouTube video description', 'YouTube-Short-Skript': 'a YouTube Shorts script',
-    'Podcast-Episode': 'a podcast episode outline',
-    'Infografik': 'an infographic', 'Webinar': 'a webinar', 'Live-Stream': 'a live stream script',
-    'Slogan / Claim': 'a slogan', 'Kurzgeschichte': 'a short story',
-    'Gedicht / Lyrik': 'a poem', 'Drehbuch / Skript': 'a script',
-    'Online-Quiz': 'an online quiz', 'Chatbot': 'a chatbot script', 'Online-Kurs': 'an online course outline',
-    'Erfahrungsbericht': 'a testimonial / experience report', 'Checkliste': 'a checklist',
-    'Glossar / Lexikon': 'a glossary', 'Produkttest / Review': 'a product review',
-    'Meta-Description (SEO)': 'a meta description', 'Einladungsschreiben': 'an invitation letter',
-    'Dankes-E-Mail': 'a thank-you email', 'Unternehmensvorstellung': 'a company introduction',
-    'Vision & Mission Statement': 'a vision & mission statement', 'Produktname / Naming': 'a product name concept',
-  };
+  // ARTICLE_MAP_EN → src/mappings.js
 
   // ── Preview groups ────────────────────────────────────────────────────────
   const PREVIEW_GROUPS = [
@@ -475,92 +356,15 @@ document.addEventListener('DOMContentLoaded', () => {
     { key: 'beispiel', icon: 'fa-lightbulb',     getValue: () => val('beispiel') },
   ];
 
-  // ── Build prompts ─────────────────────────────────────────────────────────
-  const buildFlowPrompt = () => {
-    const role = val('role-definition'),
-          type = val('content-type'), description = val('description'),
-          audience = val('target-audience'), length = val('content-length'),
-          formatting = val('formatting'), seo = val('seo-keyword-option'),
-          titleSub = val('title-subtitle-option'), perspective = val('perspective'),
-          addressForm = val('address-form'), style = val('language-style'),
-          emojis = val('emoji-option'), beispiel = val('beispiel');
-
-    if (!role && !type && !description) return '';
-    const s = [];
-
-    const _ctxDE = buildCtxPreviewText(loadProjectCtx());
-    if (_ctxDE) s.push(_ctxDE);
-    if (role) s.push(role.endsWith('.') || role.endsWith('!') || role.endsWith('?') ? role : role + '.');
-    if (type) s.push(`Erstelle ${(ARTICLE_MAP[type] ?? 'einen ')}${type}.`);
-    if (description && audience) s.push(`Das Thema lautet: ${description}. Die Zielgruppe sind ${audience}.`);
-    else if (description) s.push(`Das Thema lautet: ${description}.`);
-    else if (audience) s.push(`Die Zielgruppe sind ${audience}.`);
-
-    const fp = [];
-    if (length) fp.push(`Textlänge ${LENGTH_MAP[length] || length}`);
-    if (formatting) fp.push(`Formatierung als ${formatting}`);
-    if (seo === 'Ja') fp.push('inklusive SEO-Keywords');
-    if (titleSub === 'ja') fp.push('mit Titel und Untertitel');
-    if (emojis === 'keine') fp.push('ohne Emojis');
-    else if (emojis === 'wenige') fp.push('mit wenigen Emojis');
-    else if (emojis === 'viele') fp.push('mit vielen Emojis');
-    if (fp.length) s.push(`Verwende ${fp.join(', ')}.`);
-
-    const pp = [];
-    if (perspective) pp.push(perspective);
-    if (addressForm) pp.push(ADDRESS_MAP[addressForm] || addressForm);
-    if (pp.length) s.push(`Schreibe aus der ${pp.join(', in der ')}.`);
-    if (style) s.push(`Der Sprachstil soll ${style.toLowerCase()} sein.`);
-    if (beispiel) s.push(`Orientiere dich stilistisch an folgendem Beispiel: ${beispiel}`);
-
-    return s.join(' ');
-  };
-
-  const buildFlowPromptEN = () => {
-    const role = val('role-definition'),
-          type = val('content-type'), description = val('description'),
-          audience = val('target-audience'), length = val('content-length'),
-          formatting = val('formatting'), seo = val('seo-keyword-option'),
-          titleSub = val('title-subtitle-option'), perspective = val('perspective'),
-          addressForm = val('address-form'), style = val('language-style'),
-          emojis = val('emoji-option'), beispiel = val('beispiel');
-
-    if (!role && !type && !description) return '';
-    const s = [];
-
-    const _ctxEN = buildCtxPreviewText(loadProjectCtx());
-    if (_ctxEN) s.push(_ctxEN);
-    if (role) s.push(role.endsWith('.') || role.endsWith('!') || role.endsWith('?') ? role : role + '.');
-    if (type) s.push(`Create ${ARTICLE_MAP_EN[type] ?? 'a ' + type}.`);
-    if (description && audience)
-      s.push(`The topic is: ${description}. The target audience is ${AUDIENCE_MAP_EN[audience] || audience}.`);
-    else if (description) s.push(`The topic is: ${description}.`);
-    else if (audience) s.push(`The target audience is ${AUDIENCE_MAP_EN[audience] || audience}.`);
-
-    const fp = [];
-    if (length) fp.push(`text length: ${LENGTH_MAP_EN[length] || length}`);
-    if (formatting) fp.push(`format: ${FORMAT_MAP_EN[formatting] || formatting}`);
-    if (seo === 'Ja') fp.push('include SEO keywords');
-    if (titleSub === 'ja') fp.push('include title and subtitle');
-    if (emojis === 'keine') fp.push('no emojis');
-    else if (emojis === 'wenige') fp.push('few emojis');
-    else if (emojis === 'viele') fp.push('many emojis');
-    if (fp.length) s.push(`Use the following: ${fp.join(', ')}.`);
-
-    const pp = [];
-    if (perspective) pp.push(PERSPECTIVE_MAP_EN[perspective] || perspective);
-    if (addressForm) pp.push(ADDRESS_MAP_EN[addressForm] || addressForm);
-    if (pp.length) s.push(`Write from a ${pp.join(', ')} perspective.`);
-    if (style) s.push(`The tone should be ${STYLE_MAP_EN[style] || style.toLowerCase()}.`);
-    if (beispiel) s.push(`Stylistically, follow this example: ${beispiel}`);
-
-    return s.join(' ');
-  };
+  // buildFlowPrompt / buildFlowPromptEN → src/prompt-builder.js
 
   // ── Language state ────────────────────────────────────────────────────────
   let activeLang = 'de';
 
-  const getCurrentPrompt = () => activeLang === 'en' ? buildFlowPromptEN() : buildFlowPrompt();
+  const _fields = () => Object.fromEntries(FIELD_IDS.map(id => [id, val(id)]).filter(([, v]) => v));
+  const getCurrentPrompt = () => activeLang === 'en'
+    ? buildFlowPromptEN(_fields(), loadProjectCtx())
+    : buildFlowPrompt(_fields(), loadProjectCtx());
 
   if (langToggle) {
     langToggle.addEventListener('click', e => {
@@ -578,138 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  // ── Prompt Reverse-Engineer (Feature: Analysieren) ───────────────────────
-  const analyzePrompt = (text) => {
-    const result = {};
-
-    // Role / Persona
-    const rolePatterns = [
-      /(?:du bist|sie sind|agiere als|handele als)\s+([^.!?\n]{5,120})/i,
-      /(?:act as|you are|you're)\s+([^.!?\n]{5,120})/i,
-    ];
-    for (const p of rolePatterns) {
-      const m = text.match(p);
-      if (m) { result['role-definition'] = m[0].trim().replace(/[,.]$/, ''); break; }
-    }
-
-    // Content type
-    const typePatterns = [
-      { p: /pressemitteilung|press.?release/i,             v: 'Pressemitteilung' },
-      { p: /whitepaper/i,                                  v: 'Whitepaper' },
-      { p: /case.?stud/i,                                  v: 'Case-Study' },
-      { p: /newsletter/i,                                  v: 'Newsletter' },
-      { p: /landing.?page/i,                               v: 'Landing Page' },
-      { p: /linkedin/i,                                    v: 'LinkedIn-Beitrag' },
-      { p: /instagram/i,                                   v: 'Instagram-Beitrag' },
-      { p: /facebook/i,                                    v: 'Facebook-Beitrag' },
-      { p: /tweet|twitter/i,                               v: 'Twitter-Beitrag' },
-      { p: /tiktok/i,                                      v: 'TikTok-Skript' },
-      { p: /youtube/i,                                     v: 'YouTube-Video' },
-      { p: /podcast/i,                                     v: 'Podcast-Episode' },
-      { p: /executive.?summary/i,                          v: 'Executive Summary' },
-      { p: /bericht|report(?!\w)/i,                        v: 'Bericht / Report' },
-      { p: /stellenanzeige|job.?posting/i,                 v: 'Stellenanzeige' },
-      { p: /produktbeschreibung|product.?description/i,    v: 'Produktbeschreibung' },
-      { p: /seo.?text|seo.?artikel|seo.?article/i,        v: 'SEO-Text' },
-      { p: /how.?to|schritt.?für.?schritt|step.?by.?step/i, v: 'How-to-Anleitung' },
-      { p: /kaltakquise|cold.?outreach|cold.?email/i,     v: 'Kaltakquise-E-Mail' },
-      { p: /follow.?up/i,                                  v: 'Follow-up-E-Mail' },
-      { p: /e.?mail|email/i,                               v: 'E-Mail' },
-      { p: /präsentation|presentation/i,                   v: 'Präsentation' },
-      { p: /blog.?post|blogartikel/i,                      v: 'Blog-Post' },
-      { p: /artikel|article/i,                             v: 'Artikel' },
-    ];
-    for (const { p, v } of typePatterns) {
-      if (p.test(text)) { result['content-type'] = v; break; }
-    }
-
-    // Length
-    const wordMatch = text.match(/(\d+)\s*(?:wörter|wörtern|words)/i);
-    if (wordMatch) {
-      const n = parseInt(wordMatch[1]);
-      if (n <= 100)       result['content-length'] = 'Sehr kurz (50–100 Wörter)';
-      else if (n <= 300)  result['content-length'] = 'Kurz (100–300 Wörter)';
-      else if (n <= 600)  result['content-length'] = 'Mittel (300–600 Wörter)';
-      else if (n <= 1200) result['content-length'] = 'Lang (600–1.200 Wörter)';
-      else                result['content-length'] = 'Sehr lang (1.200+ Wörter)';
-    } else if (/\bkurz\b|brief|concise/i.test(text)) {
-      result['content-length'] = 'Kurz (100–300 Wörter)';
-    } else if (/ausführlich|detailliert|detailed|comprehensive|lang\b/i.test(text)) {
-      result['content-length'] = 'Lang (600–1.200 Wörter)';
-    }
-
-    // Style
-    const stylePatterns = [
-      { p: /wissenschaftlich|academic|scholarly/i,   v: 'Wissenschaftlich' },
-      { p: /journalistisch|journalistic/i,            v: 'Journalistisch' },
-      { p: /werblich|promotional/i,                   v: 'Werblich' },
-      { p: /technisch|technical/i,                    v: 'Technisch' },
-      { p: /humorvoll|humor|witzig|funny/i,           v: 'Humorvoll' },
-      { p: /inspir/i,                                 v: 'Inspirierend' },
-      { p: /emotiona/i,                               v: 'Emotional' },
-      { p: /motivier|motivat/i,                       v: 'Motivierend' },
-      { p: /sachlich|factual|neutral/i,               v: 'Sachlich' },
-      { p: /persönlich|personal/i,                    v: 'Persönlich' },
-      { p: /storytelling/i,                           v: 'Storytelling' },
-      { p: /formell|formal|professionell|professional/i, v: 'Formell' },
-      { p: /informell|locker|casual|informal/i,       v: 'Informell' },
-    ];
-    for (const { p, v } of stylePatterns) {
-      if (p.test(text)) { result['language-style'] = v; break; }
-    }
-
-    // Audience
-    const audiencePatterns = [
-      { p: /b2b.{0,20}entscheider|b2b.{0,20}decision/i, v: 'B2B-Entscheider' },
-      { p: /manager|führungskraft|executive|c-?level/i,  v: 'Manager & Führungskräfte' },
-      { p: /startup|gründer|founder/i,                   v: 'Gründer & Startups' },
-      { p: /it.?profes|entwickler|developer|programmer/i,v: 'IT-Professionals' },
-      { p: /senior|50\+|ältere/i,                        v: 'Senioren (50+ Jahre)' },
-      { p: /jugend|teenager|16.{0,3}25/i,                v: 'Jugendliche (16–25 Jahre)' },
-      { p: /schüler|student|auszubildend/i,              v: 'Schüler & Auszubildende (15–22 Jahre)' },
-      { p: /eltern|famili|parent|family/i,               v: 'Eltern & Familien' },
-      { p: /kreativ|designer|creative/i,                 v: 'Kreative & Designer' },
-      { p: /b2b|unternehmen|geschäftskund/i,             v: 'Manager & Führungskräfte' },
-    ];
-    for (const { p, v } of audiencePatterns) {
-      if (p.test(text)) { result['target-audience'] = v; break; }
-    }
-
-    // Formatting
-    if (/bullet.?point|aufzählung|stichpunkt/i.test(text))              result['formatting'] = 'Bullet Points';
-    else if (/tabelle|tabellarisch|table/i.test(text))                  result['formatting'] = 'Tabellarisch';
-    else if (/faq/i.test(text))                                         result['formatting'] = 'FAQ-Format (Frage & Antwort)';
-    else if (/checkliste|checklist/i.test(text))                        result['formatting'] = 'Checkliste / Aufgabenliste';
-    else if (/überschrift|heading|mit abschnitt/i.test(text))           result['formatting'] = 'Überschriften + Fließtext';
-
-    // SEO
-    if (/seo.?keyword|keyword|schlüsselwort/i.test(text))              result['seo-keyword-option'] = 'Ja';
-
-    // Emojis
-    if (/ohne emoji|no emoji/i.test(text))                             result['emoji-option'] = 'keine';
-    else if (/mit emoji|emojis|use emoji/i.test(text))                 result['emoji-option'] = 'wenige';
-
-    // Topic / Description — find the core sentence
-    const topicPatterns = [
-      /(?:zum thema|über das thema|thema\s*[:\-])\s*([^.!?\n]{10,200})/i,
-      /(?:topic\s*[:\-]|about\s*[:\-]?|über\s*[:\-]?)\s*([^.!?\n]{10,200})/i,
-    ];
-    for (const p of topicPatterns) {
-      const m = text.match(p);
-      if (m) { result['description'] = m[1].trim(); break; }
-    }
-    if (!result['description']) {
-      // Fall back: first non-command sentence of reasonable length
-      const sentences = text.split(/[.!?]/).map(s => s.trim())
-        .filter(s => s.length > 25 && !/^(?:du bist|you are|act as|erstelle|create|write|schreibe|erzeuge|generate)/i.test(s));
-      if (sentences[0]) {
-        const s = sentences[0];
-        result['description'] = s.length > 160 ? s.substring(0, 160) + '…' : s;
-      }
-    }
-
-    return result;
-  };
+  // analyzePrompt → src/analyzer.js
 
   // ── Projekt-Kontext ───────────────────────────────────────────────────────
   const loadProjectCtx = () => {
@@ -727,14 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dot.classList.toggle('d-none', !hasContent);
   };
 
-  const buildCtxPreviewText = (ctx) => {
-    if (!ctx.active) return '';
-    const parts = [];
-    if (ctx.company)  parts.push(`Firma/Projekt: ${ctx.company}`);
-    if (ctx.industry) parts.push(`Branche: ${ctx.industry}`);
-    if (ctx.extra)    parts.push(ctx.extra);
-    return parts.length ? `[Projekt-Kontext: ${parts.join(' · ')}]` : '';
-  };
+  // buildCtxPreviewText → src/prompt-builder.js
 
   const renderCtxPreview = () => {
     const box  = document.getElementById('ctx-preview-box');
@@ -1113,7 +779,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Feature 11: Recently used templates
-  const LS_RECENT_KEY = 'chati_recent';
   const loadRecent = () => { try { return JSON.parse(localStorage.getItem(LS_RECENT_KEY)) || []; } catch { return []; } };
   const saveRecent = (id, name, category) => {
     const items = loadRecent().filter(r => r.id !== id);
@@ -1773,8 +1438,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const compareModal = new bootstrap.Modal(document.getElementById('compareModal'));
 
   document.getElementById('btn-compare')?.addEventListener('click', () => {
-    document.getElementById('compare-text-de').textContent = buildFlowPrompt()   || '–';
-    document.getElementById('compare-text-en').textContent = buildFlowPromptEN() || '–';
+    const f = _fields(), ctx = loadProjectCtx();
+    document.getElementById('compare-text-de').textContent = buildFlowPrompt(f, ctx)   || '–';
+    document.getElementById('compare-text-en').textContent = buildFlowPromptEN(f, ctx) || '–';
     compareModal.show();
   });
 
@@ -1782,7 +1448,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = e.target.closest('.compare-copy-btn');
     if (!btn) return;
     const lang = btn.dataset.lang;
-    const text = lang === 'en' ? buildFlowPromptEN() : buildFlowPrompt();
+    const f = _fields(), ctx = loadProjectCtx();
+    const text = lang === 'en' ? buildFlowPromptEN(f, ctx) : buildFlowPrompt(f, ctx);
     try { await navigator.clipboard.writeText(text); } catch {
       const ta = Object.assign(document.createElement('textarea'),
         { value: text, style: 'position:fixed;opacity:0;' });
@@ -1834,8 +1501,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Feature 6: Onboarding Tour ────────────────────────────────────────────
-  const LS_ONBOARDED_KEY = 'chati_onboarded';
-
   const ONBOARDING_STEPS = [
     {
       icon: 'fa-wand-magic-sparkles',
@@ -1920,105 +1585,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.classList.contains('onboarding-backdrop')) closeOnboarding();
   });
 
-  // ── Prompt Variationen ────────────────────────────────────────────────────
-  const buildVariations = () => {
-    const type = val('content-type'), description = val('description'),
-          audience = val('target-audience'), length = val('content-length'),
-          formatting = val('formatting'), seo = val('seo-keyword-option'),
-          titleSub = val('title-subtitle-option'), perspective = val('perspective'),
-          addressForm = val('address-form'), style = val('language-style'),
-          emojis = val('emoji-option'), beispiel = val('beispiel');
-
-    if (!type && !description) return [];
-
-    if (uiLang === 'en') {
-      const art = ARTICLE_MAP_EN[type] ?? 'a ' + (type || '');
-      const fp = [];
-      if (length)   fp.push(LENGTH_MAP_EN[length] || length);
-      if (formatting) fp.push(FORMAT_MAP_EN[formatting] || formatting);
-      if (seo === 'Ja') fp.push('SEO keywords');
-      if (titleSub === 'ja') fp.push('title');
-      if (emojis === 'keine') fp.push('no emojis');
-      else if (emojis === 'wenige') fp.push('few emojis');
-      else if (emojis === 'viele') fp.push('many emojis');
-      const fmt = fp.join(', ');
-      const aud = AUDIENCE_MAP_EN[audience] || audience;
-      const sty = STYLE_MAP_EN[style] || style;
-
-      const v1 = [];
-      if (type) v1.push(`Write ${art}.`);
-      if (description) v1.push(`Topic: ${description}.`);
-      if (audience)    v1.push(`Audience: ${aud}.`);
-      if (fmt)         v1.push(`Format: ${fmt}.`);
-      if (style)       v1.push(`Style: ${sty}.`);
-      if (beispiel)    v1.push(`Reference: ${beispiel}`);
-
-      const v2 = [];
-      if (description) v2.push(`About "${description}": `);
-      if (type)        v2.push(`Write ${art}${audience ? ` for ${aud}` : ''}.`);
-      const det = [];
-      if (fmt)   det.push(fmt);
-      if (style) det.push(`${sty} tone`);
-      if (perspective) det.push(PERSPECTIVE_MAP_EN[perspective] || perspective);
-      if (det.length) v2.push(`Consider: ${det.join(', ')}.`);
-      if (beispiel) v2.push(`Base your style on: ${beispiel}`);
-
-      const v3 = [];
-      v3.push(style ? `You are a ${sty} copywriter.` : 'You are an experienced copywriter.');
-      if (type && description) v3.push(`Create ${art} about: ${description}.`);
-      else if (type)            v3.push(`Create ${art}.`);
-      if (audience) v3.push(`Target audience: ${aud}.`);
-      if (fmt)      v3.push(`Format: ${fmt}.`);
-      if (addressForm) v3.push(`Use ${ADDRESS_MAP_EN[addressForm] || addressForm} address form.`);
-      if (beispiel) v3.push(`Style reference: ${beispiel}`);
-
-      return [v1.join(' '), v2.join(''), v3.join(' ')].filter(v => v.trim().length > 5);
-    }
-
-    const art = ARTICLE_MAP[type] ?? 'einen ';
-    const fp = [];
-    if (length)   fp.push(LENGTH_MAP[length] || length);
-    if (formatting) fp.push(formatting);
-    if (seo === 'Ja') fp.push('SEO-Keywords');
-    if (titleSub === 'ja') fp.push('Titel');
-    if (emojis === 'keine') fp.push('keine Emojis');
-    else if (emojis === 'wenige') fp.push('wenige Emojis');
-    else if (emojis === 'viele') fp.push('viele Emojis');
-    const fmt = fp.join(', ');
-
-    const v1 = [];
-    if (type) v1.push(`Verfasse ${art}${type}.`);
-    if (description) v1.push(`Thema: ${description}.`);
-    if (audience)    v1.push(`Zielgruppe: ${audience}.`);
-    if (fmt)         v1.push(`Format: ${fmt}.`);
-    if (style)       v1.push(`Stil: ${style}.`);
-    if (beispiel)    v1.push(`Referenz: ${beispiel}`);
-
-    const v2 = [];
-    if (description) v2.push(`Zum Thema „${description}": `);
-    if (type)        v2.push(`Schreibe ${art}${type}${audience ? ` für ${audience}` : ''}.`);
-    const det = [];
-    if (fmt)   det.push(fmt);
-    if (style) det.push(`${style.toLowerCase()} Stil`);
-    if (perspective) det.push(perspective);
-    if (det.length) v2.push(`Berücksichtige: ${det.join(', ')}.`);
-    if (beispiel) v2.push(`Orientiere dich an: ${beispiel}`);
-
-    const v3 = [];
-    v3.push(style ? `Du bist ein ${style.toLowerCase()} schreibender Texter.` : 'Du bist ein erfahrener Texter.');
-    if (type && description) v3.push(`Erstelle ${art}${type} über: ${description}.`);
-    else if (type)            v3.push(`Erstelle ${art}${type}.`);
-    if (audience) v3.push(`Zielgruppe: ${audience}.`);
-    if (fmt)      v3.push(`Format: ${fmt}.`);
-    if (addressForm) v3.push(`Schreibe in der ${ADDRESS_MAP[addressForm] || addressForm}.`);
-    if (beispiel) v3.push(`Stilreferenz: ${beispiel}`);
-
-    return [v1.join(' '), v2.join(''), v3.join(' ')].filter(v => v.trim().length > 5);
-  };
+  // buildVariations → src/variations.js
 
   const showVariations = () => {
     const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
-    const vars = buildVariations();
+    const vars = buildVariations(_fields(), uiLang);
     const list = document.getElementById('variations-list');
     if (!list) return;
     if (!vars.length) {
@@ -2429,7 +2000,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fmLabel) fmLabel.textContent = focusMode ? t['btn.focusExit'] : t['btn.focus'];
 
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
-    try { localStorage.setItem('chati_ui_lang', lang); } catch {}
+    try { localStorage.setItem(LS_UI_LANG_KEY, lang); } catch {}
     renderCatalog(activeFilter);
     renderLibrary();
     renderPresets();
@@ -2912,9 +2483,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-inspire')?.addEventListener('click', inspireRandom);
 
   // ── Persona-Vault (Feature: Persona-Vault v1.9) ───────────────────────────
-  const LS_VAULT_KEY = 'chati_vault';
-  const VAULT_MAX    = 10;
-
   const loadVault = () => {
     try { return JSON.parse(localStorage.getItem(LS_VAULT_KEY)) || []; } catch { return []; }
   };
