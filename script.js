@@ -10,6 +10,15 @@ import {
 import { analyzePrompt } from './src/analyzer.js';
 import { buildFlowPrompt, buildFlowPromptEN, buildCtxPreviewText } from './src/prompt-builder.js';
 import { buildVariations } from './src/variations.js';
+import {
+  FIELD_IDS, LS_FORM_KEY, LS_HISTORY_KEY, LS_LIBRARY_KEY,
+  LS_PRESETS_KEY, LS_FAVORITES_KEY, LS_THEME_KEY, LS_PROJECT_CTX,
+  LS_RECENT_KEY, LS_ONBOARDED_KEY, LS_VAULT_KEY, LS_UI_LANG_KEY,
+  HISTORY_MAX, VAULT_MAX, THEMES, STEP_BODIES,
+} from './src/constants.js';
+import { Storage } from './src/storage.js';
+import { getFormState } from './src/state.js';
+import { calculateScore } from './src/score.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -69,27 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reverseModal     = new bootstrap.Modal(document.getElementById('reverseModal'));
   const projectCtxCanvas = new bootstrap.Offcanvas(document.getElementById('projectCtxOffcanvas'));
 
-  // ── Constants ─────────────────────────────────────────────────────────────
-  const FIELD_IDS = [
-    'role-definition',
-    'content-type', 'description', 'content-length', 'target-audience',
-    'language-style', 'perspective', 'emoji-option', 'address-form',
-    'formatting', 'seo-keyword-option', 'title-subtitle-option', 'beispiel',
-  ];
-
-  const LS_FORM_KEY      = 'chati_form';
-  const LS_HISTORY_KEY   = 'chati_history';
-  const LS_LIBRARY_KEY   = 'chati_library';
-  const LS_PRESETS_KEY   = 'chati_presets';
-  const LS_FAVORITES_KEY  = 'chati_favorites';
-  const LS_THEME_KEY      = 'chati_theme';
-  const LS_PROJECT_CTX    = 'chati_project_ctx';
-  const LS_RECENT_KEY     = 'chati_recent';
-  const LS_ONBOARDED_KEY  = 'chati_onboarded';
-  const LS_VAULT_KEY      = 'chati_vault';
-  const LS_UI_LANG_KEY    = 'chati_ui_lang';
-  const HISTORY_MAX     = 8;
-  const VAULT_MAX       = 10;
+  // Constants → src/constants.js
 
   const val = (id) => (document.getElementById(id)?.value ?? '').trim();
 
@@ -361,10 +350,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Language state ────────────────────────────────────────────────────────
   let activeLang = 'de';
 
-  const _fields = () => Object.fromEntries(FIELD_IDS.map(id => [id, val(id)]).filter(([, v]) => v));
   const getCurrentPrompt = () => activeLang === 'en'
-    ? buildFlowPromptEN(_fields(), loadProjectCtx())
-    : buildFlowPrompt(_fields(), loadProjectCtx());
+    ? buildFlowPromptEN(getFormState(), loadProjectCtx())
+    : buildFlowPrompt(getFormState(), loadProjectCtx());
 
   if (langToggle) {
     langToggle.addEventListener('click', e => {
@@ -385,12 +373,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // analyzePrompt → src/analyzer.js
 
   // ── Projekt-Kontext ───────────────────────────────────────────────────────
-  const loadProjectCtx = () => {
-    try { return JSON.parse(localStorage.getItem(LS_PROJECT_CTX)) || {}; } catch { return {}; }
-  };
-  const saveProjectCtxData = (data) => {
-    try { localStorage.setItem(LS_PROJECT_CTX, JSON.stringify(data)); } catch {}
-  };
+  const loadProjectCtx = () => Storage.get(LS_PROJECT_CTX, {});
+  const saveProjectCtxData = (data) => Storage.set(LS_PROJECT_CTX, data);
 
   const renderProjectCtxDot = () => {
     const dot = document.getElementById('project-ctx-dot');
@@ -574,13 +558,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Score dots ────────────────────────────────────────────────────────────
   const refreshScore = () => {
     if (!scoreDots) return;
-    let count = 0;
+    const { count, filled } = calculateScore(getFormState());
     PREVIEW_GROUPS.forEach(g => {
       const dot = scoreDots.querySelector(`[data-step="${g.key}"]`);
-      if (!dot) return;
-      const has = Boolean(g.getValue());
-      dot.className = 'score-dot' + (has ? ` filled--${g.key}` : '');
-      if (has) count++;
+      if (dot) dot.className = 'score-dot' + (filled[g.key] ? ` filled--${g.key}` : '');
     });
     if (scoreCounter) {
       scoreCounter.textContent = `${count}/6`;
@@ -650,21 +631,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── localStorage persistence ──────────────────────────────────────────────
   const saveForm = () => {
-    try {
-      const data = {};
-      FIELD_IDS.forEach(id => { const v = val(id); if (v) data[id] = v; });
-      localStorage.setItem(LS_FORM_KEY, JSON.stringify(data));
-    } catch {}
+    const data = {};
+    FIELD_IDS.forEach(id => { const v = val(id); if (v) data[id] = v; });
+    Storage.set(LS_FORM_KEY, data);
   };
 
   const restoreForm = () => {
-    try {
-      const data = JSON.parse(localStorage.getItem(LS_FORM_KEY) || '{}');
-      FIELD_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && data[id] !== undefined) el.value = data[id];
-      });
-    } catch {}
+    const data = Storage.get(LS_FORM_KEY, {});
+    FIELD_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && data[id] !== undefined) el.value = data[id];
+    });
   };
 
   // ── URL sharing ───────────────────────────────────────────────────────────
@@ -696,9 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ── Prompt history ────────────────────────────────────────────────────────
-  const loadHistory = () => {
-    try { return JSON.parse(localStorage.getItem(LS_HISTORY_KEY)) || []; } catch { return []; }
-  };
+  const loadHistory = () => Storage.get(LS_HISTORY_KEY, []);
 
   const addToHistory = (text) => {
     const items = loadHistory();
@@ -709,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
       lang: activeLang,
       time: now.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
     });
-    try { localStorage.setItem(LS_HISTORY_KEY, JSON.stringify(items.slice(0, HISTORY_MAX))); } catch {}
+    Storage.set(LS_HISTORY_KEY, items.slice(0, HISTORY_MAX));
   };
 
   const renderHistory = () => {
@@ -758,9 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Prompt Library ────────────────────────────────────────────────────────
-  const loadLibrary = () => {
-    try { return JSON.parse(localStorage.getItem(LS_LIBRARY_KEY)) || []; } catch { return []; }
-  };
+  const loadLibrary = () => Storage.get(LS_LIBRARY_KEY, []);
 
   const saveToLibrary = (title, text) => {
     const items = loadLibrary();
@@ -775,15 +748,15 @@ document.addEventListener('DOMContentLoaded', () => {
       category: val('content-type') || '', // Feature 4: store category
       time: now.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
     });
-    try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(items)); } catch {}
+    Storage.set(LS_LIBRARY_KEY, items);
   };
 
   // Feature 11: Recently used templates
-  const loadRecent = () => { try { return JSON.parse(localStorage.getItem(LS_RECENT_KEY)) || []; } catch { return []; } };
+  const loadRecent = () => Storage.get(LS_RECENT_KEY, []);
   const saveRecent = (id, name, category) => {
     const items = loadRecent().filter(r => r.id !== id);
     items.unshift({ id, name, category });
-    try { localStorage.setItem(LS_RECENT_KEY, JSON.stringify(items.slice(0, 5))); } catch {}
+    Storage.set(LS_RECENT_KEY, items.slice(0, 5));
   };
 
   const renderLibrary = () => {
@@ -901,13 +874,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.closest('.lib-btn-duplicate')) {
       const copy = { ...entry, id: Date.now(), title: entry.title + ' (Kopie)' };
       const updated = [copy, ...items];
-      try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(updated)); } catch {}
+      Storage.set(LS_LIBRARY_KEY, updated);
       renderLibrary();
     }
 
     if (e.target.closest('.lib-btn-delete')) {
       const updated = items.filter(i => i.id !== idNum);
-      try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(updated)); } catch {}
+      Storage.set(LS_LIBRARY_KEY, updated);
       renderLibrary();
     }
   });
@@ -941,7 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
     FIELD_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     activeCardId = null;
     renderCatalog(activeFilter);
-    try { localStorage.removeItem(LS_FORM_KEY); } catch {}
+    Storage.remove(LS_FORM_KEY);
     refreshPreview();
     // Show undo toast with translated label
     const resetSpan = document.querySelector('#undo-toast [data-i18n="toast.reset"]');
@@ -969,7 +942,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Theme system ──────────────────────────────────────────────────────────
-  const THEMES = ['light', 'dark', 'ocean', 'violet', 'forest'];
   const THEME_ICONS = {
     light: 'fa-solid fa-sun', dark: 'fa-solid fa-moon',
     ocean: 'fa-solid fa-water', violet: 'fa-solid fa-star',
@@ -983,7 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.theme-swatch').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.themeValue === name)
     );
-    try { localStorage.setItem(LS_THEME_KEY, name); } catch {}
+    Storage.setString(LS_THEME_KEY, name);
   };
 
   document.querySelectorAll('.theme-swatch').forEach(btn =>
@@ -999,15 +971,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const getActiveCatalog = () => (uiLang === 'en' && typeof PROMPT_CATALOG_EN !== 'undefined') ? PROMPT_CATALOG_EN : PROMPT_CATALOG;
 
   // ── Favorites ─────────────────────────────────────────────────────────────
-  const loadFavorites = () => {
-    try { return JSON.parse(localStorage.getItem(LS_FAVORITES_KEY)) || []; } catch { return []; }
-  };
+  const loadFavorites = () => Storage.get(LS_FAVORITES_KEY, []);
 
   const toggleFavorite = (id) => {
     const favs = loadFavorites();
     const idx = favs.indexOf(id);
     if (idx === -1) favs.push(id); else favs.splice(idx, 1);
-    try { localStorage.setItem(LS_FAVORITES_KEY, JSON.stringify(favs)); } catch {}
+    Storage.set(LS_FAVORITES_KEY, favs);
     renderCatalog(activeFilter);
   };
 
@@ -1161,7 +1131,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ── Guided mode helpers ────────────────────────────────────────────────────
-  const STEP_BODIES = ['body-aufgabe', 'body-kontext', 'body-format', 'body-persona', 'body-tonfall', 'body-beispiel'];
 
   const openSection = (id) => {
     const body = document.getElementById(id);
@@ -1438,7 +1407,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const compareModal = new bootstrap.Modal(document.getElementById('compareModal'));
 
   document.getElementById('btn-compare')?.addEventListener('click', () => {
-    const f = _fields(), ctx = loadProjectCtx();
+    const f = getFormState(), ctx = loadProjectCtx();
     document.getElementById('compare-text-de').textContent = buildFlowPrompt(f, ctx)   || '–';
     document.getElementById('compare-text-en').textContent = buildFlowPromptEN(f, ctx) || '–';
     compareModal.show();
@@ -1448,7 +1417,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = e.target.closest('.compare-copy-btn');
     if (!btn) return;
     const lang = btn.dataset.lang;
-    const f = _fields(), ctx = loadProjectCtx();
+    const f = getFormState(), ctx = loadProjectCtx();
     const text = lang === 'en' ? buildFlowPromptEN(f, ctx) : buildFlowPrompt(f, ctx);
     try { await navigator.clipboard.writeText(text); } catch {
       const ta = Object.assign(document.createElement('textarea'),
@@ -1568,7 +1537,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeOnboarding = () => {
     const overlay = document.getElementById('onboarding-overlay');
     overlay?.classList.add('d-none');
-    try { localStorage.setItem(LS_ONBOARDED_KEY, '1'); } catch {}
+    Storage.setString(LS_ONBOARDED_KEY, '1');
   };
 
   document.getElementById('btn-onboarding-next')?.addEventListener('click', () => {
@@ -1589,7 +1558,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const showVariations = () => {
     const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
-    const vars = buildVariations(_fields(), uiLang);
+    const vars = buildVariations(getFormState(), uiLang);
     const list = document.getElementById('variations-list');
     if (!list) return;
     if (!vars.length) {
@@ -1647,7 +1616,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'lbl.example': 'Stilreferenz oder Beispieltext',
       'preview.title': 'Live-Vorschau', 'tab.visual': 'Visuell', 'tab.flow': 'Prompt',
       'btn.copy': 'Kopieren', 'btn.share': 'Teilen', 'btn.fullscreen': 'Vollansicht',
-      'btn.export': 'Exportieren', 'btn.variations': 'Variationen',
+      'btn.variations': 'Variationen',
       'lbl.openin': 'Öffnen in', 'btn.reset': 'Zurücksetzen',
       'modal.title': 'Generierter Prompt', 'btn.close': 'Schließen',
       'history.title': 'Prompt-Verlauf', 'history.empty': 'Noch keine Prompts generiert.',
@@ -1692,7 +1661,6 @@ document.addEventListener('DOMContentLoaded', () => {
       'presets.save.label': 'Aktuelle Einstellungen speichern als:',
       'presets.save.placeholder': 'z.B. Blog-Post Vorlage',
       'presets.save.btn': 'Speichern',
-      'presets.save.hint': 'Speichert alle 12 Formularfelder als wiederverwendbare Vorlage.',
       'presets.empty': 'Noch keine Vorlagen gespeichert.',
       'presets.emptyhint': 'Fülle das Formular aus und speichere deine Einstellungen als Vorlage.',
       'presets.btn.load': 'Laden', 'presets.btn.delete': 'Löschen',
@@ -1811,7 +1779,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'lbl.example': 'Style Reference or Example Text',
       'preview.title': 'Live Preview', 'tab.visual': 'Visual', 'tab.flow': 'Prompt',
       'btn.copy': 'Copy', 'btn.share': 'Share', 'btn.fullscreen': 'Full View',
-      'btn.export': 'Export', 'btn.variations': 'Variations',
+      'btn.variations': 'Variations',
       'lbl.openin': 'Open in', 'btn.reset': 'Reset',
       'modal.title': 'Generated Prompt', 'btn.close': 'Close',
       'history.title': 'Prompt History', 'history.empty': 'No prompts generated yet.',
@@ -1856,7 +1824,6 @@ document.addEventListener('DOMContentLoaded', () => {
       'presets.save.label': 'Save current settings as:',
       'presets.save.placeholder': 'e.g. Blog Post Template',
       'presets.save.btn': 'Save',
-      'presets.save.hint': 'Saves all 12 form fields as a reusable template.',
       'presets.empty': 'No templates saved yet.',
       'presets.emptyhint': 'Fill in the form and save your settings as a template.',
       'presets.btn.load': 'Load', 'presets.btn.delete': 'Delete',
@@ -2000,7 +1967,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fmLabel) fmLabel.textContent = focusMode ? t['btn.focusExit'] : t['btn.focus'];
 
     if (uiLangLabel) uiLangLabel.textContent = lang === 'de' ? 'EN' : 'DE';
-    try { localStorage.setItem(LS_UI_LANG_KEY, lang); } catch {}
+    Storage.setString(LS_UI_LANG_KEY, lang);
     renderCatalog(activeFilter);
     renderLibrary();
     renderPresets();
@@ -2059,7 +2026,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingIds = new Set(existing.map(i => i.id));
         const newItems = imported.filter(i => i.id && i.title && i.text && !existingIds.has(i.id));
         const merged = [...newItems, ...existing];
-        try { localStorage.setItem(LS_LIBRARY_KEY, JSON.stringify(merged)); } catch {}
+        Storage.set(LS_LIBRARY_KEY, merged);
         renderLibrary();
         const span = document.getElementById('import-toast-text');
         const t = UI_STRINGS[uiLang] || UI_STRINGS.de;
@@ -2077,16 +2044,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Personal Presets (Field-Presets) ──────────────────────────────────────
-  const loadPresets = () => {
-    try { return JSON.parse(localStorage.getItem(LS_PRESETS_KEY)) || []; } catch { return []; }
-  };
+  const loadPresets = () => Storage.get(LS_PRESETS_KEY, []);
 
   const savePreset = (name) => {
     const fields = Object.fromEntries(FIELD_IDS.map(id => [id, val(id)]).filter(([, v]) => v));
     if (!Object.keys(fields).length) return false;
     const presets = loadPresets();
     presets.unshift({ id: Date.now(), name, fields });
-    try { localStorage.setItem(LS_PRESETS_KEY, JSON.stringify(presets)); return true; } catch { return false; }
+    try { Storage.set(LS_PRESETS_KEY, presets); return true; } catch { return false; }
   };
 
   const renderPresets = () => {
@@ -2104,7 +2069,7 @@ document.addEventListener('DOMContentLoaded', () => {
       div.innerHTML = `
         <div class="library-item__header">
           <span class="library-item__title">${esc(preset.name)}</span>
-          <span class="catalog-card__badge" style="font-size:.7rem;">${fieldCount}/12 ${uiLang === 'en' ? 'fields' : 'Felder'}</span>
+          <span class="catalog-card__badge" style="font-size:.7rem;">${fieldCount}/${FIELD_IDS.length} ${uiLang === 'en' ? 'fields' : 'Felder'}</span>
         </div>
         <div class="library-item__btns">
           <button class="action-btn action-btn--primary preset-btn-load" data-pid="${preset.id}">
@@ -2143,7 +2108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (e.target.closest('.preset-btn-delete')) {
       const updated = presets.filter(p => p.id !== pid);
-      try { localStorage.setItem(LS_PRESETS_KEY, JSON.stringify(updated)); } catch {}
+      Storage.set(LS_PRESETS_KEY, updated);
       renderPresets();
     }
   });
@@ -2483,13 +2448,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-inspire')?.addEventListener('click', inspireRandom);
 
   // ── Persona-Vault (Feature: Persona-Vault v1.9) ───────────────────────────
-  const loadVault = () => {
-    try { return JSON.parse(localStorage.getItem(LS_VAULT_KEY)) || []; } catch { return []; }
-  };
+  const loadVault = () => Storage.get(LS_VAULT_KEY, []);
 
-  const saveVaultData = (items) => {
-    try { localStorage.setItem(LS_VAULT_KEY, JSON.stringify(items)); } catch {}
-  };
+  const saveVaultData = (items) => Storage.set(LS_VAULT_KEY, items);
 
   const renderVault = () => {
     const chips = document.getElementById('persona-chips');
@@ -2784,21 +2745,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Init ──────────────────────────────────────────────────────────────────
 
   // Theme first (before paint)
-  try {
-    const t = localStorage.getItem(LS_THEME_KEY);
-    applyTheme(THEMES.includes(t) ? t : 'light');
-  } catch { applyTheme('light'); }
+  const savedTheme = Storage.getString(LS_THEME_KEY);
+  applyTheme(THEMES.includes(savedTheme) ? savedTheme : 'light');
 
   // Bootstrap Tooltips initialisieren
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el =>
     new bootstrap.Tooltip(el, { trigger: 'hover focus' })
   );
 
-  // UI-Sprache aus localStorage laden
-  try {
-    const savedUiLang = localStorage.getItem('chati_ui_lang');
-    if (savedUiLang && savedUiLang !== 'de') applyUILang(savedUiLang);
-  } catch {}
+  // UI-Sprache laden
+  const savedUiLang = Storage.getString(LS_UI_LANG_KEY);
+  if (savedUiLang && savedUiLang !== 'de') applyUILang(savedUiLang);
 
   renderCatalog();
   catalogBody.style.maxHeight = 'none';
@@ -2828,11 +2785,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Feature 6: Start onboarding on first visit
-  try {
-    if (!localStorage.getItem(LS_ONBOARDED_KEY)) {
-      setTimeout(startOnboarding, 800);
-    }
-  } catch { /* private mode */ }
+  if (!Storage.getString(LS_ONBOARDED_KEY)) {
+    setTimeout(startOnboarding, 800);
+  }
 
   // Persona-Vault
   renderVault();
