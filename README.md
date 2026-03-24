@@ -141,14 +141,31 @@ Keine serverseitige Logik. Keine Build-Tools. Keine Abhängigkeiten außer CDN-L
 
 ```
 Chati/
-├── index.html      # Haupt-HTML: Struktur, Modals, Offcanvas, Toasts
-├── styles.css      # Gesamtes Styling: Custom Properties, Komponenten, Themes, Responsive
-├── script.js       # Formular-Logik, Live-Vorschau, Bibliothek, i18n, Vault, Coach
-├── catalog.js      # Prompt-Katalog: DE + EN Vorlagen als JS-Array
-├── examples.js     # Community-Beispiel-Prompts inkl. Microsoft Copilot
-├── manifest.json   # PWA Web App Manifest
-├── sw.js           # Service Worker (Offline-Support)
-├── icon.svg        # App-Icon (PWA)
+├── index.html              # App-Shell: HTML, Modals, Offcanvas, Toasts
+├── styles.css              # Styling: Custom Properties, Themes, Responsive
+├── script.js               # Haupt-Controller: DOM-Wiring, Event-Handler
+├── catalog.js              # Prompt-Katalog: DE + EN Vorlagen
+├── examples.js             # Community-Beispiel-Prompts
+├── manifest.json           # PWA Web App Manifest
+├── sw.js                   # Service Worker (Offline-Support)
+├── icon.svg                # App-Icon (PWA)
+├── vite.config.js          # Vitest Test-Runner-Konfiguration
+├── package.json            # npm-Metadaten + Test-Scripts
+├── src/
+│   ├── app.js              # ES-Modul-Einstiegspunkt
+│   ├── constants.js        # Gemeinsame Konstanten (Feld-IDs, LS-Keys, Themes)
+│   ├── mappings.js         # Übersetzungs- / Artikel-Maps
+│   ├── prompt-builder.js   # Reine Prompt-Erstellung (DE + EN)
+│   ├── analyzer.js         # Prompt-Reverse-Engineer (Regex-basiert)
+│   ├── score.js            # 6-Gruppen-Qualitätsbewertung
+│   ├── variations.js       # Alternative Prompt-Formulierungen
+│   ├── storage.js          # localStorage-Wrapper
+│   ├── state.js            # Formular-Status-Brücke
+│   ├── i18n.js             # UI_STRINGS + OPTION_LABELS (DE/EN)
+│   ├── coach.js            # Mini-Prompt-Coach-Tipps
+│   ├── onboarding-data.js  # Onboarding-Tour-Schritte
+│   ├── inspire.js          # Zufällige Inspirationsdaten
+│   └── __tests__/          # Vitest-Testsuiten
 └── README.md
 ```
 
@@ -308,6 +325,13 @@ In `examples.js` ein weiteres Objekt ans `LIBRARY_EXAMPLES`-Array anhängen:
 ## Mitwirken
 
 Pull Requests und Issues sind willkommen. Bitte vor größeren Änderungen zuerst ein Issue öffnen.
+
+### Tests ausführen
+
+```bash
+npm install
+npm test
+```
 
 ---
 
