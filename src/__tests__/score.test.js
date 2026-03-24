@@ -79,4 +79,24 @@ describe('calculateScore', () => {
     expect(count).toBe(6);
     expect(label).toBe('ausgezeichnet');
   });
+
+  it('returns filled map with per-group booleans', () => {
+    const { filled } = calculateScore({
+      'content-type': 'Blog-Post',
+      'description': 'KI-Tools',
+      'language-style': 'Sachlich',
+    });
+    expect(filled.aufgabe).toBe(true);
+    expect(filled.kontext).toBe(true);
+    expect(filled.format).toBe(false);
+    expect(filled.persona).toBe(false);
+    expect(filled.tonfall).toBe(true);
+    expect(filled.beispiel).toBe(false);
+  });
+
+  it('returns all-false filled map for empty fields', () => {
+    const { filled } = calculateScore({});
+    expect(Object.values(filled).every(v => v === false)).toBe(true);
+    expect(Object.keys(filled)).toEqual(['aufgabe', 'kontext', 'format', 'persona', 'tonfall', 'beispiel']);
+  });
 });
