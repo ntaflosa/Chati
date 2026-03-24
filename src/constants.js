@@ -32,3 +32,9 @@ export const STEP_BODIES = [
   'body-tonfall',
   'body-beispiel',
 ];
+
+export const THEME_ICONS = {
+  light: 'fa-solid fa-sun', dark: 'fa-solid fa-moon',
+  ocean: 'fa-solid fa-water', violet: 'fa-solid fa-star',
+  forest: 'fa-solid fa-leaf',
+};
