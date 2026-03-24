@@ -23,6 +23,10 @@ const ASSETS = [
   './src/analyzer.js',
   './src/score.js',
   './src/variations.js',
+  './src/i18n.js',
+  './src/coach.js',
+  './src/onboarding-data.js',
+  './src/inspire.js',
 ];
 
 self.addEventListener('install', e => {
